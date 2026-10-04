@@ -232,6 +232,7 @@ box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
 @media(max-width:800px){.pro-hero-grid{grid-template-columns:1fr}.pro-command{grid-template-columns:1fr}.photo-preview{grid-template-columns:repeat(2,1fr)}}
 
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
@@ -1871,8 +1872,248 @@ document.addEventListener("DOMContentLoaded",()=>{
  setTimeout(()=>{if(currentUser)proWelcome();},350);
 });
 
-\n/* =========================================================\n   ESTATEAI PRO — SUPABASE CLOUD LEADS\n========================================================= */\nconst SUPABASE_URL = "https://butmgtzgxllieevzgsqo.supabase.co";\nconst SUPABASE_PUBLISHABLE_KEY = "sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";\nconst estateSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);\n\nasync function cloudLoadLeads(){\n  try{\n    const {data,error}=await estateSupabase.from("leads").select("*").order("created_at",{ascending:false});\n    if(error){ console.error("Supabase load error",error); return; }\n    if(Array.isArray(data)){\n      db.leads=data.map(x=>({\n        id:Number(x.id), name:x.name||"", phone:x.phone||"",\n        type:x.type||"Buyer", location:x.location||x.address||"",\n        budget:x.budget||"", requirement:x.requirement||x.details||"",\n        status:x.status||"New", source:x.source||"Manual", score:Number(x.score||0),\n        created_at:x.created_at||new Date().toISOString()\n      }));\n      saveDB();\n      if(currentUser && typeof currentPage!=="undefined") showPage(currentPage);\n    }\n  }catch(e){ console.error("Cloud load exception",e); }\n}\n\nasync function cloudSaveLead(lead){\n  const row={\n    id:Number(lead.id), name:lead.name||"", phone:lead.phone||"",\n    type:lead.type||"Buyer", location:lead.location||"", budget:lead.budget||"",\n    requirement:lead.requirement||"", status:lead.status||"New",\n    source:lead.source||"Manual", score:Number(lead.score||0)\n  };\n  const {error}=await estateSupabase.from("leads").upsert(row,{onConflict:"id"});\n  if(error){ console.error("Supabase save error",error); return false; }\n  return true;\n}\n\nasync function cloudDeleteLead(id){\n  const {error}=await estateSupabase.from("leads").delete().eq("id",Number(id));\n  if(error){ console.error("Supabase delete error",error); return false; }\n  return true;\n}\n\n/* Override lead save so every add/edit is sent to Supabase. */\nwindow.saveLead=async function(e,id){\n  e.preventDefault();\n  const obj={\n    id:id?Number(id):uid(),\n    name:document.getElementById("lName").value,\n    phone:document.getElementById("lPhone").value,\n    type:document.getElementById("lType").value,\n    location:document.getElementById("lLocation").value,\n    budget:document.getElementById("lBudget").value,\n    source:document.getElementById("lSource").value,\n    status:document.getElementById("lStatus").value,\n    score:Number(document.getElementById("lScore").value)||0,\n    requirement:document.getElementById("lReq").value,\n    created_at:new Date().toISOString()\n  };\n  if(id){\n    const i=db.leads.findIndex(l=>Number(l.id)===Number(id));\n    if(i>=0) db.leads[i]={...db.leads[i],...obj};\n    addActivity("Lead updated: "+obj.name);\n  }else{\n    db.leads.unshift(obj);\n    addActivity("New lead added: "+obj.name);\n  }\n  saveDB();\n  const ok=await cloudSaveLead(obj);\n  closeModal(); showPage("leads");\n  toast(ok?"✓ Lead saved to cloud":"Lead saved locally; cloud save failed");\n};\n\nwindow.deleteLead=async function(id){\n  if(!isAdmin()) return toast("Admin access required");\n  const l=db.leads.find(x=>Number(x.id)===Number(id));\n  if(!l) return;\n  if(confirm("Delete this lead permanently?")){\n    if(!(await cloudDeleteLead(id))) return toast("Cloud delete failed");\n    db.leads=db.leads.filter(x=>Number(x.id)!==Number(id));\n    saveDB(); showPage("leads"); toast("✓ Lead deleted from cloud");\n  }\n};\n\nwindow.changeLeadStatus=async function(id,status){\n  const l=db.leads.find(x=>Number(x.id)===Number(id));\n  if(!l) return;\n  l.status=status; addActivity(`${l.name} moved to ${status}`); saveDB();\n  const ok=await cloudSaveLead(l);\n  showPage("leads"); toast(ok?"✓ Lead status synced":"Status saved locally; cloud sync failed");\n};\n\n/* Existing social conversion also becomes cloud-persistent. */\nwindow.convertSocialLead=async function(id){\n  const x=db.socialInbox.find(a=>Number(a.id)===Number(id));\n  if(!x) return;\n  const lead={\n    id:uid(), name:x.name||"", phone:x.phone||"",\n    type:x.intent==="Sell"?"Seller":"Buyer", location:x.location||"",\n    budget:"", requirement:x.message||"", status:"New",\n    source:x.source||"Social", score:60, created_at:new Date().toISOString()\n  };\n  if(!(await cloudSaveLead(lead))) return toast("Cloud save failed");\n  db.leads.unshift(lead); addActivity("Social lead converted: "+lead.name);\n  saveDB(); showPage("leads"); toast("✓ Social lead saved to cloud");\n};\n\ndocument.addEventListener("DOMContentLoaded",()=>{\n  setTimeout(()=>cloudLoadLeads(),1200);\n});\n
 </script>
 
+
+<script>
+/* =========================================================
+   ESTATEAI CLOUD LEADS - SUPABASE
+   Login remains local; leads are stored in Supabase.
+========================================================= */
+(function(){
+  const SUPABASE_URL = "https://butmgtzgxllieevzgsqo.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
+  let cloudClient = null;
+  let cloudReady = false;
+
+  function initCloud(){
+    try{
+      if(!window.supabase || !window.supabase.createClient){
+        console.warn("EstateAI: Supabase library not loaded");
+        return false;
+      }
+      cloudClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+      cloudReady = true;
+      return true;
+    }catch(err){
+      console.error("EstateAI: Supabase init failed",err);
+      return false;
+    }
+  }
+
+  function leadRow(lead){
+    return {
+      id:Number(lead.id),
+      name:lead.name || "",
+      phone:lead.phone || "",
+      type:lead.type || "Buyer",
+      location:lead.location || "",
+      budget:lead.budget || "",
+      source:lead.source || "Manual",
+      status:lead.status || "New",
+      score:Number(lead.score || 0),
+      requirement:lead.requirement || "",
+      created_at:lead.created_at || new Date().toISOString()
+    };
+  }
+
+  function normalizeLead(x){
+    return {
+      id:Number(x.id), name:x.name||"", phone:x.phone||"",
+      type:x.type||"Buyer", location:x.location||x.address||"",
+      budget:x.budget||"", source:x.source||"Manual",
+      status:x.status||"New", score:Number(x.score||0),
+      requirement:x.requirement||x.details||"",
+      created_at:x.created_at||new Date().toISOString()
+    };
+  }
+
+  async function cloudLoadLeads(){
+    if(!cloudReady && !initCloud()) return false;
+    try{
+      const {data,error}=await cloudClient.from("leads").select("*").order("created_at",{ascending:false});
+      if(error){
+        console.error("EstateAI cloud load error:",error);
+        return false;
+      }
+      if(Array.isArray(data)){
+        db.leads=data.map(normalizeLead);
+        saveDB();
+        if(currentUser) showPage(currentPage||"dashboard");
+        console.log("EstateAI cloud leads loaded:",db.leads.length);
+      }
+      return true;
+    }catch(err){
+      console.error("EstateAI cloud load exception:",err);
+      return false;
+    }
+  }
+
+  async function migrateLocalLeadsIfCloudEmpty(){
+    if(!cloudReady && !initCloud()) return false;
+    try{
+      const {data,error}=await cloudClient.from("leads").select("id").limit(1);
+      if(error){ console.error("EstateAI cloud check error:",error); return false; }
+      if(Array.isArray(data) && data.length>0) return true;
+
+      const local=Array.isArray(db.leads)?db.leads:[];
+      if(!local.length) return true;
+
+      const rows=local.map(leadRow);
+      const res=await cloudClient.from("leads").upsert(rows,{onConflict:"id"});
+      if(res.error){
+        console.error("EstateAI local lead migration error:",res.error);
+        return false;
+      }
+      console.log("EstateAI migrated local leads:",rows.length);
+      return true;
+    }catch(err){
+      console.error("EstateAI migration exception:",err);
+      return false;
+    }
+  }
+
+  async function cloudSaveLead(lead){
+    if(!cloudReady && !initCloud()) return false;
+    try{
+      const {error}=await cloudClient.from("leads").upsert(leadRow(lead),{onConflict:"id"});
+      if(error){
+        console.error("EstateAI cloud save error:",error);
+        return false;
+      }
+      return true;
+    }catch(err){
+      console.error("EstateAI cloud save exception:",err);
+      return false;
+    }
+  }
+
+  async function cloudDeleteLead(id){
+    if(!cloudReady && !initCloud()) return false;
+    try{
+      const {error}=await cloudClient.from("leads").delete().eq("id",Number(id));
+      if(error){
+        console.error("EstateAI cloud delete error:",error);
+        return false;
+      }
+      return true;
+    }catch(err){
+      console.error("EstateAI cloud delete exception:",err);
+      return false;
+    }
+  }
+
+  /* Keep the original login untouched so the login screen cannot be broken by cloud code. */
+  const originalLogin=window.login;
+  window.login=function(){
+    const result=originalLogin.apply(this,arguments);
+    setTimeout(async()=>{
+      if(currentUser){
+        await syncCloudLeads();
+      }
+    },300);
+    return result;
+  };
+
+  async function syncCloudLeads(){
+    if(!initCloud()) return;
+    const localBefore=Array.isArray(db.leads)?db.leads.map(x=>({...x})):[];
+    const {data,error}=await cloudClient.from("leads").select("id").limit(1);
+    if(error){
+      console.error("EstateAI cloud connection error:",error);
+      if(currentUser) toast("Cloud connection failed - local mode active");
+      return;
+    }
+    if(!data || data.length===0){
+      if(localBefore.length){
+        const rows=localBefore.map(leadRow);
+        const up=await cloudClient.from("leads").upsert(rows,{onConflict:"id"});
+        if(up.error){
+          console.error("EstateAI migration error:",up.error);
+          if(currentUser) toast("Cloud save failed - check Supabase policies");
+          return;
+        }
+      }
+    }
+    await cloudLoadLeads();
+    if(currentUser) toast("☁ Leads synced to cloud");
+  }
+
+  window.saveLead=async function(e,id){
+    e.preventDefault();
+    const old=id?db.leads.find(l=>Number(l.id)===Number(id)):null;
+    const obj={
+      id:id?Number(id):uid(),
+      name:document.getElementById("lName").value,
+      phone:document.getElementById("lPhone").value,
+      type:document.getElementById("lType").value,
+      location:document.getElementById("lLocation").value,
+      budget:document.getElementById("lBudget").value,
+      source:document.getElementById("lSource").value,
+      status:document.getElementById("lStatus").value,
+      score:Number(document.getElementById("lScore").value)||0,
+      requirement:document.getElementById("lReq").value,
+      created_at:old?.created_at||new Date().toISOString()
+    };
+    if(id){
+      const i=db.leads.findIndex(l=>Number(l.id)===Number(id));
+      if(i>=0)db.leads[i]=obj;
+      addActivity("Lead updated: "+obj.name);
+    }else{
+      db.leads.unshift(obj);
+      addActivity("New lead added: "+obj.name);
+    }
+    saveDB();
+    closeModal();
+    showPage("leads");
+    const ok=await cloudSaveLead(obj);
+    toast(ok?"✓ Lead saved permanently to cloud":"Lead saved locally; cloud sync failed");
+  };
+
+  window.deleteLead=async function(id){
+    if(!isAdmin())return toast("Admin access required");
+    const l=db.leads.find(x=>Number(x.id)===Number(id));
+    if(!l)return;
+    if(confirm("Delete this lead permanently?")){
+      const ok=await cloudDeleteLead(id);
+      if(!ok)return toast("Cloud delete failed");
+      db.leads=db.leads.filter(x=>Number(x.id)!==Number(id));
+      saveDB();showPage("leads");toast("✓ Lead deleted from cloud");
+    }
+  };
+
+  window.changeLeadStatus=async function(id,status){
+    const l=db.leads.find(x=>Number(x.id)===Number(id));
+    if(!l)return;
+    l.status=status;
+    addActivity(`${l.name} moved to ${status}`);
+    saveDB();
+    const ok=await cloudSaveLead(l);
+    showPage("leads");
+    toast(ok?"✓ Lead status synced":"Status saved locally; cloud sync failed");
+  };
+
+  window.convertSocialLead=async function(id){
+    const x=db.socialInbox.find(a=>Number(a.id)===Number(id));
+    if(!x)return;
+    const lead={
+      id:uid(),name:x.name||"",phone:x.phone||"",
+      type:x.intent==="Sell"?"Seller":"Buyer",location:x.location||"",
+      budget:"",requirement:x.message||"",status:"New",
+      source:x.source||"Social",score:60,created_at:new Date().toISOString()
+    };
+    const ok=await cloudSaveLead(lead);
+    if(!ok)return toast("Cloud save failed");
+    db.leads.unshift(lead);addActivity("Social lead converted: "+lead.name);
+    saveDB();showPage("leads");toast("✓ Social lead saved to cloud");
+  };
+
+  document.addEventListener("DOMContentLoaded",()=>{
+    setTimeout(()=>{
+      if(currentUser) syncCloudLeads();
+    },900);
+  });
+})();
+</script>
 </body>
 </html>
