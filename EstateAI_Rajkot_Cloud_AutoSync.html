@@ -1,0 +1,2350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EstateAI Rajkot CRM</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+ --primary:#2563eb;--primary2:#1d4ed8;--bg:#f4f7fb;--card:#fff;
+ --text:#172033;--muted:#667085;--border:#e5e7eb;--sidebar:#101828;
+ --green:#16a34a;--orange:#f59e0b;--red:#ef4444;--purple:#7c3aed;
+}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.app{display:flex;min-height:100vh}
+.sidebar{
+ width:250px;background:var(--sidebar);color:#fff;position:fixed;
+ inset:0 auto 0 0;z-index:50;display:flex;flex-direction:column
+}
+.logo{padding:22px 20px;border-bottom:1px solid #273244}
+.logo h1{font-size:24px}.logo h1 span{color:#60a5fa}
+.logo p{color:#98a2b3;font-size:12px;margin-top:5px}
+.nav{padding:13px 10px;overflow:auto;flex:1}
+.nav button{
+ width:100%;border:0;background:transparent;color:#aeb8c8;padding:10px 12px;
+ margin-bottom:4px;border-radius:9px;text-align:left;display:flex;
+ align-items:center;gap:10px
+}
+.nav button:hover{background:#1d2939;color:#fff}
+.nav button.active{background:var(--primary);color:#fff}
+.nav-icon{width:22px;text-align:center}
+.sidebar-bottom{padding:14px;border-top:1px solid #273244}
+.profile{display:flex;align-items:center;gap:10px}
+.avatar{
+ width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);
+ display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold
+}
+.main{margin-left:250px;width:calc(100% - 250px)}
+.topbar{
+ height:70px;background:#fff;border-bottom:1px solid var(--border);padding:0 24px;
+ display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30
+}
+.search{width:420px;position:relative}
+.search span{position:absolute;left:13px;top:10px;color:#98a2b3}
+.search input{width:100%;padding:11px 15px 11px 39px;border:1px solid var(--border);border-radius:9px;outline:none}
+.top-actions{display:flex;align-items:center;gap:9px}
+.icon-btn{width:39px;height:39px;border:1px solid var(--border);background:#fff;border-radius:9px}
+.content{padding:25px}
+.page-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}
+.page-head h2{font-size:28px}.page-head p{color:var(--muted);margin-top:5px}
+.primary{background:var(--primary);color:#fff;border:0;padding:11px 16px;border-radius:8px;font-weight:bold}
+.primary:hover{background:var(--primary2)}
+.secondary{background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:8px}
+.danger{background:#fff;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:8px}
+.card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:20px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}
+.kpi{background:#fff;border:1px solid var(--border);border-radius:13px;padding:18px}
+.kpi h3{font-size:27px;margin:10px 0 5px}.kpi p{color:var(--muted);font-size:13px}
+.kpi-icon{float:right;font-size:23px;background:#eff6ff;padding:8px;border-radius:9px}
+.up{color:var(--green);font-size:12px}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filter{padding:10px 12px;border:1px solid var(--border);background:#fff;border-radius:8px}
+.table-wrap{background:#fff;border:1px solid var(--border);border-radius:13px;overflow:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:13px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+th{background:#f8fafc;color:#667085;font-size:11px;text-transform:uppercase}
+td{font-size:14px}
+.badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;font-weight:bold}
+.green{background:#dcfce7;color:#15803d}.blue{background:#dbeafe;color:#1d4ed8}
+.orange{background:#fef3c7;color:#b45309}.red{background:#fee2e2;color:#b91c1c}
+.purple{background:#ede9fe;color:#6d28d9}.gray{background:#eef2f7;color:#475467}
+.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
+.property{background:#fff;border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.property-img{
+ height:145px;background:linear-gradient(135deg,#dbeafe,#93c5fd);
+ display:flex;align-items:center;justify-content:center;font-size:55px
+}
+.property-body{padding:15px}.property-body h3{margin:9px 0 5px}
+.property-body p{color:var(--muted);font-size:13px;margin:5px 0}
+.property-footer{margin-top:13px;display:flex;justify-content:space-between;align-items:center}
+.kanban{display:flex;gap:14px;overflow:auto;padding-bottom:10px}
+.column{min-width:245px;width:245px;background:#eef2f7;border-radius:12px;padding:12px}
+.column-head{display:flex;justify-content:space-between;margin-bottom:10px}
+.lead-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px}
+.lead-card h4{margin-bottom:6px}.lead-card p{font-size:12px;color:var(--muted);margin:4px 0}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.form-group{display:flex;flex-direction:column;gap:7px}.full{grid-column:1/-1}
+.form-group label{font-size:13px;font-weight:bold}
+.form-group input,.form-group select,.form-group textarea{
+ padding:11px;border:1px solid var(--border);border-radius:8px;outline:none;background:#fff
+}
+.form-group textarea{min-height:95px;resize:vertical}
+.form-actions{margin-top:20px;display:flex;justify-content:flex-end;gap:9px}
+.modal-bg{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+.modal-bg.show{display:flex}
+.modal{width:760px;max-width:100%;max-height:90vh;overflow:auto;background:#fff;border-radius:14px}
+.modal-head{padding:17px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:20px}
+.activity-item{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.dot{width:10px;height:10px;background:var(--primary);border-radius:50%;margin-top:5px;flex:none}
+.chart{height:230px;display:flex;align-items:flex-end;gap:15px;padding:10px;border-bottom:1px solid var(--border);margin-top:18px}
+.bar{flex:1;background:linear-gradient(#60a5fa,#2563eb);border-radius:6px 6px 0 0;position:relative}
+.bar span{position:absolute;bottom:-23px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted)}
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.feature{border:1px solid var(--border);border-radius:10px;padding:15px;background:#fff}
+.feature p{font-size:12px;color:var(--muted);margin-top:5px}
+.login-screen{
+ min-height:100vh;background:linear-gradient(135deg,#0f172a,#1e3a8a);
+ display:flex;align-items:center;justify-content:center;padding:20px
+}
+.login-box{width:420px;max-width:100%;background:#fff;border-radius:18px;padding:30px;box-shadow:0 25px 70px #0005}
+.login-logo{text-align:center;margin-bottom:25px}.login-logo h1{font-size:31px}
+.login-logo span{color:#2563eb}.login-logo p{color:#667085;font-size:13px;margin-top:5px}
+.login-box input{width:100%;padding:13px;border:1px solid var(--border);border-radius:9px;margin:7px 0 14px}
+.login-box label{font-size:13px;font-weight:bold}
+.login-box button{width:100%;padding:13px;margin-top:5px}
+.login-error{color:#b91c1c;background:#fee2e2;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px}
+.stat-mini{padding:16px;background:#f8fafc;border-radius:10px}
+.match{border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px;background:#fff}
+.progress{height:8px;background:#eef2f7;border-radius:10px;overflow:hidden;margin-top:7px}
+.progress div{height:100%;background:#2563eb}
+.toast{
+ position:fixed;right:20px;bottom:20px;background:#101828;color:#fff;padding:13px 17px;
+ border-radius:9px;z-index:300;box-shadow:0 10px 30px #0003
+}
+.dark{--bg:#0f172a;--card:#111827;--text:#f8fafc;--muted:#94a3b8;--border:#263244}
+.dark .card,.dark .kpi,.dark .property,.dark .lead-card,.dark .table-wrap,.dark .modal,
+.dark .secondary,.dark .filter,.dark .form-group input,.dark .form-group select,.dark .form-group textarea,
+.dark .feature{background:#111827;color:#f8fafc;border-color:#263244}
+.dark .topbar{background:#111827;border-color:#263244}
+.dark th{background:#172033}.dark .stat-mini{background:#172033}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.property-grid{grid-template-columns:repeat(2,1fr)}.feature-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){
+ .sidebar{width:70px}.logo h1,.logo p,.nav button span:not(.nav-icon),.profile-text{display:none}
+ .nav button{justify-content:center}.main{margin-left:70px;width:calc(100% - 70px)}
+ .search{width:240px}.grid2,.grid3{grid-template-columns:1fr}.property-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .content{padding:14px}.topbar{padding:0 10px}.search{width:170px}.kpis{grid-template-columns:1fr}
+ .form-grid{grid-template-columns:1fr}.feature-grid{grid-template-columns:1fr}
+ .page-head{align-items:flex-start;flex-direction:column}
+}
+
+/* =========================================================
+   ESTATEAI PRO UX / AUTHENTIC WELCOME / PHOTO / REALTIME
+========================================================= */
+:root{
+ --pro-grad:linear-gradient(135deg,#2563eb 0%,#7c3aed 55%,#06b6d4 100%);
+ --glass:rgba(255,255,255,.72);
+}
+*{scrollbar-width:thin}
+button,.nav button,.icon-btn,.primary,.secondary,.danger,.feature,.kpi,.property,.card{
+ transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease;
+}
+button:hover{transform:translateY(-1px)}
+.kpi:hover,.property:hover,.feature:hover,.card.pro-hover:hover{
+ box-shadow:0 14px 35px rgba(16,24,40,.10);transform:translateY(-2px)
+}
+.pro-welcome{
+ position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
+ background:radial-gradient(circle at 20% 20%,#38bdf8 0,transparent 28%),
+            radial-gradient(circle at 80% 80%,#8b5cf6 0,transparent 30%),
+            linear-gradient(135deg,#07111f,#172554 55%,#0f172a);
+ overflow:hidden;animation:proFade .45s ease;
+}
+.pro-welcome.hidden{display:none}
+.pro-orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.45;animation:proFloat 8s ease-in-out infinite}
+.pro-orb.o1{width:240px;height:240px;background:#38bdf8;top:-60px;left:-40px}
+.pro-orb.o2{width:300px;height:300px;background:#8b5cf6;right:-90px;bottom:-100px;animation-delay:-3s}
+.pro-welcome-box{
+ width:min(720px,92vw);padding:45px 38px;border:1px solid rgba(255,255,255,.18);
+ border-radius:28px;background:rgba(255,255,255,.10);backdrop-filter:blur(20px);
+ color:#fff;text-align:center;box-shadow:0 35px 100px rgba(0,0,0,.35);
+ position:relative;overflow:hidden;
+}
+.pro-welcome-box:after{
+ content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.16),transparent 65%);
+ transform:translateX(-100%);animation:proShine 1.7s ease .3s forwards;
+}
+.pro-welcome-icon{font-size:58px;margin-bottom:12px;animation:proPop .7s cubic-bezier(.2,.8,.2,1)}
+.pro-welcome-box h1{font-size:clamp(30px,6vw,54px);letter-spacing:-1.5px}
+.pro-welcome-box h1 span{color:#7dd3fc}
+.pro-welcome-box p{margin-top:10px;color:#dbeafe;font-size:15px}
+.pro-welcome-status{margin-top:24px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.pro-pill{padding:8px 12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(255,255,255,.08);font-size:12px}
+.pro-loading{height:4px;background:rgba(255,255,255,.16);border-radius:9px;margin-top:26px;overflow:hidden}
+.pro-loading div{height:100%;width:0;background:#fff;animation:proLoad 1.6s ease forwards}
+.pro-hero{
+ background:var(--pro-grad);color:#fff;border-radius:20px;padding:26px;margin-bottom:20px;
+ position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(37,99,235,.20)
+}
+.pro-hero:before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;
+background:rgba(255,255,255,.12);right:-70px;top:-100px}
+.pro-hero-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:center}
+.pro-hero h2{font-size:clamp(25px,4vw,39px);margin-bottom:8px}
+.pro-hero p{color:#e0f2fe;line-height:1.55}
+.pro-quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.pro-quick div{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);
+padding:13px;border-radius:13px}
+.pro-quick strong{display:block;font-size:22px}
+.photo-drop{
+ border:2px dashed #cbd5e1;border-radius:14px;padding:18px;text-align:center;
+ background:#f8fafc;cursor:pointer
+}
+.photo-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.photo-preview img{width:100%;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--border)}
+.pro-source{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;
+ border:1px solid var(--border);border-radius:12px;margin:8px 0;background:#fff
+}
+.pro-source small{color:var(--muted)}
+.pro-live-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#22c55e;
+box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
+.pro-command{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px
+}
+.pro-command button{padding:13px;border:1px solid var(--border);background:#fff;border-radius:11px;text-align:left}
+.dark .photo-drop,.dark .pro-source,.dark .pro-command button{background:#111827;border-color:#263244;color:#fff}
+.dark .pro-source small{color:#94a3b8}
+@keyframes proFade{from{opacity:0}to{opacity:1}}
+@keyframes proPop{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes proFloat{50%{transform:translateY(-24px) scale(1.04)}}
+@keyframes proShine{to{transform:translateX(100%)}}
+@keyframes proLoad{to{width:100%}}
+@keyframes proPulse{50%{box-shadow:0 0 0 8px rgba(34,197,94,.08)}}
+@media(max-width:800px){.pro-hero-grid{grid-template-columns:1fr}.pro-command{grid-template-columns:1fr}.photo-preview{grid-template-columns:repeat(2,1fr)}}
+
+
+.social-live{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#ecfdf3;color:#166534;font-size:12px}
+.social-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:15px 0}
+.social-card{border:1px solid var(--border);border-radius:14px;padding:16px;background:#fff}
+.dark .social-card{background:#111827;border-color:#263244}
+.social-card strong{font-size:24px;display:block;margin-top:6px}
+@media(max-width:800px){.social-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>Estate<span>AI</span></h1>
+      <p>Rajkot Real Estate CRM</p>
+    </div>
+
+    <div id="loginError" class="login-error hidden"></div>
+
+    <label>Username</label>
+    <input id="loginUser" placeholder="admin@estateai.in or admin">
+
+    <label>Password</label>
+    <input id="loginPass" type="password" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')login()">
+
+    <button class="primary" onclick="login()">Login</button>
+
+    <p style="font-size:12px;color:#667085;margin-top:15px;text-align:center">
+      Cloud Admin: admin@estateai.in<br>
+      Login is secured by Supabase Authentication
+    </p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="app hidden">
+
+<aside class="sidebar">
+  <div class="logo">
+    <h1>Estate<span>AI</span></h1>
+    <p>Rajkot Real Estate CRM</p>
+  </div>
+
+  <nav class="nav" id="nav"></nav>
+
+  <div class="sidebar-bottom">
+    <div class="profile">
+      <div class="avatar" id="sideAvatar">A</div>
+      <div class="profile-text">
+        <strong id="sideName">Admin</strong><br>
+        <small style="color:#98a2b3" id="sideRole">Administrator</small>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="search">
+      <span>🔍</span>
+      <input id="globalSearch" placeholder="Search properties, buyers, sellers, leads..."
+        oninput="globalSearch(this.value)">
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" onclick="showNotifications()">🔔</button>
+      <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+      <button class="icon-btn" onclick="logout()">↪</button>
+      <div class="avatar" id="topAvatar">A</div>
+    </div>
+  </header>
+
+  <div class="content" id="content"></div>
+</main>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Modal</h3>
+      <button class="icon-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* =========================================================
+   ESTATEAI CRM
+   Browser-only version
+   Data persists through localStorage
+========================================================= */
+
+const STORAGE="estateai_rajkot_v3";
+let currentUser=null;
+let currentPage="dashboard";
+
+const defaultData={
+  properties:[
+   {id:1,title:"Premium 3 BHK Apartment",type:"Apartment",purpose:"Sale",city:"Rajkot",locality:"Kalawad Road",price:"₹78 L",area:"1650 Sq Ft",bhk:"3",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
+   {id:2,title:"Luxury 4 BHK Villa",type:"Villa",purpose:"Sale",city:"Rajkot",locality:"Raiya Road",price:"₹1.85 Cr",area:"3100 Sq Ft",bhk:"4",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
+   {id:3,title:"Residential Plot",type:"Plot",purpose:"Sale",city:"Rajkot",locality:"Mavdi",price:"₹62 L",area:"180 Sq Yd",bhk:"",status:"Active",verified:false,owner:"Demo Seller",updated:"Yesterday"},
+   {id:4,title:"Modern 2 BHK Flat",type:"Apartment",purpose:"Rent",city:"Rajkot",locality:"Nana Mava",price:"₹18,000/mo",area:"1150 Sq Ft",bhk:"2",status:"Active",verified:true,owner:"Demo Owner",updated:"Today"},
+   {id:5,title:"Commercial Office",type:"Commercial",purpose:"Sale",city:"Rajkot",locality:"150 Feet Ring Road",price:"₹1.20 Cr",area:"2100 Sq Ft",bhk:"",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
+   {id:6,title:"3 BHK Family Home",type:"Apartment",purpose:"Sale",city:"Rajkot",locality:"University Road",price:"₹72 L",area:"1550 Sq Ft",bhk:"3",status:"Active",verified:false,owner:"Demo Seller",updated:"2 days ago"}
+  ],
+  leads:[
+   {id:101,name:"Demo Buyer 1",type:"Buyer",phone:"",location:"Kalawad Road",budget:"₹70L-₹90L",requirement:"3 BHK",status:"New",source:"Demo",score:82},
+   {id:102,name:"Demo Buyer 2",type:"Buyer",phone:"",location:"Raiya Road",budget:"₹1Cr-₹2Cr",requirement:"4 BHK Villa",status:"Qualified",source:"Demo",score:91},
+   {id:103,name:"Demo Seller 1",type:"Seller",phone:"",location:"Mavdi",budget:"₹60L",requirement:"Sell 3 BHK",status:"Contacted",source:"Demo",score:75},
+   {id:104,name:"Demo Buyer 3",type:"Buyer",phone:"",location:"Nana Mava",budget:"₹15K-₹25K",requirement:"2 BHK Rent",status:"Site Visit",source:"Demo",score:88}
+  ],
+  followups:[
+   {id:1,lead:"Demo Buyer 1",task:"Call regarding 3 BHK",due:"Today 4:00 PM",status:"Pending"},
+   {id:2,lead:"Demo Buyer 2",task:"Send Villa details",due:"Today 5:00 PM",status:"Pending"},
+   {id:3,lead:"Demo Seller 1",task:"Property valuation",due:"Tomorrow 11:00 AM",status:"Pending"},
+   {id:4,lead:"Demo Buyer 3",task:"Confirm site visit",due:"Tomorrow 2:00 PM",status:"Completed"}
+  ],
+  visits:[
+   {id:1,customer:"Demo Buyer 1",property:"Premium 3 BHK Apartment",time:"Today 5:30 PM",status:"Scheduled"},
+   {id:2,customer:"Demo Buyer 2",property:"Luxury 4 BHK Villa",time:"Today 6:30 PM",status:"Scheduled"}
+  ],
+  agents:[
+   {id:1,name:"Aarav Patel",role:"Senior Agent",location:"Rajkot",deals:42,revenue:"₹4.8 Cr"},
+   {id:2,name:"Riya Shah",role:"Sales Agent",location:"Rajkot",deals:36,revenue:"₹3.2 Cr"},
+   {id:3,name:"Karan Mehta",role:"Property Consultant",location:"Rajkot",deals:29,revenue:"₹2.4 Cr"}
+  ],
+  users:[
+   {id:1,name:"Admin User",username:"admin",password:"admin123",role:"Admin",active:true},
+   {id:2,name:"Sales Agent",username:"agent",password:"agent123",role:"Agent",active:true}
+  ],
+  activities:[
+   {text:"Demo property inventory loaded",time:"Just now"},
+   {text:"CRM initialized",time:"Just now"}
+  ],
+  settings:{
+   company:"EstateAI Realty",
+   city:"Rajkot",
+   currency:"INR ₹",
+   timezone:"Asia/Kolkata",
+   theme:"light"
+  }
+};
+
+let db=loadDB();
+proEnsureArray();
+
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function loadDB(){
+  try{
+    const saved=localStorage.getItem(STORAGE);
+    if(!saved){
+      const recovery=localStorage.getItem(STORAGE+"_last_backup");
+      if(recovery){
+        const recovered=JSON.parse(recovery);
+        return {...clone(defaultData),...recovered};
+      }
+      return clone(defaultData);
+    }
+    const parsed=JSON.parse(saved);
+    // Keep old browser data, but always restore required system structures/users.
+    const base=clone(defaultData);
+    const merged={...base,...parsed};
+    for(const key of Object.keys(base)){
+      if(Array.isArray(base[key]) && !Array.isArray(merged[key])) merged[key]=clone(base[key]);
+      if(base[key] && typeof base[key]==='object' && !Array.isArray(base[key]) &&
+         (merged[key]==null || typeof merged[key]!=='object')) merged[key]=clone(base[key]);
+    }
+    merged.users=Array.isArray(parsed.users)?parsed.users:clone(defaultData.users);
+    // Ensure the built-in accounts can always recover access if an old DB removed them.
+    for(const required of defaultData.users){
+      if(!merged.users.some(x=>x.username===required.username)){
+        merged.users.push(clone(required));
+      }
+    }
+    return merged;
+  }catch(e){
+    console.warn('EstateAI DB recovery:',e);
+    try{
+      const recovery=localStorage.getItem(STORAGE+"_last_backup");
+      if(recovery){
+        const recovered=JSON.parse(recovery);
+        const merged={...clone(defaultData),...recovered};
+        localStorage.setItem(STORAGE,JSON.stringify(merged));
+        return merged;
+      }
+    }catch(recoveryError){ console.warn("EstateAI backup recovery failed:",recoveryError); }
+    return clone(defaultData);
+  }
+}
+function saveDB(){
+  try{
+    const old=localStorage.getItem(STORAGE);
+    if(old && old!==JSON.stringify(db)) localStorage.setItem(STORAGE+"_last_backup",old);
+    localStorage.setItem(STORAGE,JSON.stringify(db));
+    localStorage.setItem(STORAGE+"_saved_at",new Date().toISOString());
+    // Cloud sync is queued by the auto-sync engine below.
+    try{ if(currentUser && window.EstateAICloud?.queue) window.EstateAICloud.queue(); }catch(_){}
+    return true;
+  }catch(e){
+    console.error("EstateAI local save failed:",e);
+    try{ localStorage.setItem(STORAGE+"_last_backup",JSON.stringify(db)); }catch(_){}
+    try{ toast("⚠ Local storage full/blocked. Cloud auto-sync will retry."); }catch(_){}
+    return false;
+  }
+}
+function uid(){
+  return Date.now()+Math.floor(Math.random()*1000);
+}
+function esc(v){
+  const d=document.createElement("div");
+  d.textContent=v==null?"":String(v);
+  return d.innerHTML;
+}
+function toast(msg){
+  const old=document.querySelector(".toast");
+  if(old)old.remove();
+  const t=document.createElement("div");
+  t.className="toast";
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+function addActivity(text){
+  db.activities.unshift({text,time:new Date().toLocaleString("en-IN")});
+  db.activities=db.activities.slice(0,30);
+  saveDB();
+}
+
+/* =========================================================
+   AUTH — SUPABASE AUTHENTICATION
+   Cloud login: admin@estateai.in + password created in Supabase.
+   The public/publishable key is safe for browser use; never put a
+   Supabase service_role/secret key in this file.
+========================================================= */
+
+const ESTATEAI_AUTH_EMAILS={
+  admin:"admin@estateai.in"
+};
+
+function authEmailFromInput(value){
+  const v=String(value||"").trim();
+  return ESTATEAI_AUTH_EMAILS[v.toLowerCase()] || v;
+}
+
+async function localUserForAuth(authUser){
+  const email=String(authUser?.email||"").toLowerCase();
+  let profile=null;
+  try{
+    const c=await supabaseAuthClient();
+    if(c && authUser?.id){
+      const r=await c.from("profiles").select("id,full_name,email,username,role,active").eq("id",authUser.id).maybeSingle();
+      if(!r.error)profile=r.data||null;
+    }
+  }catch(e){console.warn("EstateAI profile lookup:",e)}
+  let user=(Array.isArray(db.users)?db.users:[]).find(x=>
+    String(x.auth_user_id||x.id||"")===String(authUser.id||"") ||
+    String(x.email||"").toLowerCase()===email ||
+    (email===ESTATEAI_AUTH_EMAILS.admin && String(x.username||"").toLowerCase()==="admin")
+  );
+  const role=profile?.role || (email===ESTATEAI_AUTH_EMAILS.admin?"Admin":(user?.role||"Agent"));
+  const active=profile?.active!==false && user?.active!==false;
+  user={...(user||{}),
+    id:user?.id||uid(), auth_user_id:authUser.id,
+    name:profile?.full_name || user?.name || (email===ESTATEAI_AUTH_EMAILS.admin?"Admin User":(authUser.user_metadata?.name||email.split("@")[0])),
+    username:profile?.username || user?.username || email.split("@")[0], email, role, active
+  };
+  const idx=db.users.findIndex(x=>String(x.auth_user_id||x.id||"")===String(authUser.id||"") || String(x.email||"").toLowerCase()===email);
+  if(idx>=0)db.users[idx]=user; else db.users.push(user);
+  saveDB();
+  return user;
+}
+
+async function supabaseAuthClient(){
+  try{
+    if(!window.supabase || !window.supabase.createClient)return null;
+    if(window.__estateaiAuthClient)return window.__estateaiAuthClient;
+    window.__estateaiAuthClient=window.supabase.createClient(
+      "https://butmgtzgxllieevzgsqo.supabase.co",
+      "sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig"
+    );
+    return window.__estateaiAuthClient;
+  }catch(e){
+    console.error("EstateAI Auth init failed:",e);
+    return null;
+  }
+}
+
+async function enterAuthenticatedApp(authUser){
+  if(!authUser)return false;
+  currentUser=await localUserForAuth(authUser);
+  if(currentUser.active===false){throw new Error("Your account is disabled. Contact the administrator.");}
+  sessionStorage.setItem("estateai_user",JSON.stringify(currentUser));
+  document.getElementById("loginError").classList.add("hidden");
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  buildNav();
+  updateProfile();
+  showPage("dashboard");
+  setTimeout(proWelcome,120);
+  return true;
+}
+
+async function login(){
+  const input=document.getElementById("loginUser").value.trim();
+  const password=document.getElementById("loginPass").value;
+  const email=authEmailFromInput(input);
+  const errorEl=document.getElementById("loginError");
+  errorEl.classList.add("hidden");
+
+  if(!email || !password){
+    errorEl.textContent="Enter email/username and password.";
+    errorEl.classList.remove("hidden");
+    return false;
+  }
+
+  const client=await supabaseAuthClient();
+  if(!client){
+    errorEl.textContent="Cloud login is not available. Check your internet connection.";
+    errorEl.classList.remove("hidden");
+    return false;
+  }
+
+  const {data,error}=await client.auth.signInWithPassword({email,password});
+  if(error || !data?.user){
+    console.error("EstateAI Supabase login error:",error);
+    errorEl.textContent=error?.message||"Invalid email or password.";
+    errorEl.classList.remove("hidden");
+    return false;
+  }
+
+  try{await enterAuthenticatedApp(data.user);}
+  catch(e){errorEl.textContent=e.message||"Account is disabled.";errorEl.classList.remove("hidden");return false;}
+  if(window.EstateAICloud?.sync)setTimeout(()=>window.EstateAICloud.sync(true),400);
+  return true;
+}
+
+async function restoreSession(){
+  try{
+    const client=await supabaseAuthClient();
+    if(client){
+      const {data}=await client.auth.getSession();
+      if(data?.session?.user){
+        await enterAuthenticatedApp(data.session.user);
+        return;
+      }
+    }
+    sessionStorage.removeItem("estateai_user");
+  }catch(e){
+    console.warn("EstateAI session restore:",e);
+  }
+}
+
+async function logout(){
+  try{
+    const client=await supabaseAuthClient();
+    if(client)await client.auth.signOut();
+  }catch(e){console.warn("EstateAI logout:",e)}
+  sessionStorage.removeItem("estateai_user");
+  currentUser=null;
+  location.reload();
+}
+
+function isAdmin(){
+  return currentUser?.role==="Admin";
+}
+
+function updateProfile(){
+  if(!currentUser)return;
+  const letter=currentUser.name.charAt(0).toUpperCase();
+  document.getElementById("sideAvatar").textContent=letter;
+  document.getElementById("topAvatar").textContent=letter;
+  document.getElementById("sideName").textContent=currentUser.name;
+  document.getElementById("sideRole").textContent=currentUser.role;
+}
+
+function buildNav(){
+  const items=[
+   ["dashboard","📊","Dashboard",true],
+   ["properties","🏠","Properties",true],
+   ["leads","👥","Leads",true],
+   ["buyers","🧑","Buyers",true],
+   ["sellers","🏷️","Sellers",true],
+   ["matching","🎯","Buyer Matching",true],
+   ["followups","📅","Follow-ups",true],
+   ["visits","📍","Site Visits",true],
+   ["deals","🤝","Deals",true],
+   ["agents","👨‍💼","Agents",true],
+   ["reports","📈","Reports",true],
+   ["ai","🤖","AI Assistant",true],
+   ["admin","🛡️","Admin Control",isAdmin()],
+   ["settings","⚙️","Settings",true]
+  ];
+  document.getElementById("nav").innerHTML=items.filter(x=>x[3]).map(x=>`
+    <button onclick="showPage('${x[0]}',this)">
+      <span class="nav-icon">${x[1]}</span><span>${x[2]}</span>
+    </button>
+  `).join("");
+}
+
+/* =========================================================
+   ROUTER
+========================================================= */
+
+const pages={
+ dashboard:dashboardPage,
+ properties:propertiesPage,
+ leads:leadsPage,
+ buyers:buyersPage,
+ sellers:sellersPage,
+ matching:matchingPage,
+ followups:followupsPage,
+ visits:visitsPage,
+ deals:dealsPage,
+ agents:agentsPage,
+ reports:reportsPage,
+ ai:aiPage,
+ admin:adminPage,
+ settings:settingsPage
+};
+
+function showPage(page,button){
+  if(page==="admin"&&!isAdmin()){
+    toast("Admin access required");
+    return;
+  }
+
+  currentPage=page;
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(button)button.classList.add("active");
+  else{
+    const b=[...document.querySelectorAll(".nav button")]
+      .find(x=>x.getAttribute("onclick")?.includes("'"+page+"'"));
+    if(b)b.classList.add("active");
+  }
+
+  document.getElementById("content").innerHTML=pages[page]?pages[page]():page404();
+  window.scrollTo(0,0);
+}
+
+function page404(){
+ return `<div class="card"><h2>Page not found</h2></div>`;
+}
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function dashboardPage(){
+ const active=db.properties.filter(p=>p.status==="Active").length;
+ const buyers=db.leads.filter(l=>l.type==="Buyer").length;
+ const sellers=db.leads.filter(l=>l.type==="Seller").length;
+ const pending=db.followups.filter(x=>x.status!=="Completed").length;
+
+ return `
+ <div class="page-head">
+  <div>
+   <h2>Rajkot Dashboard</h2>
+   <p>Welcome, ${esc(currentUser.name)}. Manage your real-estate business from one place.</p>
+  </div>
+  <button class="primary" onclick="openPropertyModal()">+ Add Property</button>
+ </div>
+
+ <div class="kpis">
+  ${kpi("🏠","Active Properties",active,"Inventory")}
+  ${kpi("👥","Buyer Leads",buyers,"Buyer enquiries")}
+  ${kpi("🏷️","Seller Leads",sellers,"Seller enquiries")}
+  ${kpi("📅","Pending Follow-ups",pending,"Requires attention")}
+ </div>
+
+ <div class="grid2">
+  <div class="card">
+   <h3>Sales Activity</h3>
+   <p style="color:#667085;font-size:13px;margin-top:4px">Monthly CRM activity</p>
+   <div class="chart">
+    <div class="bar" style="height:42%"><span>May</span></div>
+    <div class="bar" style="height:55%"><span>Jun</span></div>
+    <div class="bar" style="height:62%"><span>Jul</span></div>
+    <div class="bar" style="height:70%"><span>Aug</span></div>
+    <div class="bar" style="height:81%"><span>Sep</span></div>
+    <div class="bar" style="height:94%"><span>Oct</span></div>
+   </div>
+  </div>
+
+  <div class="card">
+   <h3>Recent Activity</h3>
+   ${db.activities.slice(0,6).map(a=>`
+    <div class="activity-item">
+     <div class="dot"></div>
+     <div><strong>${esc(a.text)}</strong><p style="font-size:11px;color:#667085">${esc(a.time)}</p></div>
+    </div>
+   `).join("")}
+  </div>
+ </div>
+
+ <div class="card" style="margin-top:18px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+   <h3>Rajkot Property Inventory</h3>
+   <button class="secondary" onclick="showPage('properties')">View All</button>
+  </div>
+  <div class="table-wrap">
+   <table>
+    <thead><tr><th>Property</th><th>Location</th><th>Purpose</th><th>Price</th><th>Verified</th></tr></thead>
+    <tbody>
+     ${db.properties.slice(0,7).map(p=>`
+      <tr>
+       <td><strong>${esc(p.title)}</strong></td>
+       <td>${esc(p.locality)}</td>
+       <td><span class="badge blue">${esc(p.purpose)}</span></td>
+       <td>${esc(p.price)}</td>
+       <td>${p.verified?'<span class="badge green">Verified</span>':'<span class="badge orange">Unverified</span>'}</td>
+      </tr>
+     `).join("")}
+    </tbody>
+   </table>
+  </div>
+ </div>
+ `;
+}
+
+function kpi(icon,title,value,sub){
+ return `<div class="kpi"><span class="kpi-icon">${icon}</span><p>${title}</p><h3>${value}</h3><span class="up">${sub}</span></div>`;
+}
+
+/* =========================================================
+   PROPERTIES
+========================================================= */
+
+function propertiesPage(){
+ return `
+ <div class="page-head">
+  <div><h2>Rajkot Properties</h2><p>Buy, sell and rent inventory.</p></div>
+  <button class="primary" onclick="openPropertyModal()">+ Add Property</button>
+ </div>
+
+ <div class="toolbar">
+  <input id="propertySearch" class="filter" style="flex:1"
+   placeholder="Search property, locality, owner..."
+   oninput="renderProperties()">
+  <select id="propertyPurpose" class="filter" onchange="renderProperties()">
+   <option>All</option><option>Sale</option><option>Rent</option>
+  </select>
+  <select id="propertyType" class="filter" onchange="renderProperties()">
+   <option>All Types</option><option>Apartment</option><option>Villa</option>
+   <option>Plot</option><option>Commercial</option><option>Office</option><option>Shop</option>
+  </select>
+  <select id="propertyLocality" class="filter" onchange="renderProperties()">
+   <option>All Rajkot Areas</option>
+   ${rajkotAreas().map(x=>`<option>${x}</option>`).join("")}
+  </select>
+ </div>
+
+ <div class="property-grid" id="propertyGrid">${propertyCards(db.properties)}</div>
+ `;
+}
+
+function rajkotAreas(){
+ return ["Raiya Road","Kalawad Road","150 Feet Ring Road","Mavdi","Nana Mava",
+ "Kothariya","University Road","Gondal Road","Bhakti Nagar","Dhebar Road",
+ "Astron Chowk","Amin Marg","Other Rajkot"];
+}
+
+function propertyCards(list){
+ if(!list.length)return `<div class="card" style="grid-column:1/-1;text-align:center">No properties found.</div>`;
+ return list.map(p=>`
+ <div class="property">
+  <div class="property-img">${p.type==="Plot"?"🌳":p.type==="Commercial"?"🏢":"🏠"}</div>
+  <div class="property-body">
+   <span class="badge ${p.purpose==="Sale"?"blue":"purple"}">${esc(p.purpose)}</span>
+   ${p.verified?'<span class="badge green">✓ Verified</span>':'<span class="badge orange">Unverified</span>'}
+   <h3>${esc(p.title)}</h3>
+   <p>📍 ${esc(p.locality)}, Rajkot</p>
+   <p>📐 ${esc(p.area)} ${p.bhk?` · ${esc(p.bhk)} BHK`:""}</p>
+   <p>👤 ${esc(p.owner||"Owner")}</p>
+   <div class="property-footer">
+    <strong style="font-size:18px">${esc(p.price)}</strong>
+    <span class="badge green">${esc(p.status)}</span>
+   </div>
+   <div style="display:flex;gap:7px;margin-top:13px">
+    <button class="secondary" style="flex:1" onclick="editProperty(${p.id})">Edit</button>
+    <button class="secondary" onclick="viewProperty(${p.id})">View</button>
+    ${isAdmin()?`<button class="danger" onclick="deleteProperty(${p.id})">🗑</button>`:""}
+   </div>
+  </div>
+ </div>
+ `).join("");
+}
+
+function renderProperties(){
+ const q=(document.getElementById("propertySearch")?.value||"").toLowerCase();
+ const purpose=document.getElementById("propertyPurpose")?.value||"All";
+ const type=document.getElementById("propertyType")?.value||"All Types";
+ const loc=document.getElementById("propertyLocality")?.value||"All Rajkot Areas";
+
+ const list=db.properties.filter(p=>{
+  const text=`${p.title} ${p.locality} ${p.city} ${p.owner}`.toLowerCase();
+  return (!q||text.includes(q))
+   &&(purpose==="All"||p.purpose===purpose)
+   &&(type==="All Types"||p.type===type)
+   &&(loc==="All Rajkot Areas"||p.locality===loc);
+ });
+ document.getElementById("propertyGrid").innerHTML=propertyCards(list);
+}
+
+function openPropertyModal(property=null){
+ document.getElementById("modalTitle").textContent=property?"Edit Property":"Add Rajkot Property";
+ document.getElementById("modalBody").innerHTML=`
+ <form onsubmit="saveProperty(event,${property?property.id:"null"})">
+  <div class="form-grid">
+   <div class="form-group full"><label>Property Title</label>
+    <input id="pTitle" required value="${esc(property?.title||"")}" placeholder="Premium 3 BHK Apartment"></div>
+
+   <div class="form-group"><label>Property Type</label>
+    <select id="pType">${["Apartment","Villa","Plot","Commercial","Office","Shop","Agricultural Land"].map(x=>`<option ${property?.type===x?"selected":""}>${x}</option>`).join("")}</select>
+   </div>
+
+   <div class="form-group"><label>Purpose</label>
+    <select id="pPurpose"><option ${property?.purpose==="Sale"||!property?"selected":""}>Sale</option><option ${property?.purpose==="Rent"?"selected":""}>Rent</option></select>
+   </div>
+
+   <div class="form-group"><label>Price</label>
+    <input id="pPrice" required value="${esc(property?.price||"")}" placeholder="₹85 L"></div>
+
+   <div class="form-group"><label>Area</label>
+    <input id="pArea" value="${esc(property?.area||"")}" placeholder="1600 Sq Ft"></div>
+
+   <div class="form-group"><label>BHK</label>
+    <select id="pBhk"><option value="">N/A</option>${["1","2","3","4","5+"].map(x=>`<option ${property?.bhk===x?"selected":""}>${x}</option>`).join("")}</select>
+   </div>
+
+   <div class="form-group"><label>Locality</label>
+    <select id="pLocality">${rajkotAreas().map(x=>`<option ${property?.locality===x?"selected":""}>${x}</option>`).join("")}</select>
+   </div>
+
+   <div class="form-group"><label>Owner / Seller</label>
+    <input id="pOwner" value="${esc(property?.owner||"")}" placeholder="Seller name"></div>
+
+   <div class="form-group"><label>Status</label>
+    <select id="pStatus"><option ${!property||property.status==="Active"?"selected":""}>Active</option><option ${property?.status==="Sold"?"selected":""}>Sold</option><option ${property?.status==="On Hold"?"selected":""}>On Hold</option></select>
+   </div>
+
+   <div class="form-group"><label>Verification</label>
+    <select id="pVerified"><option value="yes" ${property?.verified?"selected":""}>Verified</option><option value="no" ${property&&!property.verified?"selected":""}>Unverified</option></select>
+   </div>
+
+   <div class="form-group full"><label>Notes</label>
+    <textarea id="pNotes">${esc(property?.notes||"")}</textarea></div>
+  </div>
+
+  <div class="form-actions">
+   <button type="button" class="secondary" onclick="closeModal()">Cancel</button>
+   <button class="primary">${property?"Update Property":"Create Property"}</button>
+  </div>
+ </form>`;
+ openModal();
+}
+
+function saveProperty(e,id){
+ e.preventDefault();
+ const obj={
+  id:id||uid(),
+  title:document.getElementById("pTitle").value,
+  type:document.getElementById("pType").value,
+  purpose:document.getElementById("pPurpose").value,
+  price:document.getElementById("pPrice").value,
+  area:document.getElementById("pArea").value,
+  bhk:document.getElementById("pBhk").value,
+  city:"Rajkot",
+  locality:document.getElementById("pLocality").value,
+  owner:document.getElementById("pOwner").value,
+  status:document.getElementById("pStatus").value,
+  verified:document.getElementById("pVerified").value==="yes",
+  updated:"Just now",
+  notes:document.getElementById("pNotes").value
+ };
+ if(id){
+  const i=db.properties.findIndex(p=>p.id===id);
+  if(i>=0)db.properties[i]=obj;
+  addActivity("Property updated: "+obj.title);
+ }else{
+  db.properties.unshift(obj);
+  addActivity("Property added: "+obj.title);
+ }
+ saveDB();closeModal();showPage("properties");toast("Property saved");
+}
+
+function editProperty(id){
+ const p=db.properties.find(x=>x.id===id);
+ if(p)openPropertyModal(p);
+}
+function deleteProperty(id){
+ if(!isAdmin())return toast("Admin access required");
+ const p=db.properties.find(x=>x.id===id);
+ if(!p)return;
+ if(confirm("Delete this property?")){
+  db.properties=db.properties.filter(x=>x.id!==id);
+  addActivity("Property deleted: "+p.title);
+  saveDB();showPage("properties");toast("Property deleted");
+ }
+}
+function viewProperty(id){
+ const p=db.properties.find(x=>x.id===id);
+ if(!p)return;
+ document.getElementById("modalTitle").textContent="Property Details";
+ document.getElementById("modalBody").innerHTML=`
+  <div class="grid2">
+   <div class="stat-mini"><strong>Property</strong><p>${esc(p.title)}</p></div>
+   <div class="stat-mini"><strong>Price</strong><p>${esc(p.price)}</p></div>
+   <div class="stat-mini"><strong>Location</strong><p>${esc(p.locality)}, Rajkot</p></div>
+   <div class="stat-mini"><strong>Type</strong><p>${esc(p.type)}</p></div>
+   <div class="stat-mini"><strong>Purpose</strong><p>${esc(p.purpose)}</p></div>
+   <div class="stat-mini"><strong>Area</strong><p>${esc(p.area)}</p></div>
+  </div>
+  <div style="margin-top:18px"><strong>Data status:</strong>
+   ${p.verified?'<span class="badge green">Verified</span>':'<span class="badge orange">Unverified</span>'}
+  </div>
+  <div style="margin-top:18px;text-align:right"><button class="primary" onclick="closeModal()">Close</button></div>
+ `;
+ openModal();
+}
+
+/* =========================================================
+   LEADS
+========================================================= */
+
+const leadStages=["New","Contacted","Qualified","Site Visit","Negotiation","Won","Lost"];
+
+function leadsPage(){
+ return `
+ <div class="page-head">
+  <div><h2>Lead Pipeline</h2><p>Buyer and seller enquiries.</p></div>
+  <button class="primary" onclick="openLeadModal()">+ Add Lead</button>
+ </div>
+ <div class="toolbar">
+  <input id="leadSearch" class="filter" style="flex:1" placeholder="Search lead..." oninput="renderLeads()">
+  <select id="leadTypeFilter" class="filter" onchange="renderLeads()"><option>All</option><option>Buyer</option><option>Seller</option><option>Tenant</option><option>Investor</option></select>
+ </div>
+ <div class="kanban" id="leadBoard">${leadBoard(db.leads)}</div>`;
+}
+
+function leadBoard(list){
+ return leadStages.map(stage=>`
+  <div class="column">
+   <div class="column-head"><strong>${stage}</strong><span class="badge blue">${list.filter(l=>l.status===stage).length}</span></div>
+   ${list.filter(l=>l.status===stage).map(leadCard).join("")}
+  </div>`).join("");
+}
+
+function leadCard(l){
+ return `<div class="lead-card">
+  <h4>${esc(l.name)}</h4>
+  <p>👤 ${esc(l.type)}</p>
+  ${l.phone?`<p>📞 ${esc(l.phone)}</p>`:"<p>📞 Phone not provided</p>"}
+  <p>📍 ${esc(l.location||"Rajkot")}</p>
+  <p>💰 ${esc(l.budget||"Not specified")}</p>
+  <p>🎯 Score: <strong>${l.score||0}/100</strong></p>
+  <select class="filter" style="width:100%;margin-top:9px" onchange="changeLeadStatus(${l.id},this.value)">
+   ${leadStages.map(s=>`<option ${l.status===s?"selected":""}>${s}</option>`).join("")}
+  </select>
+  <div style="display:flex;gap:6px;margin-top:8px">
+   <button class="secondary" style="flex:1" onclick="editLead(${l.id})">Edit</button>
+   ${isAdmin()?`<button class="danger" onclick="deleteLead(${l.id})">🗑</button>`:""}
+  </div>
+ </div>`;
+}
+
+function renderLeads(){
+ const q=(document.getElementById("leadSearch")?.value||"").toLowerCase();
+ const type=document.getElementById("leadTypeFilter")?.value||"All";
+ const list=db.leads.filter(l=>{
+  return (!q||`${l.name} ${l.location} ${l.phone}`.toLowerCase().includes(q))
+   &&(type==="All"||l.type===type);
+ });
+ document.getElementById("leadBoard").innerHTML=leadBoard(list);
+}
+
+function openLeadModal(lead=null){
+ document.getElementById("modalTitle").textContent=lead?"Edit Lead":"Add Lead";
+ document.getElementById("modalBody").innerHTML=`
+ <form onsubmit="saveLead(event,${lead?lead.id:"null"})">
+  <div class="form-grid">
+   <div class="form-group"><label>Name</label><input id="lName" required value="${esc(lead?.name||"")}"></div>
+   <div class="form-group"><label>Phone</label><input id="lPhone" value="${esc(lead?.phone||"")}"></div>
+   <div class="form-group"><label>Lead Type</label><select id="lType">${["Buyer","Seller","Tenant","Investor"].map(x=>`<option ${lead?.type===x?"selected":""}>${x}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Location</label><input id="lLocation" value="${esc(lead?.location||"Rajkot")}"></div>
+   <div class="form-group"><label>Budget</label><input id="lBudget" value="${esc(lead?.budget||"")}"></div>
+   <div class="form-group"><label>Lead Source</label><select id="lSource">${["Website","WhatsApp","Facebook","Instagram","Referral","Walk-in","Broker","Demo"].map(x=>`<option ${lead?.source===x?"selected":""}>${x}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Lead Status</label><select id="lStatus">${leadStages.map(x=>`<option ${lead?.status===x?"selected":""}>${x}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Lead Score</label><input id="lScore" type="number" min="0" max="100" value="${lead?.score||50}"></div>
+   <div class="form-group full"><label>Requirement</label><textarea id="lReq">${esc(lead?.requirement||"")}</textarea></div>
+  </div>
+  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">${lead?"Update Lead":"Create Lead"}</button></div>
+ </form>`;
+ openModal();
+}
+
+function saveLead(e,id){
+ e.preventDefault();
+ const obj={
+  id:id||uid(),name:document.getElementById("lName").value,phone:document.getElementById("lPhone").value,
+  type:document.getElementById("lType").value,location:document.getElementById("lLocation").value,
+  budget:document.getElementById("lBudget").value,source:document.getElementById("lSource").value,
+  status:document.getElementById("lStatus").value,score:Number(document.getElementById("lScore").value)||0,
+  requirement:document.getElementById("lReq").value
+ };
+ if(id){
+  const i=db.leads.findIndex(l=>l.id===id);if(i>=0)db.leads[i]=obj;
+  addActivity("Lead updated: "+obj.name);
+ }else{
+  db.leads.unshift(obj);addActivity("New lead added: "+obj.name);
+ }
+ saveDB();closeModal();showPage("leads");toast("Lead saved");
+}
+function editLead(id){const l=db.leads.find(x=>x.id===id);if(l)openLeadModal(l)}
+function deleteLead(id){
+ if(!isAdmin())return toast("Admin access required");
+ const l=db.leads.find(x=>x.id===id);
+ if(confirm("Delete this lead?")){
+  db.leads=db.leads.filter(x=>x.id!==id);saveDB();showPage("leads");toast("Lead deleted");
+ }
+}
+function changeLeadStatus(id,status){
+ const l=db.leads.find(x=>x.id===id);
+ if(l){l.status=status;addActivity(`${l.name} moved to ${status}`);saveDB();showPage("leads")}
+}
+
+/* =========================================================
+   BUYERS / SELLERS
+========================================================= */
+
+function buyersPage(){
+ const buyers=db.leads.filter(l=>l.type==="Buyer"||l.type==="Tenant"||l.type==="Investor");
+ return peoplePage("Buyers","Buyer requirements and purchasing enquiries.",buyers,"Buyer");
+}
+function sellersPage(){
+ const sellers=db.leads.filter(l=>l.type==="Seller");
+ return peoplePage("Sellers","Owners and seller enquiries.",sellers,"Seller");
+}
+function peoplePage(title,sub,list,type){
+ return `
+ <div class="page-head">
+  <div><h2>${title}</h2><p>${sub}</p></div>
+  <button class="primary" onclick="openLeadModal()">+ Add ${type}</button>
+ </div>
+ <div class="card">
+  <div class="table-wrap">
+   <table>
+    <thead><tr><th>Name</th><th>Phone</th><th>Location</th><th>Budget</th><th>Requirement</th><th>Score</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>
+     ${list.length?list.map(l=>`
+      <tr>
+       <td><strong>${esc(l.name)}</strong></td><td>${esc(l.phone||"-")}</td>
+       <td>${esc(l.location||"-")}</td><td>${esc(l.budget||"-")}</td>
+       <td>${esc(l.requirement||"-")}</td><td><span class="badge green">${l.score||0}</span></td>
+       <td><span class="badge blue">${esc(l.status)}</span></td>
+       <td><button class="secondary" onclick="editLead(${l.id})">Edit</button></td>
+      </tr>`).join(""):`<tr><td colspan="8">No records found.</td></tr>`}
+    </tbody>
+   </table>
+  </div>
+ </div>`;
+}
+
+/* =========================================================
+   MATCHING
+========================================================= */
+
+function matchingPage(){
+ const buyers=db.leads.filter(l=>l.type==="Buyer"||l.type==="Tenant"||l.type==="Investor");
+ const selected=buyers[0]?.id||"";
+ return `
+ <div class="page-head">
+  <div><h2>🎯 Buyer Matching</h2><p>Find properties that fit a buyer's requirement.</p></div>
+ </div>
+ <div class="card">
+  <div class="form-group">
+   <label>Select Buyer</label>
+   <select id="matchBuyer" onchange="renderMatches()">
+    ${buyers.map(b=>`<option value="${b.id}">${esc(b.name)} — ${esc(b.location||"Rajkot")} — ${esc(b.budget||"Budget N/A")}</option>`).join("")}
+   </select>
+  </div>
+  <div id="matches" style="margin-top:20px">${selected?matchesFor(selected):"<p>No buyer leads available.</p>"}</div>
+ </div>`;
+}
+
+function parseMoney(s){
+ if(!s)return null;
+ const m=String(s).replace(/,/g,"").match(/([\d.]+)\s*(Cr|crore|L|lakh|K|k)?/i);
+ if(!m)return null;
+ let n=Number(m[1]),unit=(m[2]||"").toLowerCase();
+ if(unit==="cr"||unit==="crore")n*=10000000;
+ else if(unit==="l"||unit==="lakh")n*=100000;
+ else if(unit==="k")n*=1000;
+ return n;
+}
+function buyerBudgetNumber(budget){
+ const nums=String(budget||"").match(/[\d.]+\s*(?:Cr|L|K)?/gi);
+ if(!nums)return null;
+ const values=nums.map(parseMoney).filter(Boolean);
+ return values.length?Math.max(...values):null;
+}
+function matchesFor(id){
+ const b=db.leads.find(x=>x.id===Number(id));
+ if(!b)return "";
+ const budget=buyerBudgetNumber(b.budget);
+ const req=(b.requirement||"").toLowerCase();
+ const loc=(b.location||"").toLowerCase();
+
+ const results=db.properties.map(p=>{
+  let score=0;
+  if(loc && (p.locality||"").toLowerCase().includes(loc))score+=35;
+  else if(loc && "rajkot".includes(loc))score+=15;
+  const price=parseMoney(p.price);
+  if(budget&&price){
+   if(price<=budget)score+=40;
+   else if(price<=budget*1.15)score+=25;
+  }else score+=15;
+  if(req){
+   if(req.includes(String(p.bhk||"").toLowerCase()))score+=15;
+   if(req.includes((p.type||"").toLowerCase()))score+=10;
+  }else score+=10;
+  if(p.purpose==="Rent" && b.type==="Tenant")score+=10;
+  if(p.purpose==="Sale" && b.type!=="Tenant")score+=10;
+  return {...p,match:Math.min(100,score)};
+ }).sort((a,c)=>c.match-a.match).slice(0,8);
+
+ return results.map(p=>`
+  <div class="match">
+   <div style="display:flex;justify-content:space-between;gap:10px">
+    <div><strong>${esc(p.title)}</strong><p style="font-size:12px;color:#667085">${esc(p.locality)} · ${esc(p.price)}</p></div>
+    <span class="badge ${p.match>=75?"green":p.match>=50?"blue":"orange"}">${p.match}% Match</span>
+   </div>
+   <div class="progress"><div style="width:${p.match}%"></div></div>
+   <div style="margin-top:10px"><button class="secondary" onclick="viewProperty(${p.id})">View Property</button></div>
+  </div>`).join("");
+}
+function renderMatches(){
+ const id=document.getElementById("matchBuyer").value;
+ document.getElementById("matches").innerHTML=matchesFor(id);
+}
+
+/* =========================================================
+   FOLLOWUPS
+========================================================= */
+
+function followupsPage(){
+ return `
+ <div class="page-head">
+  <div><h2>Follow-ups</h2><p>Never miss a customer follow-up.</p></div>
+  <button class="primary" onclick="openFollowupModal()">+ Schedule Follow-up</button>
+ </div>
+ <div class="card">
+  <div class="table-wrap">
+   <table><thead><tr><th>Lead</th><th>Task</th><th>Due</th><th>Status</th><th>Action</th></tr></thead>
+   <tbody>
+   ${db.followups.map((f,i)=>`
+    <tr><td><strong>${esc(f.lead)}</strong></td><td>${esc(f.task)}</td><td>${esc(f.due)}</td>
+    <td><span class="badge ${f.status==="Completed"?"green":"orange"}">${f.status}</span></td>
+    <td><button class="secondary" onclick="completeFollowup(${i})">${f.status==="Completed"?"Undo":"Mark Done"}</button></td></tr>
+   `).join("")}</tbody></table>
+  </div>
+ </div>`;
+}
+function openFollowupModal(){
+ document.getElementById("modalTitle").textContent="Schedule Follow-up";
+ document.getElementById("modalBody").innerHTML=`
+ <form onsubmit="saveFollowup(event)">
+  <div class="form-grid">
+   <div class="form-group"><label>Lead</label><select id="fLead">${db.leads.map(l=>`<option>${esc(l.name)}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Due</label><input id="fDue" required placeholder="Today 5:00 PM"></div>
+   <div class="form-group full"><label>Task</label><textarea id="fTask" required placeholder="Call customer..."></textarea></div>
+  </div>
+  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Save</button></div>
+ </form>`;
+ openModal();
+}
+function saveFollowup(e){
+ e.preventDefault();
+ db.followups.push({id:uid(),lead:document.getElementById("fLead").value,task:document.getElementById("fTask").value,due:document.getElementById("fDue").value,status:"Pending"});
+ saveDB();addActivity("Follow-up scheduled");closeModal();showPage("followups");toast("Follow-up created");
+}
+function completeFollowup(i){
+ db.followups[i].status=db.followups[i].status==="Completed"?"Pending":"Completed";
+ saveDB();showPage("followups");
+}
+
+/* =========================================================
+   VISITS
+========================================================= */
+
+function visitsPage(){
+ return `
+ <div class="page-head">
+  <div><h2>Site Visits</h2><p>Manage buyer property visits.</p></div>
+  <button class="primary" onclick="openVisitModal()">+ Schedule Visit</button>
+ </div>
+ <div class="kpis">
+  ${kpi("📍","Scheduled",db.visits.filter(x=>x.status==="Scheduled").length,"Upcoming")}
+  ${kpi("✅","Completed",db.visits.filter(x=>x.status==="Completed").length,"Finished")}
+  ${kpi("❌","Cancelled",db.visits.filter(x=>x.status==="Cancelled").length,"Cancelled")}
+  ${kpi("🏠","Properties",db.properties.length,"Inventory")}
+ </div>
+ <div class="card"><div class="table-wrap">
+ <table><thead><tr><th>Customer</th><th>Property</th><th>Date/Time</th><th>Status</th><th>Action</th></tr></thead>
+ <tbody>${db.visits.map(v=>`
+  <tr><td><strong>${esc(v.customer)}</strong></td><td>${esc(v.property)}</td><td>${esc(v.time)}</td>
+  <td><span class="badge blue">${esc(v.status)}</span></td>
+  <td><button class="secondary" onclick="cycleVisit(${v.id})">Change Status</button></td></tr>`).join("")}</tbody></table>
+ </div></div>`;
+}
+function openVisitModal(){
+ document.getElementById("modalTitle").textContent="Schedule Site Visit";
+ document.getElementById("modalBody").innerHTML=`
+ <form onsubmit="saveVisit(event)">
+ <div class="form-grid">
+  <div class="form-group"><label>Customer</label><select id="vCustomer">${db.leads.filter(l=>l.type!=="Seller").map(l=>`<option>${esc(l.name)}</option>`).join("")}</select></div>
+  <div class="form-group"><label>Property</label><select id="vProperty">${db.properties.filter(p=>p.status==="Active").map(p=>`<option>${esc(p.title)}</option>`).join("")}</select></div>
+  <div class="form-group full"><label>Date / Time</label><input id="vTime" required placeholder="Tomorrow 5:00 PM"></div>
+ </div>
+ <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Schedule</button></div>
+ </form>`;
+ openModal();
+}
+function saveVisit(e){
+ e.preventDefault();
+ db.visits.push({id:uid(),customer:document.getElementById("vCustomer").value,property:document.getElementById("vProperty").value,time:document.getElementById("vTime").value,status:"Scheduled"});
+ saveDB();addActivity("New site visit scheduled");closeModal();showPage("visits");toast("Visit scheduled");
+}
+function cycleVisit(id){
+ const v=db.visits.find(x=>x.id===id);if(!v)return;
+ v.status=v.status==="Scheduled"?"Completed":v.status==="Completed"?"Cancelled":"Scheduled";
+ saveDB();showPage("visits");
+}
+
+/* =========================================================
+   DEALS
+========================================================= */
+
+function dealsPage(){
+ const stages=[["New Deal",5,"₹2.4 Cr"],["Site Visit",8,"₹3.8 Cr"],["Negotiation",6,"₹4.2 Cr"],["Documentation",3,"₹2.1 Cr"],["Closed",12,"₹8.4 Cr"]];
+ return `
+ <div class="page-head"><div><h2>Deals Pipeline</h2><p>Track transactions from enquiry to closing.</p></div>
+ <button class="primary" onclick="openDealModal()">+ Create Deal</button></div>
+ <div class="grid3">${stages.map(s=>`<div class="kpi"><p>${s[0]}</p><h3>${s[1]}</h3><strong>${s[2]}</strong></div>`).join("")}</div>
+ <div class="card" style="margin-top:18px">
+  <h3>Current Deal Board</h3>
+  <div class="kanban" style="margin-top:15px">
+   ${stages.map(s=>`<div class="column"><div class="column-head"><strong>${s[0]}</strong><span class="badge blue">${s[1]}</span></div>
+    ${["Demo Buyer 1","Demo Buyer 2","Demo Seller 1"].map((n,i)=>`
+     <div class="lead-card"><h4>${n}</h4><p>🏠 Property transaction</p><p>💰 ${["₹78 L","₹1.85 Cr","₹62 L"][i]}</p><p>👨‍💼 Assigned Agent</p></div>
+    `).join("")}
+   </div>`).join("")}
+  </div>
+ </div>`;
+}
+function openDealModal(){
+ document.getElementById("modalTitle").textContent="Create Deal";
+ document.getElementById("modalBody").innerHTML=`
+ <form onsubmit="event.preventDefault();closeModal();toast('Deal created')">
+  <div class="form-grid">
+   <div class="form-group"><label>Customer</label><select>${db.leads.map(l=>`<option>${esc(l.name)}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Property</label><select>${db.properties.map(p=>`<option>${esc(p.title)}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Deal Value</label><input required placeholder="₹85 L"></div>
+   <div class="form-group"><label>Stage</label><select><option>New Deal</option><option>Site Visit</option><option>Negotiation</option><option>Documentation</option><option>Closed</option></select></div>
+  </div>
+  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Create Deal</button></div>
+ </form>`;
+ openModal();
+}
+
+/* =========================================================
+   AGENTS
+========================================================= */
+
+function agentsPage(){
+ return `
+ <div class="page-head"><div><h2>Agents</h2><p>Manage your sales team.</p></div>
+ <button class="primary" onclick="openUserModal()">+ Add User</button></div>
+ <div class="card"><div class="table-wrap"><table>
+ <thead><tr><th>Agent</th><th>Role</th><th>Location</th><th>Deals</th><th>Revenue</th><th>Action</th></tr></thead>
+ <tbody>${db.agents.map(a=>`
+  <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${a.name[0]}</div><strong>${esc(a.name)}</strong></div></td>
+  <td>${esc(a.role)}</td><td>${esc(a.location)}</td><td>${a.deals}</td><td><strong>${esc(a.revenue)}</strong></td>
+  <td><button class="secondary" onclick="alert('Agent profile: ${esc(a.name)}')">View</button></td></tr>
+ `).join("")}</tbody></table></div></div>`;
+}
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+function reportsPage(){
+ const total=db.leads.length;
+ const buyers=db.leads.filter(l=>l.type==="Buyer").length;
+ const sellers=db.leads.filter(l=>l.type==="Seller").length;
+ return `
+ <div class="page-head"><div><h2>Reports & Analytics</h2><p>CRM performance overview.</p></div>
+ <button class="primary" onclick="exportLeadsCSV()">Export Leads CSV</button></div>
+ <div class="kpis">
+  ${kpi("👥","Total Leads",total,"CRM records")}
+  ${kpi("🧑","Buyers",buyers,"Buyer leads")}
+  ${kpi("🏷️","Sellers",sellers,"Seller leads")}
+  ${kpi("🏠","Properties",db.properties.length,"Inventory")}
+ </div>
+ <div class="grid2">
+  <div class="card"><h3>Lead Funnel</h3>
+   ${leadStages.slice(0,5).map((s,i)=>{
+    const n=db.leads.filter(l=>l.status===s).length;
+    const pct=total?Math.max(4,n/total*100):4;
+    return `<div style="margin:17px 0"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${s}</span><strong>${n}</strong></div>
+    <div class="progress"><div style="width:${pct}%;background:${["#2563eb","#3b82f6","#60a5fa","#f59e0b","#16a34a"][i]}"></div></div></div>`;
+   }).join("")}
+  </div>
+  <div class="card"><h3>Rajkot Areas</h3>
+   ${rajkotAreas().slice(0,8).map(a=>`<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+    <span>${a}</span><strong>${db.properties.filter(p=>p.locality===a).length} listings</strong></div>`).join("")}
+  </div>
+ </div>`;
+}
+
+/* =========================================================
+   AI ASSISTANT
+========================================================= */
+
+function aiPage(){
+ return `
+ <div class="page-head"><div><h2>🤖 AI Assistant</h2><p>CRM insights and quick commands.</p></div></div>
+ <div class="card" style="max-width:900px;margin:auto">
+  <div id="chat" style="min-height:330px;max-height:430px;overflow:auto;padding:8px">
+   <div style="background:#eff6ff;padding:14px;border-radius:10px">
+    <strong>EstateAI</strong>
+    <p style="margin-top:6px">Namaste! Try: "How many properties in Rajkot?", "show buyers", or "pending followups".</p>
+   </div>
+  </div>
+  <div style="display:flex;gap:9px;border-top:1px solid var(--border);padding-top:14px">
+   <input id="aiInput" class="filter" style="flex:1" placeholder="Ask about your CRM..." onkeydown="if(event.key==='Enter')askAI()">
+   <button class="primary" onclick="askAI()">Ask AI</button>
+  </div>
+ </div>`;
+}
+function askAI(){
+ const input=document.getElementById("aiInput");if(!input||!input.value.trim())return;
+ const q=input.value.trim();const low=q.toLowerCase();
+ let answer="";
+ if(low.includes("property")||low.includes("properties")){
+  answer=`There are ${db.properties.length} properties in the CRM, including ${db.properties.filter(p=>p.purpose==="Sale").length} sale and ${db.properties.filter(p=>p.purpose==="Rent").length} rent listings.`;
+ }else if(low.includes("buyer")){
+  answer=`There are ${db.leads.filter(l=>l.type==="Buyer").length} buyer leads currently stored.`;
+ }else if(low.includes("seller")){
+  answer=`There are ${db.leads.filter(l=>l.type==="Seller").length} seller leads currently stored.`;
+ }else if(low.includes("follow")){
+  answer=`${db.followups.filter(f=>f.status!=="Completed").length} follow-ups are pending.`;
+ }else if(low.includes("rajkot")){
+  answer=`The CRM is configured for Rajkot. ${db.properties.length} inventory records are currently loaded.`;
+ }else{
+  answer="I can currently answer CRM summary questions about properties, buyers, sellers, leads and follow-ups. For advanced AI analysis, connect an AI API/backend.";
+ }
+ const chat=document.getElementById("chat");
+ chat.innerHTML+=`
+ <div style="background:#f8fafc;padding:12px;border-radius:10px;margin:9px 0;text-align:right"><strong>You</strong><p>${esc(q)}</p></div>
+ <div style="background:#eff6ff;padding:12px;border-radius:10px;margin:9px 0"><strong>EstateAI</strong><p style="margin-top:5px">${esc(answer)}</p></div>`;
+ input.value="";chat.scrollTop=chat.scrollHeight;
+}
+
+/* =========================================================
+   ADMIN CONTROL — SUPABASE AUTH USER MANAGEMENT
+========================================================= */
+async function adminFunction(action,payload={}){
+  const c=await supabaseAuthClient();
+  if(!c || !currentUser?.id)throw new Error("You must be logged in.");
+  const {data:{session}}=await c.auth.getSession();
+  if(!session?.access_token)throw new Error("Session expired. Please login again.");
+  const r=await fetch("https://butmgtzgxllieevzgsqo.supabase.co/functions/v1/admin-users",{
+    method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token,"apikey":"sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig"},
+    body:JSON.stringify({action,...payload})
+  });
+  const data=await r.json().catch(()=>({}));
+  if(!r.ok||data?.error)throw new Error(data?.error||"Admin operation failed");
+  return data;
+}
+
+async function refreshCloudUsers(){
+  if(!isAdmin())return;
+  try{
+    const data=await adminFunction("list");
+    if(Array.isArray(data.users)){
+      const local=db.users||[];
+      db.users=data.users.map(u=>{const old=local.find(x=>String(x.auth_user_id||x.id)===String(u.id)||String(x.email).toLowerCase()===String(u.email).toLowerCase());return {...old,...u,auth_user_id:u.id,id:old?.id||uid()};});
+      saveDB();
+    }
+  }catch(e){console.warn("Cloud user list:",e);}
+}
+
+async function saveUserCloud(e,id){
+ e.preventDefault();
+ if(!isAdmin())return toast("Admin only");
+ const name=document.getElementById("uName").value.trim();
+ const username=document.getElementById("uUsername").value.trim();
+ const email=document.getElementById("uEmail").value.trim().toLowerCase();
+ const password=document.getElementById("uPassword").value;
+ const role=document.getElementById("uRole").value;
+ const active=document.getElementById("uActive").value==="yes";
+ try{
+   if(!name||!email||(!id&&!password))throw new Error("Name, email and password are required for a new user.");
+   const result=await adminFunction(id?"update":"create",{user_id:id,email,name,username,password,role,active});
+   const u=result.user;
+   const local={...(db.users.find(x=>String(x.auth_user_id||x.id)===String(id)||String(x.email).toLowerCase()===email)||{}),id:uid(),auth_user_id:u?.id||id,name,email,username,role,active};
+   const idx=db.users.findIndex(x=>String(x.auth_user_id||x.id)===String(id)||String(x.email||"").toLowerCase()===email);
+   if(idx>=0)db.users[idx]=local;else db.users.push(local);
+   saveDB();closeModal();await refreshCloudUsers();buildNav();updateProfile();showPage("admin");toast(id?"Cloud user updated":"Cloud user created — login is ready");
+ }catch(err){console.error(err);toast(err.message||"Could not save cloud user");}
+}
+
+async function disableCloudUser(authId,active){
+ if(!isAdmin())return;
+ try{await adminFunction("update",{user_id:authId,active});await refreshCloudUsers();showPage("admin");toast(active?"User enabled":"User disabled");}
+ catch(e){toast(e.message||"Could not update user");}
+}
+
+/* =========================================================
+   ADMIN CONTROL
+========================================================= */
+
+function adminPage(){
+ if(!isAdmin())return `<div class="card"><h2>Access denied</h2></div>`;
+ setTimeout(()=>refreshCloudUsers(),50);
+ return `
+ <div class="page-head">
+  <div><h2>🛡️ Admin Control Center</h2><p>Manage CRM data and users without coding.</p></div>
+  <button class="primary" onclick="backupData()">Download Backup</button>
+ </div>
+
+ <div class="grid3">
+  <div class="card"><h3>Inventory</h3><p style="color:#667085;margin-top:7px">${db.properties.length} properties</p>
+   <button class="secondary" style="margin-top:12px" onclick="showPage('properties')">Manage</button></div>
+  <div class="card"><h3>Users</h3><p style="color:#667085;margin-top:7px">${db.users.length} users</p>
+   <button class="secondary" style="margin-top:12px" onclick="openUserModal()">Add User</button></div>
+  <div class="card"><h3>Leads</h3><p style="color:#667085;margin-top:7px">${db.leads.length} leads</p>
+   <button class="secondary" style="margin-top:12px" onclick="showPage('leads')">Manage</button></div>
+ </div>
+
+ <div class="card" style="margin-top:18px">
+  <h3>User & Permission Management</h3>
+  <div class="table-wrap" style="margin-top:14px"><table>
+   <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+   <tbody>${db.users.map(u=>`
+    <tr><td><strong>${esc(u.name)}</strong></td><td>${esc(u.email||u.username||"")}</td><td><span class="badge purple">${u.role}</span></td>
+    <td><span class="badge ${u.active!==false?"green":"red"}">${u.active!==false?"Active":"Disabled"}</span></td>
+    <td>
+     <button class="secondary" onclick="editUser('${esc(u.auth_user_id||u.id)}')">Edit</button>
+     ${String(u.auth_user_id||u.id)!==String(currentUser.auth_user_id||currentUser.id)?`<button class="danger" onclick="toggleUser('${esc(u.auth_user_id||u.id)}')">${u.active!==false?"Disable":"Enable"}</button>`:""}
+    </td></tr>
+   `).join("")}</tbody>
+  </table></div>
+ </div>
+
+ <div class="card" style="margin-top:18px">
+  <h3>Data Tools</h3>
+  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
+   <button class="secondary" onclick="exportAllJSON()">Export Full JSON</button>
+   <button class="secondary" onclick="document.getElementById('importFile').click()">Import JSON</button>
+   <button class="danger" onclick="resetDemoData()">Reset Demo Data</button>
+   <input id="importFile" type="file" accept=".json" class="hidden" onchange="importJSON(event)">
+  </div>
+ </div>
+
+ <div class="card" style="margin-top:18px">
+  <h3>Audit Log</h3>
+  ${db.activities.slice(0,15).map(a=>`<div class="activity-item"><div class="dot"></div><div><strong>${esc(a.text)}</strong><p style="font-size:11px;color:#667085">${esc(a.time)}</p></div></div>`).join("")}
+ </div>`;
+}
+
+function openUserModal(user=null){
+ if(!isAdmin())return toast("Admin only");
+ document.getElementById("modalTitle").textContent=user?"Edit Cloud User":"Create Cloud Login User";
+ document.getElementById("modalBody").innerHTML=`
+ <form onsubmit="saveUserCloud(event,${user?.auth_user_id?`'${esc(user.auth_user_id)}'`:"null"})">
+ <div class="form-grid">
+  <div class="form-group"><label>Full Name</label><input id="uName" required value="${esc(user?.name||"")}"></div>
+  <div class="form-group"><label>Username</label><input id="uUsername" value="${esc(user?.username||"")}" placeholder="krunal"></div>
+  <div class="form-group full"><label>Email (Supabase Login)</label><input id="uEmail" type="email" required value="${esc(user?.email||"")}" placeholder="agent@example.com"></div>
+  <div class="form-group"><label>Password ${user?"(leave blank to keep current)":""}</label><input id="uPassword" type="password" ${user?"":"required"} placeholder="Minimum 6 characters"></div>
+  <div class="form-group"><label>Role</label><select id="uRole"><option ${user?.role==="Agent"||!user?"selected":""}>Agent</option><option ${user?.role==="Admin"?"selected":""}>Admin</option></select></div>
+  <div class="form-group"><label>Status</label><select id="uActive"><option value="yes" ${!user||user.active!==false?"selected":""}>Active</option><option value="no" ${user&&user.active===false?"selected":""}>Disabled</option></select></div>
+ </div>
+ <div style="margin-top:12px;padding:12px;background:#eff6ff;border-radius:10px;font-size:12px;color:#1d4ed8">🔐 This creates/updates the real Supabase Auth account. The user can log in from any device with this email and password.</div>
+ <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Save Cloud User</button></div>
+ </form>`;
+ openModal();
+}
+function editUser(id){const u=db.users.find(x=>String(x.auth_user_id||x.id)===String(id)||String(x.id)===String(id));if(u)openUserModal(u)}
+function toggleUser(id){const u=db.users.find(x=>String(x.auth_user_id||x.id)===String(id)||String(x.id)===String(id));if(u?.auth_user_id)disableCloudUser(u.auth_user_id,!u.active)}
+
+function backupData(){
+ const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+ downloadBlob(blob,"estateai-backup.json");
+}
+function exportAllJSON(){backupData()}
+function importJSON(e){
+ const file=e.target.files[0];if(!file)return;
+ if(!confirm("Restore this backup? A safety copy of current data will be kept first.")){e.target.value="";return;}
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const data=JSON.parse(reader.result);
+   if(!data.properties||!data.leads)throw new Error();
+   localStorage.setItem(STORAGE+"_before_restore",JSON.stringify(db));
+   db={...clone(defaultData),...data};
+   proEnsureArray();
+   saveDB();
+   location.reload();
+  }catch(err){alert("Invalid EstateAI backup file. Current data was not replaced.");}
+ };
+ reader.readAsText(file);
+}
+function resetDemoData(){
+ if(!isAdmin()){toast("Admin access required");return;}
+ if(!confirm("Reset local demo data? A safety copy will be kept first. Cloud leads will NOT be deleted."))return;
+ localStorage.setItem(STORAGE+"_before_reset",JSON.stringify(db));
+ db=clone(defaultData);
+ proEnsureArray();
+ saveDB();
+ location.reload();
+}
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+function settingsPage(){
+ return `
+ <div class="page-head"><div><h2>Settings</h2><p>Configure your CRM without coding.</p></div>
+ <button class="primary" onclick="saveSettings()">Save Changes</button></div>
+
+ <div class="card">
+  <h3>Company Configuration</h3>
+  <div class="form-grid" style="margin-top:18px">
+   <div class="form-group"><label>Company Name</label><input id="sCompany" value="${esc(db.settings.company)}"></div>
+   <div class="form-group"><label>Primary City</label><input id="sCity" value="${esc(db.settings.city)}"></div>
+   <div class="form-group"><label>Currency</label><select id="sCurrency"><option>INR ₹</option><option>USD $</option><option>EUR €</option></select></div>
+   <div class="form-group"><label>Timezone</label><select id="sTimezone"><option>Asia/Kolkata</option><option>Asia/Dubai</option></select></div>
+  </div>
+ </div>
+
+ <div class="card" style="margin-top:18px">
+  <h3>Enabled CRM Modules</h3>
+  <div class="feature-grid" style="margin-top:16px">
+   ${[
+    ["🏠","Property Management"],["👥","Lead Management"],["🎯","Buyer Matching"],
+    ["🏷️","Seller Management"],["📅","Follow-up Automation"],["📍","Site Visits"],
+    ["🤝","Deals"],["📊","Reports"],["💬","Communications"],["🤖","AI Assistant"],
+    ["👨‍💼","Agent Management"],["🔔","Notifications"]
+   ].map(x=>`<div class="feature"><div style="font-size:25px">${x[0]}</div><strong>${x[1]}</strong><p>Enabled</p></div>`).join("")}
+  </div>
+ </div>
+
+ <div class="card" style="margin-top:18px">
+  <h3>Data Safety</h3>
+  <p style="color:#667085;margin-top:7px">Data is protected locally with recovery backups. CRM leads also sync to Supabase Cloud. Cloud data is not deleted by refresh or browser restart.</p>
+  <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+   <button class="secondary" onclick="backupData()">Download Backup</button>
+   <button class="secondary" onclick="document.getElementById('importFile2').click()">Restore Backup</button>
+   <input id="importFile2" type="file" accept=".json" class="hidden" onchange="importJSON(event)">
+  </div>
+ </div>`;
+}
+function saveSettings(){
+ db.settings.company=document.getElementById("sCompany").value;
+ db.settings.city=document.getElementById("sCity").value;
+ db.settings.currency=document.getElementById("sCurrency").value;
+ db.settings.timezone=document.getElementById("sTimezone").value;
+ saveDB();toast("Settings saved");
+}
+
+/* =========================================================
+   SEARCH / NOTIFICATIONS / THEME
+========================================================= */
+
+function globalSearch(value){
+ const q=value.trim().toLowerCase();
+ if(!q)return;
+ const p=db.properties.filter(x=>`${x.title} ${x.locality} ${x.owner}`.toLowerCase().includes(q));
+ const l=db.leads.filter(x=>`${x.name} ${x.location} ${x.phone}`.toLowerCase().includes(q));
+ if(p.length||l.length){
+  if(currentPage==="properties"){
+   const grid=document.getElementById("propertyGrid");
+   if(grid)grid.innerHTML=propertyCards(p);
+  }
+ }
+}
+function showNotifications(){
+ const pending=db.followups.filter(x=>x.status!=="Completed").length;
+ alert(`EstateAI Notifications\n\n• ${pending} pending follow-ups\n• ${db.visits.filter(x=>x.status==="Scheduled").length} scheduled site visits\n• ${db.leads.filter(x=>x.status==="New").length} new leads`);
+}
+function toggleTheme(){
+ document.body.classList.toggle("dark");
+ db.settings.theme=document.body.classList.contains("dark")?"dark":"light";
+ saveDB();
+}
+function applyTheme(){
+ if(db.settings.theme==="dark")document.body.classList.add("dark");
+}
+
+/* =========================================================
+   CSV
+========================================================= */
+
+function exportLeadsCSV(){
+ const rows=[
+  ["Name","Type","Phone","Location","Budget","Requirement","Status","Source","Score"],
+  ...db.leads.map(l=>[l.name,l.type,l.phone,l.location,l.budget,l.requirement,l.status,l.source,l.score])
+ ];
+ const csv=rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+ downloadBlob(new Blob([csv],{type:"text/csv"}),"estateai-leads.csv");
+ toast("CSV exported");
+}
+function downloadBlob(blob,name){
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");a.href=url;a.download=name;
+ document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function openModal(){document.getElementById("modalBg").classList.add("show")}
+function closeModal(){document.getElementById("modalBg").classList.remove("show")}
+document.getElementById("modalBg").addEventListener("click",e=>{
+ if(e.target.id==="modalBg")closeModal();
+});
+
+/* =========================================================
+   INIT
+========================================================= */
+
+document.addEventListener("DOMContentLoaded",()=>{
+ applyTheme();
+ restoreSession();
+});
+
+/* =========================================================
+   ESTATEAI PRO EXTENSION
+   - authentic welcome animation
+   - photo uploads stored locally
+   - live same-browser sync using BroadcastChannel
+   - admin command center
+   - social/API connector readiness
+   - AI assistant configuration hook
+========================================================= */
+const ESTATEAI_PRO_VERSION="4.0.0";
+let proChannel=null;
+
+function proEnsureArray(){
+  db.properties=db.properties||[];
+  db.leads=db.leads||[];
+  db.activities=db.activities||[];
+  db.socialInbox=db.socialInbox||[];
+  db.settings=db.settings||{};
+  db.settings.integrations=db.settings.integrations||{
+    facebook:false,instagram:false,google:false,webhook:false,ai:false
+  };
+}
+proEnsureArray();
+
+function proPersist(){
+  saveDB();
+  try{ if(proChannel) proChannel.postMessage({type:"estateai-update",at:Date.now()}); }catch(e){}
+}
+
+function proSync(){
+  try{
+    if("BroadcastChannel" in window){
+      proChannel=new BroadcastChannel("estateai-pro-live");
+      proChannel.onmessage=()=>{ db=loadDB(); if(currentUser) showPage(currentPage); };
+    }
+  }catch(e){}
+}
+
+function proWelcome(){
+  const old=document.getElementById("proWelcome");
+  if(old)old.remove();
+  const el=document.createElement("div");
+  el.id="proWelcome";el.className="pro-welcome";
+  const name=(currentUser?.name||"Administrator").split(" ")[0];
+  el.innerHTML=`
+   <div class="pro-orb o1"></div><div class="pro-orb o2"></div>
+   <div class="pro-welcome-box">
+    <div class="pro-welcome-icon">🏙️</div>
+    <h1>Welcome, <span>${esc(name)}</span></h1>
+    <p>EstateAI Rajkot Pro is preparing your command center.</p>
+    <div class="pro-welcome-status">
+      <span class="pro-pill">✓ Secure Session</span>
+      <span class="pro-pill">⚡ Live Sync</span>
+      <span class="pro-pill">🤖 AI Ready</span>
+      <span class="pro-pill">🛡️ ${isAdmin()?"Full Admin":"Agent"} Access</span>
+    </div>
+    <div class="pro-loading"><div></div></div>
+   </div>`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.classList.add("hidden"),1700);
+  setTimeout(()=>el.remove(),2150);
+}
+
+function proDashboardEnhance(){
+  if(currentPage!=="dashboard")return;
+  const c=document.getElementById("content"); if(!c)return;
+  const head=c.querySelector(".page-head"); if(!head || c.querySelector(".pro-hero"))return;
+  const hero=document.createElement("div");hero.className="pro-hero";
+  hero.innerHTML=`
+   <div class="pro-hero-grid">
+    <div><h2>EstateAI Pro Command Center</h2>
+    <p><span class="pro-live-dot"></span>Live CRM workspace • Rajkot • ${ESTATEAI_PRO_VERSION}</p>
+    <div class="pro-command">
+      <button onclick="showPage('properties')">🏠 <b>Inventory</b><br><small>Manage properties</small></button>
+      <button onclick="showPage('leads')">👥 <b>Lead Center</b><br><small>Buyers & sellers</small></button>
+      <button onclick="showPage('ai')">🤖 <b>AI Assistant</b><br><small>CRM intelligence</small></button>
+    </div></div>
+    <div class="pro-quick">
+      <div><strong>${db.properties.length}</strong><small>Properties</small></div>
+      <div><strong>${db.leads.length}</strong><small>Leads</small></div>
+      <div><strong>${db.socialInbox.length}</strong><small>Social Inbox</small></div>
+      <div><strong>${isAdmin()?"FULL":"LIMITED"}</strong><small>Admin Control</small></div>
+    </div>
+   </div>`;
+  c.insertBefore(hero,head.nextSibling);
+}
+
+function proPhotoFields(property=null){
+ return `
+ <div class="form-group full">
+  <label>Property Photos</label>
+  <label class="photo-drop">
+   📷 Click to add photos (JPG/PNG/WebP)
+   <input id="pPhotos" type="file" accept="image/*" multiple style="display:none"
+     onchange="proPreviewPhotos(event)">
+  </label>
+  <div id="photoPreview" class="photo-preview">
+   ${(property?.photos||[]).map(x=>`<img src="${esc(x)}" alt="Property photo">`).join("")}
+  </div>
+  <small style="color:#667085">Photos are stored in this browser. For cloud/public storage, connect a backend/storage service.</small>
+ </div>`;
+}
+
+function proPreviewPhotos(e){
+ const files=[...e.target.files||[]].slice(0,8);
+ const box=document.getElementById("photoPreview");if(!box)return;
+ box.innerHTML="";
+ files.forEach(f=>{
+   const r=new FileReader();
+   r.onload=()=>{const img=document.createElement("img");img.src=r.result;box.appendChild(img);};
+   r.readAsDataURL(f);
+ });
+}
+
+async function proReadPhotoFiles(){
+ const input=document.getElementById("pPhotos");
+ if(!input||!input.files.length)return [];
+ const files=[...input.files].slice(0,8);
+ return Promise.all(files.map(f=>new Promise(resolve=>{
+   const r=new FileReader();r.onload=()=>resolve(r.result);r.readAsDataURL(f);
+ })));
+}
+
+/* Replace property modal with a photo-enabled version. */
+const _openPropertyModal=window.openPropertyModal;
+window.openPropertyModal=async function(property=null){
+ document.getElementById("modalTitle").textContent=property?"Edit Property":"Add Rajkot Property";
+ document.getElementById("modalBody").innerHTML=`
+ <form onsubmit="proSaveProperty(event,${property?property.id:"null"})">
+  <div class="form-grid">
+   <div class="form-group full"><label>Property Title</label>
+    <input id="pTitle" required value="${esc(property?.title||"")}" placeholder="Premium 3 BHK Apartment"></div>
+   <div class="form-group"><label>Property Type</label>
+    <select id="pType">${["Apartment","Villa","Plot","Commercial","Office","Shop","Agricultural Land"].map(x=>`<option ${property?.type===x?"selected":""}>${x}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Purpose</label>
+    <select id="pPurpose"><option ${property?.purpose==="Sale"||!property?"selected":""}>Sale</option><option ${property?.purpose==="Rent"?"selected":""}>Rent</option></select></div>
+   <div class="form-group"><label>Price</label><input id="pPrice" required value="${esc(property?.price||"")}" placeholder="₹85 L"></div>
+   <div class="form-group"><label>Area</label><input id="pArea" value="${esc(property?.area||"")}" placeholder="1600 Sq Ft"></div>
+   <div class="form-group"><label>BHK</label><select id="pBhk"><option value="">N/A</option>${["1","2","3","4","5+"].map(x=>`<option ${property?.bhk===x?"selected":""}>${x}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Locality</label><select id="pLocality">${rajkotAreas().map(x=>`<option ${property?.locality===x?"selected":""}>${x}</option>`).join("")}</select></div>
+   <div class="form-group"><label>Owner / Seller</label><input id="pOwner" value="${esc(property?.owner||"")}" placeholder="Seller name"></div>
+   <div class="form-group"><label>Status</label><select id="pStatus"><option ${!property||property.status==="Active"?"selected":""}>Active</option><option ${property?.status==="Sold"?"selected":""}>Sold</option><option ${property?.status==="On Hold"?"selected":""}>On Hold</option></select></div>
+   <div class="form-group"><label>Verification</label><select id="pVerified"><option value="yes" ${property?.verified?"selected":""}>Verified</option><option value="no" ${property&&!property.verified?"selected":""}>Unverified</option></select></div>
+   ${proPhotoFields(property)}
+   <div class="form-group full"><label>Notes / Full Details</label><textarea id="pNotes">${esc(property?.notes||"")}</textarea></div>
+  </div>
+  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">${property?"Update Property":"Create Property"}</button></div>
+ </form>`;
+ openModal();
+};
+
+window.proSaveProperty=async function(e,id){
+ e.preventDefault();
+ const old=id?db.properties.find(p=>p.id===id):null;
+ const uploaded=await proReadPhotoFiles();
+ const obj={
+  id:id||uid(),title:document.getElementById("pTitle").value,type:document.getElementById("pType").value,
+  purpose:document.getElementById("pPurpose").value,price:document.getElementById("pPrice").value,
+  area:document.getElementById("pArea").value,bhk:document.getElementById("pBhk").value,city:"Rajkot",
+  locality:document.getElementById("pLocality").value,owner:document.getElementById("pOwner").value,
+  status:document.getElementById("pStatus").value,verified:document.getElementById("pVerified").value==="yes",
+  updated:"Just now",notes:document.getElementById("pNotes").value,
+  photos:uploaded.length?uploaded:(old?.photos||[])
+ };
+ if(id){const i=db.properties.findIndex(p=>p.id===id);if(i>=0)db.properties[i]=obj;addActivity("Property updated: "+obj.title)}
+ else{db.properties.unshift(obj);addActivity("Property added: "+obj.title)}
+ proPersist();closeModal();showPage("properties");toast("Property saved with photo support");
+};
+
+/* Photo gallery on view. */
+const _viewProperty=window.viewProperty;
+window.viewProperty=function(id){
+ const p=db.properties.find(x=>x.id===id);if(!p)return;
+ document.getElementById("modalTitle").textContent="Property Details";
+ document.getElementById("modalBody").innerHTML=`
+  ${(p.photos||[]).length?`<div class="photo-preview" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">${p.photos.map(x=>`<img src="${esc(x)}" style="height:130px" alt="Property photo">`).join("")}</div>`:""}
+  <div class="grid2">
+   <div class="stat-mini"><strong>Property</strong><p>${esc(p.title)}</p></div>
+   <div class="stat-mini"><strong>Price</strong><p>${esc(p.price)}</p></div>
+   <div class="stat-mini"><strong>Location</strong><p>${esc(p.locality)}, Rajkot</p></div>
+   <div class="stat-mini"><strong>Type</strong><p>${esc(p.type)}</p></div>
+   <div class="stat-mini"><strong>Purpose</strong><p>${esc(p.purpose)}</p></div>
+   <div class="stat-mini"><strong>Area</strong><p>${esc(p.area)}</p></div>
+  </div>
+  <div style="margin-top:18px"><strong>Verification:</strong> ${p.verified?'<span class="badge green">Verified</span>':'<span class="badge orange">Unverified</span>'}</div>
+  <div style="margin-top:18px;text-align:right"><button class="primary" onclick="closeModal()">Close</button></div>`;
+ openModal();
+};
+
+/* Real-time local social inbox. External social networks must call a backend webhook/API. */
+function socialInboxPage(){
+ proEnsureArray();
+ return `
+ <div class="page-head">
+  <div><h2>🌐 Social & Web Lead Center</h2><p>One inbox for buyer/seller signals and connected sources.</p></div>
+  ${isAdmin()?'<button class="primary" onclick="openConnectorModal()">⚙ Configure Connections</button>':""}
+ </div>
+ <div class="card">
+  <div class="pro-source"><div><b>🔵 Facebook</b><br><small>Official API/Webhook required</small></div><span class="badge ${db.settings.integrations.facebook?"green":"orange"}">${db.settings.integrations.facebook?"Connected":"Not Connected"}</span></div>
+  <div class="pro-source"><div><b>📸 Instagram</b><br><small>Official API/Webhook required</small></div><span class="badge ${db.settings.integrations.instagram?"green":"orange"}">${db.settings.integrations.instagram?"Connected":"Not Connected"}</span></div>
+  <div class="pro-source"><div><b>🔎 Google</b><br><small>Business/lead integration required</small></div><span class="badge ${db.settings.integrations.google?"green":"orange"}">${db.settings.integrations.google?"Connected":"Not Connected"}</span></div>
+  <div class="pro-source"><div><b>🔗 Your Webhook</b><br><small>Backend endpoint can push new leads here</small></div><span class="badge ${db.settings.integrations.webhook?"green":"orange"}">${db.settings.integrations.webhook?"Ready":"Not Configured"}</span></div>
+ </div>
+ <div class="card" style="margin-top:18px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+   <div><h3>Live Incoming Queue</h3><p style="color:#667085;margin-top:4px"><span class="pro-live-dot"></span>Updates automatically inside this browser session</p></div>
+   ${isAdmin()?'<button class="secondary" onclick="openSocialLeadModal()">+ Test Incoming Lead</button>':""}
+  </div>
+  <div style="margin-top:15px">
+   ${db.socialInbox.length?db.socialInbox.slice().reverse().map(x=>`
+    <div class="lead-card">
+     <div style="display:flex;justify-content:space-between;gap:8px"><h4>${esc(x.name||"Unknown")}</h4><span class="badge ${x.intent==="Sell"?"orange":"blue"}">${esc(x.intent||"Inquiry")}</span></div>
+     <p>📱 ${esc(x.phone||"Not provided")} • 📍 ${esc(x.location||"Rajkot")}</p>
+     <p>📝 ${esc(x.message||"")}</p><p>🌐 Source: ${esc(x.source||"Webhook")}</p>
+     <div style="margin-top:8px"><button class="secondary" onclick="convertSocialLead(${x.id})">Create CRM Lead</button></div>
+    </div>`).join(""):"<div class='stat-mini'>No incoming social leads yet.</div>"}
+  </div>
+ </div>`;
+}
+
+function openConnectorModal(){
+ if(!isAdmin())return toast("Admin only");
+ document.getElementById("modalTitle").textContent="Integration Control Center";
+ document.getElementById("modalBody").innerHTML=`
+ <div class="card">
+  <h3>Connection switches</h3>
+  <p style="color:#667085;margin:8px 0 16px">These switches mark an integration as configured. They do not bypass Facebook/Instagram/Google permissions.</p>
+  ${["facebook","instagram","google","webhook","ai"].map(k=>`
+   <label style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border)">
+    <span><b>${k.toUpperCase()}</b><br><small>Official API / backend required</small></span>
+    <input id="int_${k}" type="checkbox" ${db.settings.integrations[k]?"checked":""}>
+   </label>`).join("")}
+  <div class="form-actions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveConnectors()">Save</button></div>
+ </div>`;
+ openModal();
+}
+function saveConnectors(){
+ ["facebook","instagram","google","webhook","ai"].forEach(k=>db.settings.integrations[k]=document.getElementById("int_"+k).checked);
+ proPersist();closeModal();showPage("social");toast("Integration settings saved");
+}
+function openSocialLeadModal(){
+ document.getElementById("modalTitle").textContent="Simulate Incoming Social Lead";
+ document.getElementById("modalBody").innerHTML=`
+ <form onsubmit="saveSocialLead(event)">
+  <div class="form-grid">
+   <div class="form-group"><label>Name</label><input id="slName" required placeholder="Seller / Buyer name"></div>
+   <div class="form-group"><label>Phone</label><input id="slPhone" placeholder="+91..."></div>
+   <div class="form-group"><label>Intent</label><select id="slIntent"><option>Sell</option><option>Buy</option></select></div>
+   <div class="form-group"><label>Source</label><select id="slSource"><option>Facebook</option><option>Instagram</option><option>Google</option><option>Website</option></select></div>
+   <div class="form-group full"><label>Location</label><input id="slLocation" value="Rajkot"></div>
+   <div class="form-group full"><label>Post / Message</label><textarea id="slMessage" required placeholder="Want to sell my 3 BHK..."></textarea></div>
+  </div>
+  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Receive Lead</button></div>
+ </form>`;
+ openModal();
+}
+function saveSocialLead(e){
+ e.preventDefault();
+ db.socialInbox.push({id:uid(),name:slName.value,phone:slPhone.value,intent:slIntent.value,
+ source:slSource.value,location:slLocation.value,message:slMessage.value,created:new Date().toISOString()});
+ proPersist();closeModal();showPage("social");toast("Incoming lead received");
+}
+function convertSocialLead(id){
+ const x=db.socialInbox.find(a=>a.id===id);if(!x)return;
+ const lead={id:uid(),name:x.name,phone:x.phone,type:x.intent==="Sell"?"Seller":"Buyer",
+ location:x.location,budget:"",requirement:x.message,status:"New",source:x.source,score:60};
+ db.leads.unshift(lead);addActivity("Social lead converted: "+x.name);proPersist();showPage("leads");toast("CRM lead created");
+}
+
+/* =========================================================
+   REAL SOCIAL LEAD PIPELINE
+   Meta -> Supabase Edge Function -> social_leads table -> CRM
+========================================================= */
+const SOCIAL_TABLE="social_leads";
+let socialPollTimer=null;
+let socialLastSeenAt=0;
+
+function socialClient(){
+  try{
+    if(window.__estateaiSocialClient)return window.__estateaiSocialClient;
+    if(!window.supabase?.createClient)return null;
+    window.__estateaiSocialClient=window.supabase.createClient(
+      "https://butmgtzgxllieevzgsqo.supabase.co",
+      "sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig",
+      {auth:{persistSession:true,autoRefreshToken:true}}
+    );
+    return window.__estateaiSocialClient;
+  }catch(e){return null;}
+}
+
+function classifySocialIntent(x){
+  const raw=((x.intent||"")+" "+(x.message||"")+" "+(x.requirement||"")).toLowerCase();
+  if(/\b(sell|selling|sale|bech|bechna|vech|વેચ|વેચવું)\b/.test(raw))return "Seller";
+  if(/\b(buy|buying|purchase|kharid|kharidna|ખરીદ|ખરીદવું)\b/.test(raw))return "Buyer";
+  return x.type||"Buyer";
+}
+
+async function pullSocialLeads(){
+  if(!currentUser)return;
+  const c=socialClient();if(!c)return;
+  try{
+    const {data,error}=await c.from(SOCIAL_TABLE).select("*").order("created_at",{ascending:true}).limit(100);
+    if(error){console.warn("Social lead table:",error.message);return;}
+    let changed=false;
+    for(const x of (data||[])){
+      const sid=String(x.id);
+      const exists=db.leads.some(l=>String(l.external_id||"")===sid || (x.external_lead_id && String(l.external_id||"")===String(x.external_lead_id)));
+      if(exists){socialLastSeenAt=Math.max(socialLastSeenAt,Date.parse(x.created_at||0)||0);continue;}
+      const lead={
+        id:uid(),external_id:sid,name:x.name||"Unknown Contact",phone:x.phone||"",
+        type:classifySocialIntent(x),location:x.location||"",budget:x.budget||"",
+        requirement:x.requirement||x.message||"",status:"New",source:x.source||"Meta",
+        score:Number(x.score||70),created_at:x.created_at||new Date().toISOString(),
+        social_url:x.social_url||"",photo_url:x.photo_url||""
+      };
+      db.leads.unshift(lead);
+      db.socialInbox=db.socialInbox||[];
+      db.socialInbox.push({id:uid(),external_id:sid,name:lead.name,phone:lead.phone,
+        intent:lead.type==="Seller"?"Sell":"Buy",source:lead.source,location:lead.location,
+        message:lead.requirement,created:lead.created_at,social_url:lead.social_url});
+      addActivity("New "+lead.type+" lead from "+lead.source+": "+lead.name);
+      changed=true;
+      socialLastSeenAt=Math.max(socialLastSeenAt,Date.parse(lead.created_at)||0);
+    }
+    if(changed){proPersist(); if(currentPage==="social"||currentPage==="leads"||currentPage==="dashboard")showPage(currentPage); toast("⚡ New social lead received");}
+  }catch(e){console.warn("Social polling failed",e)}
+}
+
+function startSocialPolling(){
+  if(socialPollTimer)clearInterval(socialPollTimer);
+  pullSocialLeads();
+  socialPollTimer=setInterval(pullSocialLeads,1000);
+}
+
+function stopSocialPolling(){if(socialPollTimer){clearInterval(socialPollTimer);socialPollTimer=null;}}
+
+function socialInboxPage(){
+ const cfg=db.settings?.integrations||{};
+ const total=db.socialInbox?.length||0;
+ const fb=(db.leads||[]).filter(x=>String(x.source).toLowerCase().includes("facebook")).length;
+ const ig=(db.leads||[]).filter(x=>String(x.source).toLowerCase().includes("instagram")).length;
+ const google=(db.leads||[]).filter(x=>String(x.source).toLowerCase().includes("google")).length;
+ return `
+ <div class="page-head"><div><h2>🌐 Social Lead Center</h2><p>Facebook, Instagram, Google and website leads in one CRM.</p></div>
+ <div class="social-live"><span class="pro-live-dot"></span> LIVE • checks every second</div></div>
+ <div class="social-grid">
+  <div class="social-card">📘 Facebook<strong>${fb}</strong><small>CRM leads</small></div>
+  <div class="social-card">📸 Instagram<strong>${ig}</strong><small>CRM leads</small></div>
+  <div class="social-card">🌐 Google / Web<strong>${google}</strong><small>CRM leads</small></div>
+ </div>
+ <div class="card">
+  <h3>🔗 Automatic Connection</h3>
+  <p style="color:#667085;margin:7px 0 14px">Meta sends new Lead Ads/webhook events to your Supabase Edge Function. The CRM then imports them automatically.</p>
+  <div class="pro-source"><span>Facebook Lead Ads</span><span class="badge ${cfg.facebook?"green":"orange"}">${cfg.facebook?"CONNECTED":"CONNECT META"}</span></div>
+  <div class="pro-source"><span>Instagram Professional / Lead Ads</span><span class="badge ${cfg.instagram?"green":"orange"}">${cfg.instagram?"CONNECTED":"CONNECT META"}</span></div>
+  <div class="pro-source"><span>Google / Website webhook</span><span class="badge ${cfg.google?"green":"orange"}">${cfg.google?"CONNECTED":"CONNECT"}</span></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+   ${isAdmin()?'<button class="primary" onclick="openConnectorModal()">⚙ Configure</button>':''}
+   ${isAdmin()?'<button class="secondary" onclick="openSocialLeadModal()">+ Test Incoming Lead</button>':''}
+  </div>
+ </div>
+ <div class="card" style="margin-top:18px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3>Incoming Queue</h3><span class="badge blue">${total}</span></div>
+  ${(db.socialInbox||[]).slice().reverse().slice(0,30).map(x=>`
+   <div class="pro-source"><div><strong>${esc(x.name||"Unknown")}</strong><br><small>${esc(x.source||"Social")} • ${esc(x.location||"")}</small><br><small>${esc(x.message||"")}</small></div>
+   <button class="secondary" onclick="convertSocialLead(${x.id})">Create CRM Lead</button></div>`).join("") || '<div class="stat-mini">No incoming social leads yet.</div>'}
+ </div>`;
+}
+
+/* Start social polling after cloud auth is restored. */
+const _socialOldLogin=window.login;
+window.login=async function(){const r=await _socialOldLogin.apply(this,arguments);if(currentUser)startSocialPolling();return r;};
+const _socialOldLogout=window.logout;
+window.logout=async function(){stopSocialPolling();return _socialOldLogout.apply(this,arguments);};
+document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{if(currentUser)startSocialPolling();},1200));
+
+/* AI: genuine API calls require a secure backend; never expose a production secret in frontend. */
+function aiPage(){
+ return `
+ <div class="page-head"><div><h2>🤖 EstateAI Intelligence</h2><p>CRM analysis + secure AI connection point.</p></div></div>
+ <div class="grid2">
+  <div class="card">
+   <h3>CRM AI</h3><p style="color:#667085;margin:7px 0 15px">Ask about your local CRM data.</p>
+   <div id="chat" style="max-height:390px;overflow:auto"></div>
+   <div style="display:flex;gap:8px;margin-top:10px"><input id="aiInput" class="filter" style="flex:1" placeholder="e.g. How many seller leads?">
+   <button class="primary" onclick="askAI()">Ask</button></div>
+  </div>
+  <div class="card">
+   <h3>Real AI Connection</h3>
+   <p style="color:#667085;margin-top:7px">For production AI, use a backend proxy so your API key is never exposed to visitors.</p>
+   <div class="stat-mini" style="margin-top:15px"><b>Connection</b><p>${db.settings.integrations.ai?"Marked ready":"Not configured"}</p></div>
+   ${isAdmin()?'<button class="secondary" style="margin-top:12px" onclick="openConnectorModal()">Configure AI</button>':""}
+  </div>
+ </div>`;
+}
+function askAI(){
+ const input=document.getElementById("aiInput"),q=(input?.value||"").trim();if(!q)return;
+ const low=q.toLowerCase();let answer="";
+ if(low.includes("property"))answer=`There are ${db.properties.length} properties in the CRM. ${db.properties.filter(p=>p.status==="Active").length} are active.`;
+ else if(low.includes("buyer"))answer=`There are ${db.leads.filter(l=>l.type==="Buyer").length} buyer leads.`;
+ else if(low.includes("seller"))answer=`There are ${db.leads.filter(l=>l.type==="Seller").length} seller leads.`;
+ else if(low.includes("lead"))answer=`There are ${db.leads.length} total CRM leads.`;
+ else if(low.includes("follow"))answer=`${db.followups.filter(f=>f.status!=="Completed").length} follow-ups are pending.`;
+ else if(low.includes("social"))answer=`${db.socialInbox.length} incoming social/web records are in the queue.`;
+ else answer="I can analyze properties, buyers, sellers, leads, social inbox and follow-ups. Connect a secure backend AI endpoint for generative answers.";
+ const chat=document.getElementById("chat");
+ chat.innerHTML+=`<div style="background:#eff6ff;padding:12px;border-radius:10px;margin:9px 0"><b>EstateAI</b><p style="margin-top:5px">${esc(answer)}</p></div>`;
+ input.value="";chat.scrollTop=chat.scrollHeight;
+}
+
+/* Admin gets the complete operational surface. */
+function proAdminPage(){
+ if(!isAdmin())return `<div class="card"><h2>Access denied</h2></div>`;
+ return `
+ <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>Full control over inventory, leads, users, integrations and data.</p></div>
+ <button class="primary" onclick="backupData()">⬇ Backup Everything</button></div>
+ <div class="kpis">
+  ${kpi("🏠","Properties",db.properties.length,"Full control")}
+  ${kpi("👥","Leads",db.leads.length,"Full control")}
+  ${kpi("🌐","Social Inbox",db.socialInbox.length,"Incoming")}
+  ${kpi("👤","Users",db.users.length,"Access control")}
+ </div>
+ <div class="grid3">
+  <div class="card"><h3>👥 Users & Roles</h3><p style="color:#667085;margin-top:6px">Create, disable and change roles.</p><button class="secondary" style="margin-top:12px" onclick="openUserModal()">Manage Users</button></div>
+  <div class="card"><h3>🌐 Integrations</h3><p style="color:#667085;margin-top:6px">Social/API/AI connection flags.</p><button class="secondary" style="margin-top:12px" onclick="openConnectorModal()">Configure</button></div>
+  <div class="card"><h3>💾 Data Control</h3><p style="color:#667085;margin-top:6px">Export/import/reset local database.</p><button class="secondary" style="margin-top:12px" onclick="backupData()">Backup</button></div>
+ </div>
+ <div class="card" style="margin-top:18px"><h3>Live System Status</h3>
+  <div class="pro-source"><span>Realtime browser sync</span><span class="badge green">ACTIVE</span></div>
+  <div class="pro-source"><span>Photo storage</span><span class="badge green">ACTIVE</span></div>
+  <div class="pro-source"><span>Social official API</span><span class="badge ${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"green":"orange"}">${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"CONFIGURED":"REQUIRES API"}</span></div>
+  <div class="pro-source"><span>Secure AI backend</span><span class="badge ${db.settings.integrations.ai?"green":"orange"}">${db.settings.integrations.ai?"CONFIGURED":"REQUIRES BACKEND"}</span></div>
+ </div>
+ `;
+}
+
+/* Add the new pages to the router and nav while preserving all existing pages. */
+function proBuildNav(){
+ buildNav();
+ const nav=document.getElementById("nav");
+ if(!nav)return;
+ const add=(id,icon,label,adminOnly=false)=>{
+   if(adminOnly&&!isAdmin())return;
+   if([...nav.querySelectorAll("button")].some(b=>b.getAttribute("onclick")?.includes("'"+id+"'")))return;
+   nav.insertAdjacentHTML("beforeend",`<button onclick="showPage('${id}',this)"><span class="nav-icon">${icon}</span><span>${label}</span></button>`);
+ };
+ add("social","🌐","Social Lead Center");
+ if(isAdmin())add("masteradmin","👑","Master Admin");
+}
+
+pages.social=socialInboxPage;
+pages.masteradmin=proAdminPage;
+
+const _showPage=window.showPage;
+window.showPage=function(page,button){
+ if(page==="social" || page==="masteradmin"){
+   if(page==="masteradmin"&&!isAdmin()){toast("Admin access required");return}
+   currentPage=page;
+   document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+   if(button)button.classList.add("active");
+   else [...document.querySelectorAll(".nav button")].find(x=>x.getAttribute("onclick")?.includes("'"+page+"'"))?.classList.add("active");
+   document.getElementById("content").innerHTML=pages[page]();
+   window.scrollTo(0,0);return;
+ }
+ _showPage(page,button);
+ setTimeout(proDashboardEnhance,0);
+};
+
+/* Ensure the enhanced nav is used after login/session restore. */
+const _buildNav=window.buildNav;
+window.buildNav=function(){_buildNav();proBuildNav();};
+
+document.addEventListener("DOMContentLoaded",()=>{
+ proEnsureArray();
+ proSync();
+ setTimeout(()=>{if(currentUser)proWelcome();},350);
+});
+
+/* =========================================================
+   ESTATEAI CLOUD AUTO-SYNC
+   - Supabase is the cloud source of truth for the complete CRM DB.
+   - LocalStorage is only a fast cache / offline safety copy.
+   - Changes are pushed about once per second while logged in.
+   - Changes from another device are checked about once per second.
+   - Realtime channel is also enabled when available.
+   IMPORTANT: only the public/publishable key belongs in this HTML.
+========================================================= */
+(function(){
+  const SUPABASE_URL="https://butmgtzgxllieevzgsqo.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY="sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
+  const STATE_TABLE="estateai_state";
+  let client=null, timer=null, channel=null;
+  let busy=false, dirty=false, hydrating=false;
+  let lastCloudUpdatedAt=0;
+  let lastLocalHash="";
+
+  function init(){
+    try{
+      if(!window.supabase?.createClient)return false;
+      if(client)return true;
+      client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
+        auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+      });
+      return true;
+    }catch(e){console.error("EstateAI cloud init:",e);return false;}
+  }
+
+  function hashState(){
+    try{return JSON.stringify(db);}catch(e){return String(Date.now());}
+  }
+
+  function markDirty(){
+    if(!hydrating)dirty=true;
+  }
+
+  async function getRemote(){
+    if(!init() || !(currentUser?.auth_user_id||currentUser?.id))return null;
+    try{
+      const {data,error}=await client.from(STATE_TABLE)
+        .select("user_id,state,updated_at")
+        .eq("user_id",currentUser.auth_user_id||currentUser.id).maybeSingle();
+      if(error){console.error("EstateAI cloud read:",error);return null;}
+      return data||null;
+    }catch(e){console.error("EstateAI cloud read exception:",e);return null;}
+  }
+
+  async function push(){
+    if(busy || !(currentUser?.auth_user_id||currentUser?.id) || !init())return false;
+    busy=true;
+    try{
+      const now=new Date().toISOString();
+      const payload={user_id:currentUser.auth_user_id||currentUser.id,state:db,updated_at:now};
+      const {error}=await client.from(STATE_TABLE).upsert(payload,{onConflict:"user_id"});
+      if(error){console.error("EstateAI cloud write:",error);return false;}
+      lastCloudUpdatedAt=Date.parse(now);
+      lastLocalHash=hashState();
+      dirty=false;
+      return true;
+    }catch(e){console.error("EstateAI cloud write exception:",e);return false;}
+    finally{busy=false;}
+  }
+
+  async function pull(force=false){
+    if(busy || !(currentUser?.auth_user_id||currentUser?.id) || !init())return false;
+    const remote=await getRemote();
+    if(!remote)return false;
+    const remoteTime=Date.parse(remote.updated_at||0)||0;
+    if(!remote.state || typeof remote.state!=="object")return false;
+
+    // If local has unsent changes, send them instead of overwriting them.
+    if(dirty && !force){
+      await push();
+      return true;
+    }
+
+    if(force || remoteTime>lastCloudUpdatedAt){
+      hydrating=true;
+      try{
+        const incoming=clone(remote.state);
+        // Keep any newly introduced fields from the current app version.
+        const base=clone(defaultData);
+        db={...base,...incoming};
+        for(const key of Object.keys(base)){
+          if(Array.isArray(base[key]) && !Array.isArray(db[key]))db[key]=clone(base[key]);
+          if(base[key] && typeof base[key]==='object' && !Array.isArray(base[key]) &&
+             (db[key]==null || typeof db[key]!=='object'))db[key]=clone(base[key]);
+        }
+        saveDB();
+        lastCloudUpdatedAt=remoteTime;
+        lastLocalHash=hashState();
+        dirty=false;
+      }finally{hydrating=false;}
+      if(currentUser && document.getElementById("app") && !document.getElementById("app").classList.contains("hidden")){
+        try{showPage(currentPage||"dashboard");}catch(_){}
+      }
+    }
+    return true;
+  }
+
+  async function sync(force=false){
+    if(!(currentUser?.auth_user_id||currentUser?.id) || !init())return false;
+    if(busy)return false;
+    const remote=await getRemote();
+    if(!remote){
+      // First login on a new account: publish the local/default CRM once.
+      return await push();
+    }
+    const remoteTime=Date.parse(remote.updated_at||0)||0;
+    if(force && remote.state){
+      // On a fresh login, cloud wins unless there are local edits made after login.
+      if(!dirty){
+        hydrating=true;
+        try{
+          db={...clone(defaultData),...clone(remote.state)};
+          saveDB();
+          lastCloudUpdatedAt=remoteTime;
+          lastLocalHash=hashState();
+        }finally{hydrating=false;}
+        try{showPage(currentPage||"dashboard");}catch(_){}
+        return true;
+      }
+    }
+    if(dirty || hashState()!==lastLocalHash){
+      return await push();
+    }
+    if(remoteTime>lastCloudUpdatedAt){
+      return await pull(false);
+    }
+    lastCloudUpdatedAt=remoteTime;
+    return true;
+  }
+
+  function queue(){
+    markDirty();
+    if(timer)return;
+    timer=setTimeout(async()=>{timer=null;await sync(false);},1000);
+  }
+
+  function start(){
+    stop();
+    if(!(currentUser?.auth_user_id||currentUser?.id) || !init())return;
+    // Initial cloud restore, then roughly once per second.
+    setTimeout(()=>sync(true),150);
+    timer=setInterval(()=>sync(false),1000);
+
+    try{
+      if(channel)client.removeChannel(channel);
+      channel=client.channel("estateai-state-"+(currentUser.auth_user_id||currentUser.id))
+        .on("postgres_changes",{event:"*",schema:"public",table:STATE_TABLE,filter:"user_id=eq."+(currentUser.auth_user_id||currentUser.id)},()=>{
+          if(!dirty)sync(false);
+        }).subscribe();
+    }catch(e){console.warn("EstateAI realtime channel unavailable:",e);}
+  }
+
+  function stop(){
+    if(timer){clearInterval(timer);timer=null;}
+    if(channel && client){try{client.removeChannel(channel);}catch(_){} channel=null;}
+  }
+
+  window.EstateAICloud={sync,queue,start,stop,push,pull};
+
+  // Start/stop around Supabase Auth session changes.
+  document.addEventListener("DOMContentLoaded",()=>{
+    setTimeout(()=>{if(currentUser)start();},700);
+  });
+
+  const originalLogin=window.login;
+  window.login=async function(){
+    const result=await originalLogin.apply(this,arguments);
+    if(currentUser){start();setTimeout(()=>sync(true),250);}
+    return result;
+  };
+
+  const originalLogout=window.logout;
+  window.logout=async function(){
+    stop();
+    return originalLogout.apply(this,arguments);
+  };
+
+  // Catch changes made by app code that directly mutates db and calls saveDB.
+  setInterval(()=>{
+    if(currentUser && !hydrating){
+      const h=hashState();
+      if(lastLocalHash && h!==lastLocalHash)queue();
+    }
+  },1000);
+})();
+</script>
+
+</body>
+</html>
