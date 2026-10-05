@@ -247,7 +247,7 @@ box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
     <div id="loginError" class="login-error hidden"></div>
 
     <label>Username</label>
-    <input id="loginUser" placeholder="admin">
+    <input id="loginUser" placeholder="admin@estateai.in or admin">
 
     <label>Password</label>
     <input id="loginPass" type="password" placeholder="••••••••"
@@ -256,8 +256,8 @@ box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
     <button class="primary" onclick="login()">Login</button>
 
     <p style="font-size:12px;color:#667085;margin-top:15px;text-align:center">
-      Demo Admin: admin / admin123<br>
-      Demo Agent: agent / agent123
+      Cloud Admin: admin@estateai.in<br>
+      Login is secured by Supabase Authentication
     </p>
   </div>
 </div>
@@ -458,50 +458,130 @@ function addActivity(text){
 }
 
 /* =========================================================
-   AUTH
+   AUTH — SUPABASE AUTHENTICATION
+   Cloud login: admin@estateai.in + password created in Supabase.
+   The public/publishable key is safe for browser use; never put a
+   Supabase service_role/secret key in this file.
 ========================================================= */
 
-function login(){
-  const u=document.getElementById("loginUser").value.trim();
-  const p=document.getElementById("loginPass").value;
-  const users=Array.isArray(db.users)?db.users:[];
-  const user=users.find(x=>String(x.username||'').trim()===u && String(x.password??'')===p && x.active!==false);
+const ESTATEAI_AUTH_EMAILS={
+  admin:"admin@estateai.in"
+};
+
+function authEmailFromInput(value){
+  const v=String(value||"").trim();
+  return ESTATEAI_AUTH_EMAILS[v.toLowerCase()] || v;
+}
+
+function localUserForAuth(authUser){
+  const email=String(authUser?.email||"").toLowerCase();
+  let user=(Array.isArray(db.users)?db.users:[]).find(x=>
+    String(x.email||"").toLowerCase()===email ||
+    (email===ESTATEAI_AUTH_EMAILS.admin && String(x.username||"").toLowerCase()==="admin")
+  );
 
   if(!user){
-    document.getElementById("loginError").textContent="Invalid username or password.";
-    document.getElementById("loginError").classList.remove("hidden");
-    return;
+    user={
+      id:"supabase:"+(authUser.id||email),
+      name:email===ESTATEAI_AUTH_EMAILS.admin?"Admin User":(authUser.user_metadata?.name||email.split("@")[0]),
+      username:email.split("@")[0],
+      email,
+      role:email===ESTATEAI_AUTH_EMAILS.admin?"Admin":"Agent",
+      active:true
+    };
+    db.users.push(user);
+    saveDB();
+  }else{
+    user.email=email;
+    if(email===ESTATEAI_AUTH_EMAILS.admin)user.role="Admin";
+    user.active=true;
   }
+  return user;
+}
 
-  currentUser=user;
-  sessionStorage.setItem("estateai_user",JSON.stringify(user));
+async function supabaseAuthClient(){
+  try{
+    if(!window.supabase || !window.supabase.createClient)return null;
+    if(window.__estateaiAuthClient)return window.__estateaiAuthClient;
+    window.__estateaiAuthClient=window.supabase.createClient(
+      "https://butmgtzgxllieevzgsqo.supabase.co",
+      "sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig"
+    );
+    return window.__estateaiAuthClient;
+  }catch(e){
+    console.error("EstateAI Auth init failed:",e);
+    return null;
+  }
+}
+
+async function enterAuthenticatedApp(authUser){
+  if(!authUser)return false;
+  currentUser=localUserForAuth(authUser);
+  sessionStorage.setItem("estateai_user",JSON.stringify(currentUser));
+  document.getElementById("loginError").classList.add("hidden");
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
   buildNav();
   updateProfile();
   showPage("dashboard");
   setTimeout(proWelcome,120);
+  return true;
 }
 
-function restoreSession(){
+async function login(){
+  const input=document.getElementById("loginUser").value.trim();
+  const password=document.getElementById("loginPass").value;
+  const email=authEmailFromInput(input);
+  const errorEl=document.getElementById("loginError");
+  errorEl.classList.add("hidden");
+
+  if(!email || !password){
+    errorEl.textContent="Enter email/username and password.";
+    errorEl.classList.remove("hidden");
+    return false;
+  }
+
+  const client=await supabaseAuthClient();
+  if(!client){
+    errorEl.textContent="Cloud login is not available. Check your internet connection.";
+    errorEl.classList.remove("hidden");
+    return false;
+  }
+
+  const {data,error}=await client.auth.signInWithPassword({email,password});
+  if(error || !data?.user){
+    console.error("EstateAI Supabase login error:",error);
+    errorEl.textContent=error?.message||"Invalid email or password.";
+    errorEl.classList.remove("hidden");
+    return false;
+  }
+
+  await enterAuthenticatedApp(data.user);
+  if(window.EstateAICloud?.sync)setTimeout(()=>window.EstateAICloud.sync(true),400);
+  return true;
+}
+
+async function restoreSession(){
   try{
-    const s=sessionStorage.getItem("estateai_user");
-    if(!s)return;
-    const user=JSON.parse(s);
-    const fresh=db.users.find(x=>x.id===user.id);
-    if(fresh&&fresh.active){
-      currentUser=fresh;
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("app").classList.remove("hidden");
-      buildNav();
-      updateProfile();
-      showPage("dashboard");
-      setTimeout(proWelcome,120);
+    const client=await supabaseAuthClient();
+    if(client){
+      const {data}=await client.auth.getSession();
+      if(data?.session?.user){
+        await enterAuthenticatedApp(data.session.user);
+        return;
+      }
     }
-  }catch(e){}
+    sessionStorage.removeItem("estateai_user");
+  }catch(e){
+    console.warn("EstateAI session restore:",e);
+  }
 }
 
-function logout(){
+async function logout(){
+  try{
+    const client=await supabaseAuthClient();
+    if(client)await client.auth.signOut();
+  }catch(e){console.warn("EstateAI logout:",e)}
   sessionStorage.removeItem("estateai_user");
   currentUser=null;
   location.reload();
