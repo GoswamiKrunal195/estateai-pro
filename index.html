@@ -324,11 +324,7 @@ box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
 const STORAGE="estateai_rajkot_v3";
 const SUPABASE_URL="https://butmgtzgxllieevzgsqo.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
-const CLOUD_TABLE="estateai_user_states";
-const PROFILE_TABLE="estateai_profiles";
-const ACTIVITY_TABLE="estateai_user_activity";
-let currentAuthUserId=null;
-let activityTimer=null;
+const CLOUD_TABLE="estateai_cloud_state";
 let currentUser=null;
 let currentPage="dashboard";
 let cloudClient=null;
@@ -361,7 +357,7 @@ function loadDB(){
 }
 function saveDB(){
   try{localStorage.setItem(STORAGE,JSON.stringify(db))}catch(e){console.warn('Local cache full',e)}
-  if(currentUser && currentAuthUserId && cloudReady && !cloudLoading) queueCloudSave();
+  if(currentUser && cloudReady && !cloudLoading) queueCloudSave();
 }
 function queueCloudSave(){
   clearTimeout(cloudSaveTimer);
@@ -369,16 +365,16 @@ function queueCloudSave(){
 }
 async function saveCloudState(){
   const c=supabaseClient();
-  if(!c||!currentUser||!currentAuthUserId||!cloudReady||cloudLoading)return;
-  const payload={user_id:currentAuthUserId,state:db,updated_at:new Date().toISOString()};
-  const {error}=await c.from(CLOUD_TABLE).upsert(payload,{onConflict:'user_id'});
-  if(error){console.error('Cloud save failed',error);toast('Cloud save failed — local backup kept')}else{cloudHydrated=true}
+  if(!c||!currentUser||!cloudReady||cloudLoading)return;
+  const payload={id:1,state:db,updated_at:new Date().toISOString()};
+  const {error}=await c.from(CLOUD_TABLE).upsert(payload,{onConflict:'id'});
+  if(error){console.error('Cloud save failed',error);toast('Cloud save failed — data kept locally');return}
 }
 async function loadCloudState(seedIfEmpty=true){
   const c=supabaseClient();
-  if(!c||!currentAuthUserId)return false;
+  if(!c||!currentUser)return false;
   cloudLoading=true;
-  const {data,error}=await c.from(CLOUD_TABLE).select('state,updated_at').eq('user_id',currentAuthUserId).maybeSingle();
+  const {data,error}=await c.from(CLOUD_TABLE).select('state,updated_at').eq('id',1).maybeSingle();
   if(error){cloudLoading=false;console.error('Cloud load failed',error);toast('Cloud database connection failed');return false}
   const cloudState=data?.state;
   const cloudHasCore=cloudState && Array.isArray(cloudState.properties) && Array.isArray(cloudState.leads) && Array.isArray(cloudState.users);
@@ -387,25 +383,12 @@ async function loadCloudState(seedIfEmpty=true){
     proEnsureArray();
     try{localStorage.setItem(STORAGE,JSON.stringify(db))}catch(e){}
   }else if(seedIfEmpty){
-    await c.from(CLOUD_TABLE).upsert({user_id:currentAuthUserId,state:db,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    // First-ever cloud setup: migrate the existing browser database exactly once.
+    await c.from(CLOUD_TABLE).upsert({id:1,state:db,updated_at:new Date().toISOString()},{onConflict:'id'});
   }
   cloudLoading=false;cloudReady=true;cloudHydrated=true;
   return true;
 }
-async function recordUserActivity(kind='login'){
-  const c=supabaseClient();
-  if(!c||!currentAuthUserId)return;
-  const row={user_id:currentAuthUserId,email:currentUser?.email||'',name:currentUser?.name||'',role:currentUser?.role||'Agent',event_type:kind,user_agent:navigator.userAgent,platform:navigator.platform||'',screen_size:(screen.width||0)+'x'+(screen.height||0),last_seen_at:new Date().toISOString()};
-  const {error}=await c.from(ACTIVITY_TABLE).insert(row);
-  if(error)console.warn('Activity log failed',error);
-}
-function startActivityHeartbeat(){
-  clearInterval(activityTimer);
-  recordUserActivity('login');
-  activityTimer=setInterval(()=>recordUserActivity('heartbeat'),60000);
-}
-function stopActivityHeartbeat(){clearInterval(activityTimer);activityTimer=null}
-
 function uid(){return Date.now()+Math.floor(Math.random()*1000)}
 function esc(v){const d=document.createElement("div");d.textContent=v==null?"":String(v);return d.innerHTML}
 function toast(msg){const old=document.querySelector(".toast");if(old)old.remove();const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2500)}
@@ -418,7 +401,6 @@ function authEmailFromInput(value){
   return u?.email||v;
 }
 function userFromAuth(authUser){
-  currentAuthUserId=authUser?.id||null;
   const email=String(authUser?.email||'').toLowerCase();
   let u=(db.users||[]).find(x=>String(x.email||'').toLowerCase()===email||String(x.id||'')==='supabase:'+authUser.id);
   const meta=authUser?.user_metadata||{};
@@ -441,7 +423,6 @@ async function enterAuthenticatedApp(authUser){
   document.getElementById('app').classList.remove('hidden');
   await loadCloudState(true);
   currentUser=userFromAuth(authUser);
-  startActivityHeartbeat();
   buildNav();updateProfile();showPage('dashboard');setTimeout(proWelcome,120);
   toast('☁️ Cloud database connected');
   return true;
@@ -466,10 +447,8 @@ async function restoreSession(){
   document.getElementById('app').classList.add('hidden');
 }
 async function logout(){
-  await recordUserActivity('logout');
-  stopActivityHeartbeat();
   try{await supabaseClient()?.auth.signOut()}catch(e){}
-  sessionStorage.removeItem('estateai_user');currentUser=null;currentAuthUserId=null;cloudReady=false;cloudHydrated=false;location.reload();
+  sessionStorage.removeItem('estateai_user');currentUser=null;cloudReady=false;cloudHydrated=false;location.reload();
 }
 
 function isAdmin(){
@@ -1799,60 +1778,28 @@ function askAI(){
 }
 
 /* Admin gets the complete operational surface. */
-async function loadAdminDirectory(){
-  if(!isAdmin())return;
-  const c=supabaseClient();if(!c)return toast('Cloud unavailable');
-  const wrap=document.getElementById('adminUserDirectory');
-  if(wrap)wrap.innerHTML='<div style="padding:14px;color:#667085">Loading all user accounts and cloud data…</div>';
-  const [profiles,states,activities]=await Promise.all([
-    c.from(PROFILE_TABLE).select('user_id,name,email,role,active,created_at,last_login_at,last_seen_at').order('created_at',{ascending:false}),
-    c.from(CLOUD_TABLE).select('user_id,state,updated_at'),
-    c.from(ACTIVITY_TABLE).select('user_id,event_type,user_agent,platform,screen_size,last_seen_at,created_at').order('created_at',{ascending:false}).limit(500)
-  ]);
-  if(profiles.error||states.error||activities.error){console.error(profiles.error,states.error,activities.error);if(wrap)wrap.innerHTML='<div style="padding:14px;color:#b42318">Admin cloud directory could not be loaded. Run the latest SQL and make sure your account is marked Admin.</div>';return}
-  const stateMap=new Map((states.data||[]).map(x=>[x.user_id,x]));
-  const lastMap=new Map();
-  for(const a of activities.data||[]){if(!lastMap.has(a.user_id))lastMap.set(a.user_id,a)}
-  const rows=(profiles.data||[]).map(u=>{
-    const st=stateMap.get(u.user_id)?.state||{};const a=lastMap.get(u.user_id);
-    const counts=[['Properties',st.properties?.length||0],['Leads',st.leads?.length||0],['Buyers',(st.leads||[]).filter(x=>x.type==='Buyer').length],['Sellers',(st.leads||[]).filter(x=>x.type==='Seller').length],['Deals',st.deals?.length||0],['Visits',st.visits?.length||0]];
-    return `<div class="card" style="margin-top:12px">
-      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
-       <div><h3>${esc(u.name||u.email||'User')}</h3><p style="color:#667085;margin-top:4px">${esc(u.email||'')} • ${esc(u.role||'Agent')} • ${u.active===false?'Disabled':'Active'}</p></div>
-       <span class="badge ${u.active===false?'orange':'green'}">${u.active===false?'DISABLED':'ACTIVE'}</span>
-      </div>
-      <div class="kpis" style="margin-top:12px">${counts.map(x=>kpi('',''+x[0],x[1],'Cloud')).join('')}</div>
-      <p style="color:#667085;font-size:12px;margin-top:10px">Last account activity: ${esc(a?.created_at?new Date(a.created_at).toLocaleString('en-IN'):'—')} • Device: ${esc(a?.platform||'—')} • Screen: ${esc(a?.screen_size||'—')}</p>
-      <button class="secondary" style="margin-top:10px" onclick="viewAdminUserData('${u.user_id}')">👁️ View Full CRM Data</button>
-    </div>`;
-  }).join('');
-  if(wrap)wrap.innerHTML=rows||'<div class="card">No registered users yet.</div>';
-}
-async function viewAdminUserData(userId){
-  if(!isAdmin())return toast('Admin access required');
-  const c=supabaseClient();if(!c)return;
-  const {data,error}=await c.from(CLOUD_TABLE).select('state,updated_at').eq('user_id',userId).maybeSingle();
-  if(error||!data?.state)return toast('No cloud data found for this user');
-  const s=data.state;const summary={properties:s.properties||[],leads:s.leads||[],buyers:(s.leads||[]).filter(x=>x.type==='Buyer'),sellers:(s.leads||[]).filter(x=>x.type==='Seller'),followups:s.followups||[],visits:s.visits||[],deals:s.deals||[],activities:s.activities||[],socialInbox:s.socialInbox||[],settings:s.settings||{}};
-  document.getElementById('modalTitle').textContent='User CRM Data — Admin View';
-  document.getElementById('modalBody').innerHTML=`<p style="color:#667085;margin-bottom:12px">Read-only cloud snapshot. Passwords are never shown or stored here.</p><pre style="white-space:pre-wrap;max-height:65vh;overflow:auto;background:#0b1220;color:#e5e7eb;padding:14px;border-radius:12px;font-size:12px">${esc(JSON.stringify(summary,null,2))}</pre><div class="form-actions"><button class="primary" onclick="closeModal()">Close</button></div>`;
-  openModal();
-}
 function proAdminPage(){
  if(!isAdmin())return `<div class="card"><h2>Access denied</h2></div>`;
- setTimeout(loadAdminDirectory,50);
  return `
- <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>All registered users, their cloud CRM records and account activity.</p></div>
- <button class="primary" onclick="backupData()">⬇ Backup My Data</button></div>
+ <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>Full control over inventory, leads, users, integrations and data.</p></div>
+ <button class="primary" onclick="backupData()">⬇ Backup Everything</button></div>
  <div class="kpis">
-  ${kpi('🏠','My Properties',db.properties.length,'Cloud')}
-  ${kpi('👥','My Leads',db.leads.length,'Cloud')}
-  ${kpi('🌐','My Social Inbox',db.socialInbox.length,'Cloud')}
-  ${kpi('👤','Registered Users','—','Admin view')}
+  ${kpi("🏠","Properties",db.properties.length,"Full control")}
+  ${kpi("👥","Leads",db.leads.length,"Full control")}
+  ${kpi("🌐","Social Inbox",db.socialInbox.length,"Incoming")}
+  ${kpi("👤","Users",db.users.length,"Access control")}
  </div>
- <div class="card" style="margin-top:18px"><h3>👥 All User Accounts & Cloud CRM</h3><p style="color:#667085;margin-top:6px">Admin can see each user's profile, activity/device metadata and their complete CRM snapshot. Passwords are never visible.</p></div>
- <div id="adminUserDirectory"><div class="card" style="margin-top:12px">Loading…</div></div>
- <div class="card" style="margin-top:18px"><h3>🔐 Security</h3><p style="color:#667085;margin-top:6px">Login passwords remain inside Supabase Auth and are never exposed to the Admin dashboard.</p></div>
+ <div class="grid3">
+  <div class="card"><h3>👥 Users & Roles</h3><p style="color:#667085;margin-top:6px">Create, disable and change roles.</p><button class="secondary" style="margin-top:12px" onclick="openUserModal()">Manage Users</button></div>
+  <div class="card"><h3>🌐 Integrations</h3><p style="color:#667085;margin-top:6px">Social/API/AI connection flags.</p><button class="secondary" style="margin-top:12px" onclick="openConnectorModal()">Configure</button></div>
+  <div class="card"><h3>💾 Data Control</h3><p style="color:#667085;margin-top:6px">Export/import/reset local database.</p><button class="secondary" style="margin-top:12px" onclick="backupData()">Backup</button></div>
+ </div>
+ <div class="card" style="margin-top:18px"><h3>Live System Status</h3>
+  <div class="pro-source"><span>Realtime browser sync</span><span class="badge green">ACTIVE</span></div>
+  <div class="pro-source"><span>Photo storage</span><span class="badge green">ACTIVE</span></div>
+  <div class="pro-source"><span>Social official API</span><span class="badge ${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"green":"orange"}">${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"CONFIGURED":"REQUIRES API"}</span></div>
+  <div class="pro-source"><span>Secure AI backend</span><span class="badge ${db.settings.integrations.ai?"green":"orange"}">${db.settings.integrations.ai?"CONFIGURED":"REQUIRES BACKEND"}</span></div>
+ </div>
  `;
 }
 
