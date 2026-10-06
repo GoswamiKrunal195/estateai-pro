@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>EstateAI Rajkot CRM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -247,7 +248,7 @@ box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
     <div id="loginError" class="login-error hidden"></div>
 
     <label>Username</label>
-    <input id="loginUser" placeholder="admin@estateai.in or admin">
+    <input id="loginUser" placeholder="admin">
 
     <label>Password</label>
     <input id="loginPass" type="password" placeholder="••••••••"
@@ -256,8 +257,8 @@ box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
     <button class="primary" onclick="login()">Login</button>
 
     <p style="font-size:12px;color:#667085;margin-top:15px;text-align:center">
-      Cloud Admin: admin@estateai.in<br>
-      Login is secured by Supabase Authentication
+      Demo Admin: admin / admin123<br>
+      Demo Agent: agent / agent123
     </p>
   </div>
 </div>
@@ -313,7 +314,6 @@ box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* =========================================================
    ESTATEAI CRM
@@ -322,269 +322,154 @@ box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
 ========================================================= */
 
 const STORAGE="estateai_rajkot_v3";
+const SUPABASE_URL="https://butmgtzgxllieevzgsqo.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
+const CLOUD_TABLE="estateai_user_states";
+const PROFILE_TABLE="estateai_profiles";
+const ACTIVITY_TABLE="estateai_user_activity";
+let currentAuthUserId=null;
+let activityTimer=null;
 let currentUser=null;
 let currentPage="dashboard";
-
-const defaultData={
-  properties:[
-   {id:1,title:"Premium 3 BHK Apartment",type:"Apartment",purpose:"Sale",city:"Rajkot",locality:"Kalawad Road",price:"₹78 L",area:"1650 Sq Ft",bhk:"3",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
-   {id:2,title:"Luxury 4 BHK Villa",type:"Villa",purpose:"Sale",city:"Rajkot",locality:"Raiya Road",price:"₹1.85 Cr",area:"3100 Sq Ft",bhk:"4",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
-   {id:3,title:"Residential Plot",type:"Plot",purpose:"Sale",city:"Rajkot",locality:"Mavdi",price:"₹62 L",area:"180 Sq Yd",bhk:"",status:"Active",verified:false,owner:"Demo Seller",updated:"Yesterday"},
-   {id:4,title:"Modern 2 BHK Flat",type:"Apartment",purpose:"Rent",city:"Rajkot",locality:"Nana Mava",price:"₹18,000/mo",area:"1150 Sq Ft",bhk:"2",status:"Active",verified:true,owner:"Demo Owner",updated:"Today"},
-   {id:5,title:"Commercial Office",type:"Commercial",purpose:"Sale",city:"Rajkot",locality:"150 Feet Ring Road",price:"₹1.20 Cr",area:"2100 Sq Ft",bhk:"",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
-   {id:6,title:"3 BHK Family Home",type:"Apartment",purpose:"Sale",city:"Rajkot",locality:"University Road",price:"₹72 L",area:"1550 Sq Ft",bhk:"3",status:"Active",verified:false,owner:"Demo Seller",updated:"2 days ago"}
-  ],
-  leads:[
-   {id:101,name:"Demo Buyer 1",type:"Buyer",phone:"",location:"Kalawad Road",budget:"₹70L-₹90L",requirement:"3 BHK",status:"New",source:"Demo",score:82},
-   {id:102,name:"Demo Buyer 2",type:"Buyer",phone:"",location:"Raiya Road",budget:"₹1Cr-₹2Cr",requirement:"4 BHK Villa",status:"Qualified",source:"Demo",score:91},
-   {id:103,name:"Demo Seller 1",type:"Seller",phone:"",location:"Mavdi",budget:"₹60L",requirement:"Sell 3 BHK",status:"Contacted",source:"Demo",score:75},
-   {id:104,name:"Demo Buyer 3",type:"Buyer",phone:"",location:"Nana Mava",budget:"₹15K-₹25K",requirement:"2 BHK Rent",status:"Site Visit",source:"Demo",score:88}
-  ],
-  followups:[
-   {id:1,lead:"Demo Buyer 1",task:"Call regarding 3 BHK",due:"Today 4:00 PM",status:"Pending"},
-   {id:2,lead:"Demo Buyer 2",task:"Send Villa details",due:"Today 5:00 PM",status:"Pending"},
-   {id:3,lead:"Demo Seller 1",task:"Property valuation",due:"Tomorrow 11:00 AM",status:"Pending"},
-   {id:4,lead:"Demo Buyer 3",task:"Confirm site visit",due:"Tomorrow 2:00 PM",status:"Completed"}
-  ],
-  visits:[
-   {id:1,customer:"Demo Buyer 1",property:"Premium 3 BHK Apartment",time:"Today 5:30 PM",status:"Scheduled"},
-   {id:2,customer:"Demo Buyer 2",property:"Luxury 4 BHK Villa",time:"Today 6:30 PM",status:"Scheduled"}
-  ],
-  agents:[
-   {id:1,name:"Aarav Patel",role:"Senior Agent",location:"Rajkot",deals:42,revenue:"₹4.8 Cr"},
-   {id:2,name:"Riya Shah",role:"Sales Agent",location:"Rajkot",deals:36,revenue:"₹3.2 Cr"},
-   {id:3,name:"Karan Mehta",role:"Property Consultant",location:"Rajkot",deals:29,revenue:"₹2.4 Cr"}
-  ],
-  users:[
-   {id:1,name:"Admin User",username:"admin",password:"admin123",role:"Admin",active:true},
-   {id:2,name:"Sales Agent",username:"agent",password:"agent123",role:"Agent",active:true}
-  ],
-  activities:[
-   {text:"Demo property inventory loaded",time:"Just now"},
-   {text:"CRM initialized",time:"Just now"}
-  ],
-  settings:{
-   company:"EstateAI Realty",
-   city:"Rajkot",
-   currency:"INR ₹",
-   timezone:"Asia/Kolkata",
-   theme:"light"
-  }
-};
-
-let db=loadDB();
-proEnsureArray();
+let cloudClient=null;
+let cloudReady=false;
+let cloudHydrated=false;
+let cloudSaveTimer=null;
+let cloudLoading=false;
 
 function clone(x){return JSON.parse(JSON.stringify(x))}
+function supabaseClient(){
+  if(cloudClient)return cloudClient;
+  if(!window.supabase?.createClient)return null;
+  cloudClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  return cloudClient;
+}
+function localCache(){
+  try{const x=localStorage.getItem(STORAGE);return x?JSON.parse(x):null}catch(e){return null}
+}
 function loadDB(){
   try{
-    const saved=localStorage.getItem(STORAGE);
-    if(!saved){
-      const recovery=localStorage.getItem(STORAGE+"_last_backup");
-      if(recovery){
-        const recovered=JSON.parse(recovery);
-        return {...clone(defaultData),...recovered};
-      }
-      return clone(defaultData);
-    }
-    const parsed=JSON.parse(saved);
-    // Keep old browser data, but always restore required system structures/users.
-    const base=clone(defaultData);
-    const merged={...base,...parsed};
+    const saved=localCache();
+    if(!saved)return clone(defaultData);
+    const base=clone(defaultData), merged={...base,...saved};
     for(const key of Object.keys(base)){
-      if(Array.isArray(base[key]) && !Array.isArray(merged[key])) merged[key]=clone(base[key]);
-      if(base[key] && typeof base[key]==='object' && !Array.isArray(base[key]) &&
-         (merged[key]==null || typeof merged[key]!=='object')) merged[key]=clone(base[key]);
-    }
-    merged.users=Array.isArray(parsed.users)?parsed.users:clone(defaultData.users);
-    // Ensure the built-in accounts can always recover access if an old DB removed them.
-    for(const required of defaultData.users){
-      if(!merged.users.some(x=>x.username===required.username)){
-        merged.users.push(clone(required));
-      }
+      if(Array.isArray(base[key])&&!Array.isArray(merged[key]))merged[key]=clone(base[key]);
+      if(base[key]&&typeof base[key]==='object'&&!Array.isArray(base[key])&&(merged[key]==null||typeof merged[key]!=='object'))merged[key]=clone(base[key]);
     }
     return merged;
-  }catch(e){
-    console.warn('EstateAI DB recovery:',e);
-    try{
-      const recovery=localStorage.getItem(STORAGE+"_last_backup");
-      if(recovery){
-        const recovered=JSON.parse(recovery);
-        const merged={...clone(defaultData),...recovered};
-        localStorage.setItem(STORAGE,JSON.stringify(merged));
-        return merged;
-      }
-    }catch(recoveryError){ console.warn("EstateAI backup recovery failed:",recoveryError); }
-    return clone(defaultData);
-  }
+  }catch(e){return clone(defaultData)}
 }
 function saveDB(){
-  try{
-    const old=localStorage.getItem(STORAGE);
-    if(old && old!==JSON.stringify(db)) localStorage.setItem(STORAGE+"_last_backup",old);
-    localStorage.setItem(STORAGE,JSON.stringify(db));
-    localStorage.setItem(STORAGE+"_saved_at",new Date().toISOString());
-    return true;
-  }catch(e){
-    console.error("EstateAI local save failed:",e);
-    try{
-      localStorage.setItem(STORAGE+"_last_backup",JSON.stringify(db));
-    }catch(_){}
-    try{ toast("⚠ Local storage full/blocked. Cloud leads are still protected."); }catch(_){}
-    return false;
+  try{localStorage.setItem(STORAGE,JSON.stringify(db))}catch(e){console.warn('Local cache full',e)}
+  if(currentUser && currentAuthUserId && cloudReady && !cloudLoading) queueCloudSave();
+}
+function queueCloudSave(){
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(saveCloudState,350);
+}
+async function saveCloudState(){
+  const c=supabaseClient();
+  if(!c||!currentUser||!currentAuthUserId||!cloudReady||cloudLoading)return;
+  const payload={user_id:currentAuthUserId,state:db,updated_at:new Date().toISOString()};
+  const {error}=await c.from(CLOUD_TABLE).upsert(payload,{onConflict:'user_id'});
+  if(error){console.error('Cloud save failed',error);toast('Cloud save failed — local backup kept')}else{cloudHydrated=true}
+}
+async function loadCloudState(seedIfEmpty=true){
+  const c=supabaseClient();
+  if(!c||!currentAuthUserId)return false;
+  cloudLoading=true;
+  const {data,error}=await c.from(CLOUD_TABLE).select('state,updated_at').eq('user_id',currentAuthUserId).maybeSingle();
+  if(error){cloudLoading=false;console.error('Cloud load failed',error);toast('Cloud database connection failed');return false}
+  const cloudState=data?.state;
+  const cloudHasCore=cloudState && Array.isArray(cloudState.properties) && Array.isArray(cloudState.leads) && Array.isArray(cloudState.users);
+  if(cloudHasCore){
+    db={...clone(defaultData),...cloudState};
+    proEnsureArray();
+    try{localStorage.setItem(STORAGE,JSON.stringify(db))}catch(e){}
+  }else if(seedIfEmpty){
+    await c.from(CLOUD_TABLE).upsert({user_id:currentAuthUserId,state:db,updated_at:new Date().toISOString()},{onConflict:'user_id'});
   }
+  cloudLoading=false;cloudReady=true;cloudHydrated=true;
+  return true;
 }
-function uid(){
-  return Date.now()+Math.floor(Math.random()*1000);
+async function recordUserActivity(kind='login'){
+  const c=supabaseClient();
+  if(!c||!currentAuthUserId)return;
+  const row={user_id:currentAuthUserId,email:currentUser?.email||'',name:currentUser?.name||'',role:currentUser?.role||'Agent',event_type:kind,user_agent:navigator.userAgent,platform:navigator.platform||'',screen_size:(screen.width||0)+'x'+(screen.height||0),last_seen_at:new Date().toISOString()};
+  const {error}=await c.from(ACTIVITY_TABLE).insert(row);
+  if(error)console.warn('Activity log failed',error);
 }
-function esc(v){
-  const d=document.createElement("div");
-  d.textContent=v==null?"":String(v);
-  return d.innerHTML;
+function startActivityHeartbeat(){
+  clearInterval(activityTimer);
+  recordUserActivity('login');
+  activityTimer=setInterval(()=>recordUserActivity('heartbeat'),60000);
 }
-function toast(msg){
-  const old=document.querySelector(".toast");
-  if(old)old.remove();
-  const t=document.createElement("div");
-  t.className="toast";
-  t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),2500);
-}
-function addActivity(text){
-  db.activities.unshift({text,time:new Date().toLocaleString("en-IN")});
-  db.activities=db.activities.slice(0,30);
-  saveDB();
-}
+function stopActivityHeartbeat(){clearInterval(activityTimer);activityTimer=null}
 
-/* =========================================================
-   AUTH — SUPABASE AUTHENTICATION
-   Cloud login: admin@estateai.in + password created in Supabase.
-   The public/publishable key is safe for browser use; never put a
-   Supabase service_role/secret key in this file.
-========================================================= */
+function uid(){return Date.now()+Math.floor(Math.random()*1000)}
+function esc(v){const d=document.createElement("div");d.textContent=v==null?"":String(v);return d.innerHTML}
+function toast(msg){const old=document.querySelector(".toast");if(old)old.remove();const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2500)}
+function addActivity(text){db.activities.unshift({text,time:new Date().toLocaleString("en-IN")});db.activities=db.activities.slice(0,30);saveDB()}
 
-const ESTATEAI_AUTH_EMAILS={
-  admin:"admin@estateai.in"
-};
-
+/* ========================================================= AUTH / CLOUD ========================================================= */
 function authEmailFromInput(value){
-  const v=String(value||"").trim();
-  return ESTATEAI_AUTH_EMAILS[v.toLowerCase()] || v;
+  const v=String(value||'').trim();
+  const u=(db.users||[]).find(x=>String(x.username||'').toLowerCase()===v.toLowerCase());
+  return u?.email||v;
 }
-
-function localUserForAuth(authUser){
-  const email=String(authUser?.email||"").toLowerCase();
-  let user=(Array.isArray(db.users)?db.users:[]).find(x=>
-    String(x.email||"").toLowerCase()===email ||
-    (email===ESTATEAI_AUTH_EMAILS.admin && String(x.username||"").toLowerCase()==="admin")
-  );
-
-  if(!user){
-    user={
-      id:"supabase:"+(authUser.id||email),
-      name:email===ESTATEAI_AUTH_EMAILS.admin?"Admin User":(authUser.user_metadata?.name||email.split("@")[0]),
-      username:email.split("@")[0],
-      email,
-      role:email===ESTATEAI_AUTH_EMAILS.admin?"Admin":"Agent",
-      active:true
-    };
-    db.users.push(user);
-    saveDB();
+function userFromAuth(authUser){
+  currentAuthUserId=authUser?.id||null;
+  const email=String(authUser?.email||'').toLowerCase();
+  let u=(db.users||[]).find(x=>String(x.email||'').toLowerCase()===email||String(x.id||'')==='supabase:'+authUser.id);
+  const meta=authUser?.user_metadata||{};
+  const name=meta.name||meta.full_name||email.split('@')[0]||'User';
+  if(!u){
+    u={id:'supabase:'+authUser.id,name,username:email.split('@')[0],email,role:(meta.role==='Admin'?'Admin':'Agent'),active:true}
+    db.users.push(u);saveDB();
   }else{
-    user.email=email;
-    if(email===ESTATEAI_AUTH_EMAILS.admin)user.role="Admin";
-    user.active=true;
+    u.email=email;
+    if(meta.name||meta.full_name)u.name=meta.name||meta.full_name;
+    u.active=true;
   }
-  return user;
+  return u;
 }
-
-async function supabaseAuthClient(){
-  try{
-    if(!window.supabase || !window.supabase.createClient)return null;
-    if(window.__estateaiAuthClient)return window.__estateaiAuthClient;
-    window.__estateaiAuthClient=window.supabase.createClient(
-      "https://butmgtzgxllieevzgsqo.supabase.co",
-      "sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig"
-    );
-    return window.__estateaiAuthClient;
-  }catch(e){
-    console.error("EstateAI Auth init failed:",e);
-    return null;
-  }
-}
-
 async function enterAuthenticatedApp(authUser){
-  if(!authUser)return false;
-  currentUser=localUserForAuth(authUser);
-  sessionStorage.setItem("estateai_user",JSON.stringify(currentUser));
-  document.getElementById("loginError").classList.add("hidden");
-  document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  buildNav();
-  updateProfile();
-  showPage("dashboard");
-  setTimeout(proWelcome,120);
+  currentUser=userFromAuth(authUser);
+  sessionStorage.setItem('estateai_user',JSON.stringify({id:authUser.id,email:authUser.email,name:currentUser.name,role:currentUser.role}));
+  document.getElementById('loginError').classList.add('hidden');
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  await loadCloudState(true);
+  currentUser=userFromAuth(authUser);
+  startActivityHeartbeat();
+  buildNav();updateProfile();showPage('dashboard');setTimeout(proWelcome,120);
+  toast('☁️ Cloud database connected');
   return true;
 }
-
 async function login(){
-  const input=document.getElementById("loginUser").value.trim();
-  const password=document.getElementById("loginPass").value;
+  const input=document.getElementById('loginUser').value.trim();
+  const password=document.getElementById('loginPass').value;
+  const errorEl=document.getElementById('loginError');errorEl.classList.add('hidden');
+  if(!input||!password){errorEl.textContent='Enter email/username and password.';errorEl.classList.remove('hidden');return}
+  const c=supabaseClient();
+  if(!c){errorEl.textContent='Cloud login unavailable. Check internet connection.';errorEl.classList.remove('hidden');return}
   const email=authEmailFromInput(input);
-  const errorEl=document.getElementById("loginError");
-  errorEl.classList.add("hidden");
-
-  if(!email || !password){
-    errorEl.textContent="Enter email/username and password.";
-    errorEl.classList.remove("hidden");
-    return false;
-  }
-
-  const client=await supabaseAuthClient();
-  if(!client){
-    errorEl.textContent="Cloud login is not available. Check your internet connection.";
-    errorEl.classList.remove("hidden");
-    return false;
-  }
-
-  const {data,error}=await client.auth.signInWithPassword({email,password});
-  if(error || !data?.user){
-    console.error("EstateAI Supabase login error:",error);
-    errorEl.textContent=error?.message||"Invalid email or password.";
-    errorEl.classList.remove("hidden");
-    return false;
-  }
-
+  const {data,error}=await c.auth.signInWithPassword({email,password});
+  if(error||!data?.user){console.error(error);errorEl.textContent=error?.message||'Invalid email or password.';errorEl.classList.remove('hidden');return}
   await enterAuthenticatedApp(data.user);
-  if(window.EstateAICloud?.sync)setTimeout(()=>window.EstateAICloud.sync(true),400);
-  return true;
 }
-
 async function restoreSession(){
-  try{
-    const client=await supabaseAuthClient();
-    if(client){
-      const {data}=await client.auth.getSession();
-      if(data?.session?.user){
-        await enterAuthenticatedApp(data.session.user);
-        return;
-      }
-    }
-    sessionStorage.removeItem("estateai_user");
-  }catch(e){
-    console.warn("EstateAI session restore:",e);
-  }
+  const c=supabaseClient();if(!c)return;
+  const {data}=await c.auth.getSession();
+  if(data?.session?.user){await enterAuthenticatedApp(data.session.user);return}
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
 }
-
 async function logout(){
-  try{
-    const client=await supabaseAuthClient();
-    if(client)await client.auth.signOut();
-  }catch(e){console.warn("EstateAI logout:",e)}
-  sessionStorage.removeItem("estateai_user");
-  currentUser=null;
-  location.reload();
+  await recordUserActivity('logout');
+  stopActivityHeartbeat();
+  try{await supabaseClient()?.auth.signOut()}catch(e){}
+  sessionStorage.removeItem('estateai_user');currentUser=null;currentAuthUserId=null;cloudReady=false;cloudHydrated=false;location.reload();
 }
 
 function isAdmin(){
@@ -1478,29 +1363,20 @@ function backupData(){
 function exportAllJSON(){backupData()}
 function importJSON(e){
  const file=e.target.files[0];if(!file)return;
- if(!confirm("Restore this backup? A safety copy of current data will be kept first.")){e.target.value="";return;}
  const reader=new FileReader();
  reader.onload=()=>{
   try{
    const data=JSON.parse(reader.result);
    if(!data.properties||!data.leads)throw new Error();
-   localStorage.setItem(STORAGE+"_before_restore",JSON.stringify(db));
-   db={...clone(defaultData),...data};
-   proEnsureArray();
-   saveDB();
-   location.reload();
-  }catch(err){alert("Invalid EstateAI backup file. Current data was not replaced.");}
+   db=data;saveDB();location.reload();
+  }catch(err){alert("Invalid EstateAI backup file.")}
  };
  reader.readAsText(file);
 }
-function resetDemoData(){
- if(!isAdmin()){toast("Admin access required");return;}
- if(!confirm("Reset local demo data? A safety copy will be kept first. Cloud leads will NOT be deleted."))return;
- localStorage.setItem(STORAGE+"_before_reset",JSON.stringify(db));
- db=clone(defaultData);
- proEnsureArray();
- saveDB();
- location.reload();
+async function resetDemoData(){
+ if(!isAdmin())return toast("Admin access required");
+ if(!confirm("Reset the ENTIRE cloud CRM to demo data? This cannot be undone. Backup first if needed."))return;
+ db=clone(defaultData);proEnsureArray();saveDB();await saveCloudState();location.reload();
 }
 
 /* =========================================================
@@ -1536,7 +1412,7 @@ function settingsPage(){
 
  <div class="card" style="margin-top:18px">
   <h3>Data Safety</h3>
-  <p style="color:#667085;margin-top:7px">Data is protected locally with recovery backups. CRM leads also sync to Supabase Cloud. Cloud data is not deleted by refresh or browser restart.</p>
+  <p style="color:#667085;margin-top:7px">Primary storage: Supabase Cloud. A local cache is kept only for offline safety. Refreshing or changing device does not reset your CRM data.</p>
   <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
    <button class="secondary" onclick="backupData()">Download Backup</button>
    <button class="secondary" onclick="document.getElementById('importFile2').click()">Restore Backup</button>
@@ -1923,28 +1799,60 @@ function askAI(){
 }
 
 /* Admin gets the complete operational surface. */
+async function loadAdminDirectory(){
+  if(!isAdmin())return;
+  const c=supabaseClient();if(!c)return toast('Cloud unavailable');
+  const wrap=document.getElementById('adminUserDirectory');
+  if(wrap)wrap.innerHTML='<div style="padding:14px;color:#667085">Loading all user accounts and cloud data…</div>';
+  const [profiles,states,activities]=await Promise.all([
+    c.from(PROFILE_TABLE).select('user_id,name,email,role,active,created_at,last_login_at,last_seen_at').order('created_at',{ascending:false}),
+    c.from(CLOUD_TABLE).select('user_id,state,updated_at'),
+    c.from(ACTIVITY_TABLE).select('user_id,event_type,user_agent,platform,screen_size,last_seen_at,created_at').order('created_at',{ascending:false}).limit(500)
+  ]);
+  if(profiles.error||states.error||activities.error){console.error(profiles.error,states.error,activities.error);if(wrap)wrap.innerHTML='<div style="padding:14px;color:#b42318">Admin cloud directory could not be loaded. Run the latest SQL and make sure your account is marked Admin.</div>';return}
+  const stateMap=new Map((states.data||[]).map(x=>[x.user_id,x]));
+  const lastMap=new Map();
+  for(const a of activities.data||[]){if(!lastMap.has(a.user_id))lastMap.set(a.user_id,a)}
+  const rows=(profiles.data||[]).map(u=>{
+    const st=stateMap.get(u.user_id)?.state||{};const a=lastMap.get(u.user_id);
+    const counts=[['Properties',st.properties?.length||0],['Leads',st.leads?.length||0],['Buyers',(st.leads||[]).filter(x=>x.type==='Buyer').length],['Sellers',(st.leads||[]).filter(x=>x.type==='Seller').length],['Deals',st.deals?.length||0],['Visits',st.visits?.length||0]];
+    return `<div class="card" style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+       <div><h3>${esc(u.name||u.email||'User')}</h3><p style="color:#667085;margin-top:4px">${esc(u.email||'')} • ${esc(u.role||'Agent')} • ${u.active===false?'Disabled':'Active'}</p></div>
+       <span class="badge ${u.active===false?'orange':'green'}">${u.active===false?'DISABLED':'ACTIVE'}</span>
+      </div>
+      <div class="kpis" style="margin-top:12px">${counts.map(x=>kpi('',''+x[0],x[1],'Cloud')).join('')}</div>
+      <p style="color:#667085;font-size:12px;margin-top:10px">Last account activity: ${esc(a?.created_at?new Date(a.created_at).toLocaleString('en-IN'):'—')} • Device: ${esc(a?.platform||'—')} • Screen: ${esc(a?.screen_size||'—')}</p>
+      <button class="secondary" style="margin-top:10px" onclick="viewAdminUserData('${u.user_id}')">👁️ View Full CRM Data</button>
+    </div>`;
+  }).join('');
+  if(wrap)wrap.innerHTML=rows||'<div class="card">No registered users yet.</div>';
+}
+async function viewAdminUserData(userId){
+  if(!isAdmin())return toast('Admin access required');
+  const c=supabaseClient();if(!c)return;
+  const {data,error}=await c.from(CLOUD_TABLE).select('state,updated_at').eq('user_id',userId).maybeSingle();
+  if(error||!data?.state)return toast('No cloud data found for this user');
+  const s=data.state;const summary={properties:s.properties||[],leads:s.leads||[],buyers:(s.leads||[]).filter(x=>x.type==='Buyer'),sellers:(s.leads||[]).filter(x=>x.type==='Seller'),followups:s.followups||[],visits:s.visits||[],deals:s.deals||[],activities:s.activities||[],socialInbox:s.socialInbox||[],settings:s.settings||{}};
+  document.getElementById('modalTitle').textContent='User CRM Data — Admin View';
+  document.getElementById('modalBody').innerHTML=`<p style="color:#667085;margin-bottom:12px">Read-only cloud snapshot. Passwords are never shown or stored here.</p><pre style="white-space:pre-wrap;max-height:65vh;overflow:auto;background:#0b1220;color:#e5e7eb;padding:14px;border-radius:12px;font-size:12px">${esc(JSON.stringify(summary,null,2))}</pre><div class="form-actions"><button class="primary" onclick="closeModal()">Close</button></div>`;
+  openModal();
+}
 function proAdminPage(){
  if(!isAdmin())return `<div class="card"><h2>Access denied</h2></div>`;
+ setTimeout(loadAdminDirectory,50);
  return `
- <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>Full control over inventory, leads, users, integrations and data.</p></div>
- <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="secondary" onclick="openAdminCredentials()">🔐 Change Admin ID / Password</button><button class="primary" onclick="backupData()">⬇ Backup Everything</button></div></div>
+ <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>All registered users, their cloud CRM records and account activity.</p></div>
+ <button class="primary" onclick="backupData()">⬇ Backup My Data</button></div>
  <div class="kpis">
-  ${kpi("🏠","Properties",db.properties.length,"Full control")}
-  ${kpi("👥","Leads",db.leads.length,"Full control")}
-  ${kpi("🌐","Social Inbox",db.socialInbox.length,"Incoming")}
-  ${kpi("👤","Users",db.users.length,"Access control")}
+  ${kpi('🏠','My Properties',db.properties.length,'Cloud')}
+  ${kpi('👥','My Leads',db.leads.length,'Cloud')}
+  ${kpi('🌐','My Social Inbox',db.socialInbox.length,'Cloud')}
+  ${kpi('👤','Registered Users','—','Admin view')}
  </div>
- <div class="grid3">
-  <div class="card"><h3>👥 Users & Roles</h3><p style="color:#667085;margin-top:6px">Create, disable and change roles.</p><button class="secondary" style="margin-top:12px" onclick="openUserModal()">Manage Users</button></div>
-  <div class="card"><h3>🌐 Integrations</h3><p style="color:#667085;margin-top:6px">Social/API/AI connection flags.</p><button class="secondary" style="margin-top:12px" onclick="openConnectorModal()">Configure</button></div>
-  <div class="card"><h3>💾 Data Control</h3><p style="color:#667085;margin-top:6px">Export/import/reset local database.</p><button class="secondary" style="margin-top:12px" onclick="backupData()">Backup</button></div>
- </div>
- <div class="card" style="margin-top:18px"><h3>Live System Status</h3>
-  <div class="pro-source"><span>Realtime browser sync</span><span class="badge green">ACTIVE</span></div>
-  <div class="pro-source"><span>Photo storage</span><span class="badge green">ACTIVE</span></div>
-  <div class="pro-source"><span>Social official API</span><span class="badge ${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"green":"orange"}">${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"CONFIGURED":"REQUIRES API"}</span></div>
-  <div class="pro-source"><span>Secure AI backend</span><span class="badge ${db.settings.integrations.ai?"green":"orange"}">${db.settings.integrations.ai?"CONFIGURED":"REQUIRES BACKEND"}</span></div>
- </div>
+ <div class="card" style="margin-top:18px"><h3>👥 All User Accounts & Cloud CRM</h3><p style="color:#667085;margin-top:6px">Admin can see each user's profile, activity/device metadata and their complete CRM snapshot. Passwords are never visible.</p></div>
+ <div id="adminUserDirectory"><div class="card" style="margin-top:12px">Loading…</div></div>
+ <div class="card" style="margin-top:18px"><h3>🔐 Security</h3><p style="color:#667085;margin-top:6px">Login passwords remain inside Supabase Auth and are never exposed to the Admin dashboard.</p></div>
  `;
 }
 
@@ -1990,414 +1898,14 @@ document.addEventListener("DOMContentLoaded",()=>{
  setTimeout(()=>{if(currentUser)proWelcome();},350);
 });
 
-/* =========================================================
-   ESTATEAI CLOUD SAFETY — SUPABASE LEAD SYNC
-   Refresh/browser/device does not remove cloud leads.
-   IMPORTANT: only use the public/publishable key in this file.
-========================================================= */
-(function(){
-  const SUPABASE_URL="https://butmgtzgxllieevzgsqo.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY="sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
-  let cloudClient=null;
-  let cloudReady=false;
-  let cloudSyncBusy=false;
-
-  function initCloud(){
-    try{
-      if(!window.supabase || !window.supabase.createClient){
-        console.warn("EstateAI: Supabase library not loaded");
-        return false;
-      }
-      if(cloudClient)return true;
-      cloudClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-      cloudReady=true;
-      return true;
-    }catch(err){
-      console.error("EstateAI: Supabase init failed",err);
-      return false;
-    }
-  }
-
-  function leadRow(lead){
-    return {
-      id:Number(lead.id),
-      name:lead.name||"",
-      phone:lead.phone||"",
-      type:lead.type||"Buyer",
-      location:lead.location||"",
-      budget:lead.budget||"",
-      source:lead.source||"Manual",
-      status:lead.status||"New",
-      score:Number(lead.score||0),
-      requirement:lead.requirement||"",
-      created_at:lead.created_at||new Date().toISOString()
-    };
-  }
-
-  function normalizeLead(x){
-    return {
-      id:Number(x.id),name:x.name||"",phone:x.phone||"",
-      type:x.type||"Buyer",location:x.location||x.address||"",
-      budget:x.budget||"",source:x.source||"Manual",
-      status:x.status||"New",score:Number(x.score||0),
-      requirement:x.requirement||x.details||"",
-      created_at:x.created_at||new Date().toISOString()
-    };
-  }
-
-  async function cloudGetLeads(){
-    if(!initCloud())return {ok:false,data:[]};
-    try{
-      const {data,error}=await cloudClient.from("leads").select("*").order("created_at",{ascending:false});
-      if(error){console.error("EstateAI cloud load error:",error);return {ok:false,data:[]};}
-      return {ok:true,data:Array.isArray(data)?data.map(normalizeLead):[]};
-    }catch(err){console.error("EstateAI cloud load exception:",err);return {ok:false,data:[]};}
-  }
-
-  async function cloudUpsertLeads(rows){
-    if(!rows.length)return true;
-    if(!initCloud())return false;
-    try{
-      const {error}=await cloudClient.from("leads").upsert(rows,{onConflict:"id"});
-      if(error){console.error("EstateAI cloud upsert error:",error);return false;}
-      return true;
-    }catch(err){console.error("EstateAI cloud upsert exception:",err);return false;}
-  }
-
-  async function cloudSaveLead(lead){return cloudUpsertLeads([leadRow(lead)]);}
-
-  async function cloudDeleteLead(id){
-    if(!initCloud())return false;
-    try{
-      const {error}=await cloudClient.from("leads").delete().eq("id",Number(id));
-      if(error){console.error("EstateAI cloud delete error:",error);return false;}
-      return true;
-    }catch(err){console.error("EstateAI cloud delete exception:",err);return false;}
-  }
-
-  async function syncCloudLeads(showToast){
-    if(cloudSyncBusy)return;
-    if(!initCloud())return;
-    cloudSyncBusy=true;
-    try{
-      const result=await cloudGetLeads();
-      if(!result.ok){
-        if(showToast)toast("⚠ Cloud connection failed. Local safety copy kept.");
-        return;
-      }
-
-      const local=Array.isArray(db.leads)?db.leads.map(normalizeLead):[];
-      const cloud=result.data||[];
-      const cloudMap=new Map(cloud.map(x=>[Number(x.id),x]));
-      const localMap=new Map(local.map(x=>[Number(x.id),x]));
-      const localOnly=local.filter(x=>!cloudMap.has(Number(x.id)));
-
-      // Never erase local-only leads just because the cloud already has some data.
-      if(localOnly.length){
-        const uploaded=await cloudUpsertLeads(localOnly.map(leadRow));
-        if(!uploaded){
-          if(showToast)toast("⚠ Cloud upload failed. Local leads were kept.");
-          return;
-        }
-        localOnly.forEach(x=>cloudMap.set(Number(x.id),x));
-      }
-
-      // Cloud is authoritative for existing IDs; local-only rows were just uploaded.
-      const merged=Array.from(cloudMap.values()).map(normalizeLead);
-      merged.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
-      db.leads=merged;
-      saveDB();
-      if(currentUser)showPage(currentPage||"dashboard");
-      if(showToast)toast("☁ Leads safely synced to cloud");
-    }finally{
-      cloudSyncBusy=false;
-    }
-  }
-
-  window.EstateAICloud={sync:syncCloudLeads,saveLead:cloudSaveLead,deleteLead:cloudDeleteLead};
-
-  const originalLogin=window.login;
-  window.login=async function(){
-    const result=originalLogin.apply(this,arguments);
-    setTimeout(()=>{if(currentUser)syncCloudLeads(true);},500);
-    return result;
-  };
-
-  window.saveLead=async function(e,id){
-    e.preventDefault();
-    const old=id?db.leads.find(l=>Number(l.id)===Number(id)):null;
-    const obj={
-      id:id?Number(id):uid(),
-      name:document.getElementById("lName").value,
-      phone:document.getElementById("lPhone").value,
-      type:document.getElementById("lType").value,
-      location:document.getElementById("lLocation").value,
-      budget:document.getElementById("lBudget").value,
-      source:document.getElementById("lSource").value,
-      status:document.getElementById("lStatus").value,
-      score:Number(document.getElementById("lScore").value)||0,
-      requirement:document.getElementById("lReq").value,
-      created_at:old?.created_at||new Date().toISOString()
-    };
-
-    // Save locally first so a temporary internet failure never deletes the entry.
-    if(id){
-      const i=db.leads.findIndex(l=>Number(l.id)===Number(id));
-      if(i>=0)db.leads[i]=obj;
-      addActivity("Lead updated: "+obj.name);
-    }else{
-      db.leads.unshift(obj);
-      addActivity("New lead added: "+obj.name);
-    }
-    saveDB();
-    closeModal();
-    showPage("leads");
-
-    const ok=await cloudSaveLead(obj);
-    if(ok)toast("✓ Lead saved permanently to cloud");
-    else toast("⚠ Lead saved locally. Cloud retry will happen on next login/refresh.");
-  };
-
-  window.deleteLead=async function(id){
-    if(!isAdmin())return toast("Admin access required");
-    const l=db.leads.find(x=>Number(x.id)===Number(id));
-    if(!l)return;
-    if(!confirm("Delete this lead permanently from cloud too?"))return;
-    const ok=await cloudDeleteLead(id);
-    if(!ok)return toast("⚠ Cloud delete failed. Lead was NOT removed locally.");
-    db.leads=db.leads.filter(x=>Number(x.id)!==Number(id));
-    saveDB();showPage("leads");toast("✓ Lead deleted from cloud");
-  };
-
-  window.changeLeadStatus=async function(id,status){
-    const l=db.leads.find(x=>Number(x.id)===Number(id));
-    if(!l)return;
-    const oldStatus=l.status;
-    l.status=status;
-    addActivity(`${l.name} moved to ${status}`);
-    saveDB();
-    const ok=await cloudSaveLead(l);
-    if(!ok){l.status=oldStatus;saveDB();return toast("⚠ Cloud update failed. Status restored.");}
-    showPage("leads");toast("✓ Lead status synced");
-  };
-
-  window.convertSocialLead=async function(id){
-    const x=db.socialInbox.find(a=>Number(a.id)===Number(id));
-    if(!x)return;
-    const lead={
-      id:uid(),name:x.name||"",phone:x.phone||"",
-      type:x.intent==="Sell"?"Seller":"Buyer",location:x.location||"",
-      budget:"",requirement:x.message||"",status:"New",
-      source:x.source||"Social",score:60,created_at:new Date().toISOString()
-    };
-    const ok=await cloudSaveLead(lead);
-    if(!ok)return toast("⚠ Cloud save failed. Social lead was not converted.");
-    db.leads.unshift(lead);addActivity("Social lead converted: "+lead.name);
-    saveDB();showPage("leads");toast("✓ Social lead saved to cloud");
-  };
-
-  document.addEventListener("DOMContentLoaded",()=>{
-    setTimeout(()=>{if(currentUser)syncCloudLeads(true);},1200);
-  });
-})();
-
 
 /* =========================================================
-   ESTATEAI PERMANENT CLOUD STATE + ADMIN CREDENTIALS
-   Supabase is the source of truth. localStorage is offline cache only.
+   PERMANENT CLOUD MODE
+   Every CRM section uses the same Supabase cloud state document.
+   localStorage is only a temporary/offline cache; it is never the source of truth after login.
 ========================================================= */
-(function installPermanentCloud(){
-  const CLOUD_STATE_TABLE="estateai_state";
-  const _saveDB=window.saveDB || saveDB;
-  let stateTimer=null, stateBusy=false, lastCloudUpdated="";
-  let statePoll=null;
-
-  async function cloudStateClient(){
-    try{return await supabaseAuthClient();}catch(e){return null;}
-  }
-
-  function userId(){return currentUser?.auth_id || currentUser?.id || null;}
-
-  async function cloudStatePush(){
-    if(stateBusy || !currentUser)return false;
-    const client=await cloudStateClient(); if(!client)return false;
-    const {data:{user}}=await client.auth.getUser();
-    if(!user)return false;
-    stateBusy=true;
-    try{
-      const row={user_id:user.id,state:clone(db),updated_at:new Date().toISOString()};
-      const {error}=await client.from(CLOUD_STATE_TABLE).upsert(row,{onConflict:"user_id"});
-      if(error){console.error("EstateAI state cloud save:",error);return false;}
-      lastCloudUpdated=row.updated_at;
-      return true;
-    }catch(e){console.error("EstateAI state cloud exception:",e);return false}
-    finally{stateBusy=false;}
-  }
-
-  async function cloudStatePull(showToast=false){
-    if(!currentUser)return false;
-    const client=await cloudStateClient(); if(!client)return false;
-    const {data:{user}}=await client.auth.getUser();
-    if(!user)return false;
-    try{
-      const {data,error}=await client.from(CLOUD_STATE_TABLE).select("state,updated_at").eq("user_id",user.id).maybeSingle();
-      if(error){console.error("EstateAI state cloud load:",error);return false;}
-      if(!data?.state){
-        await cloudStatePush();
-        return true;
-      }
-      db={...clone(defaultData),...data.state};
-      proEnsureArray();
-      saveLocalOnly();
-      lastCloudUpdated=data.updated_at||"";
-      if(currentUser)updateProfile();
-      if(currentPage)showPage(currentPage);
-      if(showToast)toast("☁ CRM data restored from cloud");
-      return true;
-    }catch(e){console.error("EstateAI state cloud pull exception:",e);return false;}
-  }
-
-  function saveLocalOnly(){
-    try{
-      const old=localStorage.getItem(STORAGE);
-      const now=JSON.stringify(db);
-      if(old && old!==now) localStorage.setItem(STORAGE+"_last_backup",old);
-      localStorage.setItem(STORAGE,now);
-      localStorage.setItem(STORAGE+"_saved_at",new Date().toISOString());
-      return true;
-    }catch(e){return false;}
-  }
-
-  function scheduleStatePush(){
-    if(!currentUser)return;
-    clearTimeout(stateTimer);
-    stateTimer=setTimeout(()=>cloudStatePush(),900);
-  }
-
-  /* Every existing CRM save still works locally immediately, then syncs safely. */
-  const cloudAwareSaveDB=function(){
-    const ok=_saveDB();
-    if(ok) scheduleStatePush();
-    return ok;
-  };
-  window.saveDB=cloudAwareSaveDB;
-  saveDB=cloudAwareSaveDB;
-  /* Keep lexical saveDB calls cloud-aware too. */
-  try{ window.__estateaiOriginalSaveDB=_saveDB; }catch(e){}
-
-  async function pollCloudState(){
-    if(!currentUser || stateBusy)return;
-    const client=await cloudStateClient(); if(!client)return;
-    const {data:{user}}=await client.auth.getUser(); if(!user)return;
-    try{
-      const {data,error}=await client.from(CLOUD_STATE_TABLE).select("state,updated_at").eq("user_id",user.id).maybeSingle();
-      if(error || !data?.updated_at)return;
-      if(lastCloudUpdated && new Date(data.updated_at)<=new Date(lastCloudUpdated))return;
-      if(stateBusy)return;
-      db={...clone(defaultData),...data.state};
-      proEnsureArray();
-      saveLocalOnly();
-      lastCloudUpdated=data.updated_at;
-      updateProfile();
-      showPage(currentPage||"dashboard");
-    }catch(e){console.warn("EstateAI cloud polling:",e)}
-  }
-
-  function startStatePolling(){
-    clearInterval(statePoll);
-    statePoll=setInterval(pollCloudState,5000);
-  }
-
-  /* Password + Admin ID are changed on the authenticated Supabase account. */
-  window.openAdminCredentials=function(){
-    if(!isAdmin())return toast("Admin only");
-    const email=currentUser?.email||"admin@estateai.in";
-    document.getElementById("modalTitle").textContent="🔐 Admin Login Credentials";
-    document.getElementById("modalBody").innerHTML=`
-      <form onsubmit="saveAdminCredentials(event)">
-       <div class="form-group"><label>Admin Login ID / Email</label><input id="adminNewEmail" type="email" required value="${esc(email)}"></div>
-       <div class="form-group" style="margin-top:12px"><label>New Password</label><input id="adminNewPassword" type="password" minlength="6" placeholder="Minimum 6 characters"></div>
-       <p style="font-size:12px;color:#667085;margin-top:12px">Changing the ID may require email confirmation if Supabase Email Confirmation is enabled.</p>
-       <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Save Credentials</button></div>
-      </form>`;
-    openModal();
-  };
-
-  window.saveAdminCredentials=async function(e){
-    e.preventDefault();
-    if(!isAdmin())return toast("Admin only");
-    const client=await cloudStateClient(); if(!client)return toast("Cloud login unavailable");
-    const email=document.getElementById("adminNewEmail").value.trim().toLowerCase();
-    const password=document.getElementById("adminNewPassword").value;
-    const updates={};
-    if(email && email!==String(currentUser.email||"").toLowerCase())updates.email=email;
-    if(password)updates.password=password;
-    if(!Object.keys(updates).length)return toast("No changes entered");
-    const {data,error}=await client.auth.updateUser(updates);
-    if(error){toast(error.message||"Credential update failed");return;}
-    if(data?.user){
-      currentUser.email=data.user.email||email;
-      currentUser.username=(email.split("@")[0]||currentUser.username);
-      currentUser.auth_id=data.user.id;
-      currentUser.role="Admin";
-      const i=db.users.findIndex(u=>u.id===currentUser.id || String(u.email||"").toLowerCase()===String(data.user.email||email).toLowerCase());
-      if(i>=0)db.users[i]={...db.users[i],...currentUser};
-      else db.users.push(currentUser);
-      window.__estateaiOriginalSaveDB?.();
-      await cloudStatePush();
-      updateProfile();
-      closeModal();
-      toast("✅ Admin credentials updated. Use the new ID/password next login.");
-    }
-  };
-
-  /* Ensure the authenticated user is represented by their real Supabase name. */
-  const _localUserForAuth=localUserForAuth;
-  window.__estateaiLocalUserForAuthPatched=true;
-  /* Wrap login so cloud state is restored before dashboard is finally shown. */
-  const oldLogin=window.login;
-  window.login=async function(){
-    const result=await oldLogin.apply(this,arguments);
-    if(currentUser){
-      currentUser.auth_id=currentUser.auth_id || currentUser.id?.replace(/^supabase:/,"") || null;
-      await cloudStatePull(false);
-      const client=await cloudStateClient();
-      const {data:{user}}=client?await client.auth.getUser():{data:{user:null}};
-      if(user){
-        currentUser.auth_id=user.id;
-        currentUser.email=user.email||currentUser.email;
-        currentUser.name=user.user_metadata?.name || currentUser.name || user.email?.split("@")[0] || "User";
-        currentUser.username=currentUser.username||user.email?.split("@")[0];
-        if(currentUser.role!=="Admin" && user.email===ESTATEAI_AUTH_EMAILS.admin)currentUser.role="Admin";
-        const i=db.users.findIndex(u=>String(u.email||"").toLowerCase()===String(user.email||"").toLowerCase() || u.id===currentUser.id);
-        if(i>=0)db.users[i]={...db.users[i],...currentUser};
-        else db.users.push(currentUser);
-        saveLocalOnly();
-      }
-      updateProfile();
-      showPage("dashboard");
-      setTimeout(proWelcome,80);
-      startStatePolling();
-    }
-    return result;
-  };
-
-  /* Session restore: after Supabase restores the session, fetch cloud state. */
-  const _restore=window.restoreSession;
-  window.restoreSession=async function(){
-    const r=await _restore.apply(this,arguments);
-    if(currentUser){
-      await cloudStatePull(false);
-      updateProfile();
-      showPage(currentPage||"dashboard");
-      startStatePolling();
-    }
-    return r;
-  };
-
-
-  window.EstateAIPermanentCloud={push:cloudStatePush,pull:cloudStatePull};
-})();
+window.addEventListener('online',()=>{if(currentUser&&cloudReady)saveCloudState()});
+setInterval(()=>{if(currentUser&&cloudReady&&!cloudLoading)queueCloudSave()},5000);
 
 </script>
 
