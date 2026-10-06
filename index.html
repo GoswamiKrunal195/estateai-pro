@@ -1927,7 +1927,7 @@ function proAdminPage(){
  if(!isAdmin())return `<div class="card"><h2>Access denied</h2></div>`;
  return `
  <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>Full control over inventory, leads, users, integrations and data.</p></div>
- <button class="primary" onclick="backupData()">⬇ Backup Everything</button></div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="secondary" onclick="openAdminCredentials()">🔐 Change Admin ID / Password</button><button class="primary" onclick="backupData()">⬇ Backup Everything</button></div></div>
  <div class="kpis">
   ${kpi("🏠","Properties",db.properties.length,"Full control")}
   ${kpi("👥","Leads",db.leads.length,"Full control")}
@@ -2199,6 +2199,204 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.addEventListener("DOMContentLoaded",()=>{
     setTimeout(()=>{if(currentUser)syncCloudLeads(true);},1200);
   });
+})();
+
+
+/* =========================================================
+   ESTATEAI PERMANENT CLOUD STATE + ADMIN CREDENTIALS
+   Supabase is the source of truth. localStorage is offline cache only.
+========================================================= */
+(function installPermanentCloud(){
+  const CLOUD_STATE_TABLE="estateai_state";
+  const _saveDB=window.saveDB || saveDB;
+  let stateTimer=null, stateBusy=false, lastCloudUpdated="";
+  let statePoll=null;
+
+  async function cloudStateClient(){
+    try{return await supabaseAuthClient();}catch(e){return null;}
+  }
+
+  function userId(){return currentUser?.auth_id || currentUser?.id || null;}
+
+  async function cloudStatePush(){
+    if(stateBusy || !currentUser)return false;
+    const client=await cloudStateClient(); if(!client)return false;
+    const {data:{user}}=await client.auth.getUser();
+    if(!user)return false;
+    stateBusy=true;
+    try{
+      const row={user_id:user.id,state:clone(db),updated_at:new Date().toISOString()};
+      const {error}=await client.from(CLOUD_STATE_TABLE).upsert(row,{onConflict:"user_id"});
+      if(error){console.error("EstateAI state cloud save:",error);return false;}
+      lastCloudUpdated=row.updated_at;
+      return true;
+    }catch(e){console.error("EstateAI state cloud exception:",e);return false}
+    finally{stateBusy=false;}
+  }
+
+  async function cloudStatePull(showToast=false){
+    if(!currentUser)return false;
+    const client=await cloudStateClient(); if(!client)return false;
+    const {data:{user}}=await client.auth.getUser();
+    if(!user)return false;
+    try{
+      const {data,error}=await client.from(CLOUD_STATE_TABLE).select("state,updated_at").eq("user_id",user.id).maybeSingle();
+      if(error){console.error("EstateAI state cloud load:",error);return false;}
+      if(!data?.state){
+        await cloudStatePush();
+        return true;
+      }
+      db={...clone(defaultData),...data.state};
+      proEnsureArray();
+      saveLocalOnly();
+      lastCloudUpdated=data.updated_at||"";
+      if(currentUser)updateProfile();
+      if(currentPage)showPage(currentPage);
+      if(showToast)toast("☁ CRM data restored from cloud");
+      return true;
+    }catch(e){console.error("EstateAI state cloud pull exception:",e);return false;}
+  }
+
+  function saveLocalOnly(){
+    try{
+      const old=localStorage.getItem(STORAGE);
+      const now=JSON.stringify(db);
+      if(old && old!==now) localStorage.setItem(STORAGE+"_last_backup",old);
+      localStorage.setItem(STORAGE,now);
+      localStorage.setItem(STORAGE+"_saved_at",new Date().toISOString());
+      return true;
+    }catch(e){return false;}
+  }
+
+  function scheduleStatePush(){
+    if(!currentUser)return;
+    clearTimeout(stateTimer);
+    stateTimer=setTimeout(()=>cloudStatePush(),900);
+  }
+
+  /* Every existing CRM save still works locally immediately, then syncs safely. */
+  const cloudAwareSaveDB=function(){
+    const ok=_saveDB();
+    if(ok) scheduleStatePush();
+    return ok;
+  };
+  window.saveDB=cloudAwareSaveDB;
+  saveDB=cloudAwareSaveDB;
+  /* Keep lexical saveDB calls cloud-aware too. */
+  try{ window.__estateaiOriginalSaveDB=_saveDB; }catch(e){}
+
+  async function pollCloudState(){
+    if(!currentUser || stateBusy)return;
+    const client=await cloudStateClient(); if(!client)return;
+    const {data:{user}}=await client.auth.getUser(); if(!user)return;
+    try{
+      const {data,error}=await client.from(CLOUD_STATE_TABLE).select("state,updated_at").eq("user_id",user.id).maybeSingle();
+      if(error || !data?.updated_at)return;
+      if(lastCloudUpdated && new Date(data.updated_at)<=new Date(lastCloudUpdated))return;
+      if(stateBusy)return;
+      db={...clone(defaultData),...data.state};
+      proEnsureArray();
+      saveLocalOnly();
+      lastCloudUpdated=data.updated_at;
+      updateProfile();
+      showPage(currentPage||"dashboard");
+    }catch(e){console.warn("EstateAI cloud polling:",e)}
+  }
+
+  function startStatePolling(){
+    clearInterval(statePoll);
+    statePoll=setInterval(pollCloudState,5000);
+  }
+
+  /* Password + Admin ID are changed on the authenticated Supabase account. */
+  window.openAdminCredentials=function(){
+    if(!isAdmin())return toast("Admin only");
+    const email=currentUser?.email||"admin@estateai.in";
+    document.getElementById("modalTitle").textContent="🔐 Admin Login Credentials";
+    document.getElementById("modalBody").innerHTML=`
+      <form onsubmit="saveAdminCredentials(event)">
+       <div class="form-group"><label>Admin Login ID / Email</label><input id="adminNewEmail" type="email" required value="${esc(email)}"></div>
+       <div class="form-group" style="margin-top:12px"><label>New Password</label><input id="adminNewPassword" type="password" minlength="6" placeholder="Minimum 6 characters"></div>
+       <p style="font-size:12px;color:#667085;margin-top:12px">Changing the ID may require email confirmation if Supabase Email Confirmation is enabled.</p>
+       <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Save Credentials</button></div>
+      </form>`;
+    openModal();
+  };
+
+  window.saveAdminCredentials=async function(e){
+    e.preventDefault();
+    if(!isAdmin())return toast("Admin only");
+    const client=await cloudStateClient(); if(!client)return toast("Cloud login unavailable");
+    const email=document.getElementById("adminNewEmail").value.trim().toLowerCase();
+    const password=document.getElementById("adminNewPassword").value;
+    const updates={};
+    if(email && email!==String(currentUser.email||"").toLowerCase())updates.email=email;
+    if(password)updates.password=password;
+    if(!Object.keys(updates).length)return toast("No changes entered");
+    const {data,error}=await client.auth.updateUser(updates);
+    if(error){toast(error.message||"Credential update failed");return;}
+    if(data?.user){
+      currentUser.email=data.user.email||email;
+      currentUser.username=(email.split("@")[0]||currentUser.username);
+      currentUser.auth_id=data.user.id;
+      currentUser.role="Admin";
+      const i=db.users.findIndex(u=>u.id===currentUser.id || String(u.email||"").toLowerCase()===String(data.user.email||email).toLowerCase());
+      if(i>=0)db.users[i]={...db.users[i],...currentUser};
+      else db.users.push(currentUser);
+      window.__estateaiOriginalSaveDB?.();
+      await cloudStatePush();
+      updateProfile();
+      closeModal();
+      toast("✅ Admin credentials updated. Use the new ID/password next login.");
+    }
+  };
+
+  /* Ensure the authenticated user is represented by their real Supabase name. */
+  const _localUserForAuth=localUserForAuth;
+  window.__estateaiLocalUserForAuthPatched=true;
+  /* Wrap login so cloud state is restored before dashboard is finally shown. */
+  const oldLogin=window.login;
+  window.login=async function(){
+    const result=await oldLogin.apply(this,arguments);
+    if(currentUser){
+      currentUser.auth_id=currentUser.auth_id || currentUser.id?.replace(/^supabase:/,"") || null;
+      await cloudStatePull(false);
+      const client=await cloudStateClient();
+      const {data:{user}}=client?await client.auth.getUser():{data:{user:null}};
+      if(user){
+        currentUser.auth_id=user.id;
+        currentUser.email=user.email||currentUser.email;
+        currentUser.name=user.user_metadata?.name || currentUser.name || user.email?.split("@")[0] || "User";
+        currentUser.username=currentUser.username||user.email?.split("@")[0];
+        if(currentUser.role!=="Admin" && user.email===ESTATEAI_AUTH_EMAILS.admin)currentUser.role="Admin";
+        const i=db.users.findIndex(u=>String(u.email||"").toLowerCase()===String(user.email||"").toLowerCase() || u.id===currentUser.id);
+        if(i>=0)db.users[i]={...db.users[i],...currentUser};
+        else db.users.push(currentUser);
+        saveLocalOnly();
+      }
+      updateProfile();
+      showPage("dashboard");
+      setTimeout(proWelcome,80);
+      startStatePolling();
+    }
+    return result;
+  };
+
+  /* Session restore: after Supabase restores the session, fetch cloud state. */
+  const _restore=window.restoreSession;
+  window.restoreSession=async function(){
+    const r=await _restore.apply(this,arguments);
+    if(currentUser){
+      await cloudStatePull(false);
+      updateProfile();
+      showPage(currentPage||"dashboard");
+      startStatePolling();
+    }
+    return r;
+  };
+
+
+  window.EstateAIPermanentCloud={push:cloudStatePush,pull:cloudStatePull};
 })();
 
 </script>
