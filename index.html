@@ -2,2322 +2,909 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>EstateAI Pro — India Real Estate CRM</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EstateAI Pro — India Real Estate CRM | Auto-Sync Facebook & Instagram</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>
+tailwind.config={
+  theme:{
+    extend:{
+      fontFamily:{sans:['Inter','sans-serif'],display:['Plus Jakarta Sans','sans-serif']},
+      colors:{
+        brand:{900:'#0A1931',800:'#112555',700:'#1E3A8A',600:'#2451B3'},
+        accent:'#FFB800',teal:'#00D1A0',soft:'#F1F5F9'
+      },
+      boxShadow:{'glow':'0 20px 60px -15px rgba(255,184,0,0.3)','card':'0 8px 30px rgba(10,25,49,0.08)'}
+    }
+  }
+}
+</script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
- --primary:#2563eb;--primary2:#1d4ed8;--bg:#f4f7fb;--card:#fff;
- --text:#172033;--muted:#667085;--border:#e5e7eb;--sidebar:#101828;
- --green:#16a34a;--orange:#f59e0b;--red:#ef4444;--purple:#7c3aed;
-}
-body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-.app{display:flex;min-height:100vh}
-.sidebar{
- width:250px;background:var(--sidebar);color:#fff;position:fixed;
- inset:0 auto 0 0;z-index:50;display:flex;flex-direction:column
-}
-.logo{padding:22px 20px;border-bottom:1px solid #273244}
-.logo h1{font-size:24px}.logo h1 span{color:#60a5fa}
-.logo p{color:#98a2b3;font-size:12px;margin-top:5px}
-.nav{padding:13px 10px;overflow:auto;flex:1}
-.nav button{
- width:100%;border:0;background:transparent;color:#aeb8c8;padding:10px 12px;
- margin-bottom:4px;border-radius:9px;text-align:left;display:flex;
- align-items:center;gap:10px
-}
-.nav button:hover{background:#1d2939;color:#fff}
-.nav button.active{background:var(--primary);color:#fff}
-.nav-icon{width:22px;text-align:center}
-.sidebar-bottom{padding:14px;border-top:1px solid #273244}
-.profile{display:flex;align-items:center;gap:10px}
-.avatar{
- width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);
- display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold
-}
-.main{margin-left:250px;width:calc(100% - 250px)}
-.topbar{
- height:70px;background:#fff;border-bottom:1px solid var(--border);padding:0 24px;
- display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30
-}
-.search{width:420px;position:relative}
-.search span{position:absolute;left:13px;top:10px;color:#98a2b3}
-.search input{width:100%;padding:11px 15px 11px 39px;border:1px solid var(--border);border-radius:9px;outline:none}
-.top-actions{display:flex;align-items:center;gap:9px}
-.icon-btn{width:39px;height:39px;border:1px solid var(--border);background:#fff;border-radius:9px}
-.content{padding:25px}
-.page-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}
-.page-head h2{font-size:28px}.page-head p{color:var(--muted);margin-top:5px}
-.primary{background:var(--primary);color:#fff;border:0;padding:11px 16px;border-radius:8px;font-weight:bold}
-.primary:hover{background:var(--primary2)}
-.secondary{background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:8px}
-.danger{background:#fff;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:8px}
-.card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:20px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}
-.kpi{background:#fff;border:1px solid var(--border);border-radius:13px;padding:18px}
-.kpi h3{font-size:27px;margin:10px 0 5px}.kpi p{color:var(--muted);font-size:13px}
-.kpi-icon{float:right;font-size:23px;background:#eff6ff;padding:8px;border-radius:9px}
-.up{color:var(--green);font-size:12px}
-.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.filter{padding:10px 12px;border:1px solid var(--border);background:#fff;border-radius:8px}
-.table-wrap{background:#fff;border:1px solid var(--border);border-radius:13px;overflow:auto}
-table{width:100%;border-collapse:collapse}
-th,td{padding:13px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-th{background:#f8fafc;color:#667085;font-size:11px;text-transform:uppercase}
-td{font-size:14px}
-.badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;font-weight:bold}
-.green{background:#dcfce7;color:#15803d}.blue{background:#dbeafe;color:#1d4ed8}
-.orange{background:#fef3c7;color:#b45309}.red{background:#fee2e2;color:#b91c1c}
-.purple{background:#ede9fe;color:#6d28d9}.gray{background:#eef2f7;color:#475467}
-.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
-.property{background:#fff;border:1px solid var(--border);border-radius:13px;overflow:hidden}
-.property-img{
- height:145px;background:linear-gradient(135deg,#dbeafe,#93c5fd);
- display:flex;align-items:center;justify-content:center;font-size:55px
-}
-.property-body{padding:15px}.property-body h3{margin:9px 0 5px}
-.property-body p{color:var(--muted);font-size:13px;margin:5px 0}
-.property-footer{margin-top:13px;display:flex;justify-content:space-between;align-items:center}
-.kanban{display:flex;gap:14px;overflow:auto;padding-bottom:10px}
-.column{min-width:245px;width:245px;background:#eef2f7;border-radius:12px;padding:12px}
-.column-head{display:flex;justify-content:space-between;margin-bottom:10px}
-.lead-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px}
-.lead-card h4{margin-bottom:6px}.lead-card p{font-size:12px;color:var(--muted);margin:4px 0}
-.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
-.form-group{display:flex;flex-direction:column;gap:7px}.full{grid-column:1/-1}
-.form-group label{font-size:13px;font-weight:bold}
-.form-group input,.form-group select,.form-group textarea{
- padding:11px;border:1px solid var(--border);border-radius:8px;outline:none;background:#fff
-}
-.form-group textarea{min-height:95px;resize:vertical}
-.form-actions{margin-top:20px;display:flex;justify-content:flex-end;gap:9px}
-.modal-bg{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
-.modal-bg.show{display:flex}
-.modal{width:760px;max-width:100%;max-height:90vh;overflow:auto;background:#fff;border-radius:14px}
-.modal-head{padding:17px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.modal-body{padding:20px}
-.activity-item{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
-.dot{width:10px;height:10px;background:var(--primary);border-radius:50%;margin-top:5px;flex:none}
-.chart{height:230px;display:flex;align-items:flex-end;gap:15px;padding:10px;border-bottom:1px solid var(--border);margin-top:18px}
-.bar{flex:1;background:linear-gradient(#60a5fa,#2563eb);border-radius:6px 6px 0 0;position:relative}
-.bar span{position:absolute;bottom:-23px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted)}
-.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.feature{border:1px solid var(--border);border-radius:10px;padding:15px;background:#fff}
-.feature p{font-size:12px;color:var(--muted);margin-top:5px}
-.login-screen{
- min-height:100vh;background:linear-gradient(135deg,#0f172a,#1e3a8a);
- display:flex;align-items:center;justify-content:center;padding:20px
-}
-.login-box{width:420px;max-width:100%;background:#fff;border-radius:18px;padding:30px;box-shadow:0 25px 70px #0005}
-.login-logo{text-align:center;margin-bottom:25px}.login-logo h1{font-size:31px}
-.login-logo span{color:#2563eb}.login-logo p{color:#667085;font-size:13px;margin-top:5px}
-.login-box input{width:100%;padding:13px;border:1px solid var(--border);border-radius:9px;margin:7px 0 14px}
-.login-box label{font-size:13px;font-weight:bold}
-.login-box button{width:100%;padding:13px;margin-top:5px}
-.login-error{color:#b91c1c;background:#fee2e2;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px}
-.stat-mini{padding:16px;background:#f8fafc;border-radius:10px}
-.match{border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px;background:#fff}
-.progress{height:8px;background:#eef2f7;border-radius:10px;overflow:hidden;margin-top:7px}
-.progress div{height:100%;background:#2563eb}
-.toast{
- position:fixed;right:20px;bottom:20px;background:#101828;color:#fff;padding:13px 17px;
- border-radius:9px;z-index:300;box-shadow:0 10px 30px #0003
-}
-.dark{--bg:#0f172a;--card:#111827;--text:#f8fafc;--muted:#94a3b8;--border:#263244}
-.dark .card,.dark .kpi,.dark .property,.dark .lead-card,.dark .table-wrap,.dark .modal,
-.dark .secondary,.dark .filter,.dark .form-group input,.dark .form-group select,.dark .form-group textarea,
-.dark .feature{background:#111827;color:#f8fafc;border-color:#263244}
-.dark .topbar{background:#111827;border-color:#263244}
-.dark th{background:#172033}.dark .stat-mini{background:#172033}
-@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.property-grid{grid-template-columns:repeat(2,1fr)}.feature-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:800px){
- .sidebar{width:70px}.logo h1,.logo p,.nav button span:not(.nav-icon),.profile-text{display:none}
- .nav button{justify-content:center}.main{margin-left:70px;width:calc(100% - 70px)}
- .search{width:240px}.grid2,.grid3{grid-template-columns:1fr}.property-grid{grid-template-columns:1fr}
-}
-@media(max-width:600px){
- .content{padding:14px}.topbar{padding:0 10px}.search{width:170px}.kpis{grid-template-columns:1fr}
- .form-grid{grid-template-columns:1fr}.feature-grid{grid-template-columns:1fr}
- .page-head{align-items:flex-start;flex-direction:column}
-}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:999px}
+.live-dot{animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,209,160,0.7)}70%{box-shadow:0 0 0 8px rgba(0,209,160,0)}100%{box-shadow:0 0 0 0 rgba(0,209,160,0)}}
+.shimmer{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 37%,#f1f5f9 63%);background-size:400% 100%;animation:shim 1.4s ease infinite}
+@keyframes shim{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.reel-gradient{background:linear-gradient(to top,rgba(0,0,0,0.85) 15%, transparent 65%)}
 
-/* =========================================================
-   ESTATEAI PRO UX / AUTHENTIC WELCOME / PHOTO / REALTIME
-========================================================= */
-:root{
- --pro-grad:linear-gradient(135deg,#2563eb 0%,#7c3aed 55%,#06b6d4 100%);
- --glass:rgba(255,255,255,.72);
-}
-*{scrollbar-width:thin}
-button,.nav button,.icon-btn,.primary,.secondary,.danger,.feature,.kpi,.property,.card{
- transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease;
-}
-button:hover{transform:translateY(-1px)}
-.kpi:hover,.property:hover,.feature:hover,.card.pro-hover:hover{
- box-shadow:0 14px 35px rgba(16,24,40,.10);transform:translateY(-2px)
-}
-.pro-welcome{
- position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
- background:radial-gradient(circle at 20% 20%,#38bdf8 0,transparent 28%),
-            radial-gradient(circle at 80% 80%,#8b5cf6 0,transparent 30%),
-            linear-gradient(135deg,#07111f,#172554 55%,#0f172a);
- overflow:hidden;animation:proFade .45s ease;
-}
-.pro-welcome.hidden{display:none}
-.pro-orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.45;animation:proFloat 8s ease-in-out infinite}
-.pro-orb.o1{width:240px;height:240px;background:#38bdf8;top:-60px;left:-40px}
-.pro-orb.o2{width:300px;height:300px;background:#8b5cf6;right:-90px;bottom:-100px;animation-delay:-3s}
-.pro-welcome-box{
- width:min(720px,92vw);padding:45px 38px;border:1px solid rgba(255,255,255,.18);
- border-radius:28px;background:rgba(255,255,255,.10);backdrop-filter:blur(20px);
- color:#fff;text-align:center;box-shadow:0 35px 100px rgba(0,0,0,.35);
- position:relative;overflow:hidden;
-}
-.pro-welcome-box:after{
- content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.16),transparent 65%);
- transform:translateX(-100%);animation:proShine 1.7s ease .3s forwards;
-}
-.pro-welcome-icon{font-size:58px;margin-bottom:12px;animation:proPop .7s cubic-bezier(.2,.8,.2,1)}
-.pro-welcome-box h1{font-size:clamp(30px,6vw,54px);letter-spacing:-1.5px}
-.pro-welcome-box h1 span{color:#7dd3fc}
-.pro-welcome-box p{margin-top:10px;color:#dbeafe;font-size:15px}
-.pro-welcome-status{margin-top:24px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.pro-pill{padding:8px 12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(255,255,255,.08);font-size:12px}
-.pro-loading{height:4px;background:rgba(255,255,255,.16);border-radius:9px;margin-top:26px;overflow:hidden}
-.pro-loading div{height:100%;width:0;background:#fff;animation:proLoad 1.6s ease forwards}
-.pro-hero{
- background:var(--pro-grad);color:#fff;border-radius:20px;padding:26px;margin-bottom:20px;
- position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(37,99,235,.20)
-}
-.pro-hero:before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;
-background:rgba(255,255,255,.12);right:-70px;top:-100px}
-.pro-hero-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:center}
-.pro-hero h2{font-size:clamp(25px,4vw,39px);margin-bottom:8px}
-.pro-hero p{color:#e0f2fe;line-height:1.55}
-.pro-quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.pro-quick div{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);
-padding:13px;border-radius:13px}
-.pro-quick strong{display:block;font-size:22px}
-.photo-drop{
- border:2px dashed #cbd5e1;border-radius:14px;padding:18px;text-align:center;
- background:#f8fafc;cursor:pointer
-}
-.photo-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.photo-preview img{width:100%;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--border)}
-.pro-source{
- display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;
- border:1px solid var(--border);border-radius:12px;margin:8px 0;background:#fff
-}
-.pro-source small{color:var(--muted)}
-.pro-live-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#22c55e;
-box-shadow:0 0 0 5px #dcfce7;animation:proPulse 1.5s infinite;margin-right:8px}
-.pro-command{
- display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px
-}
-.pro-command button{padding:13px;border:1px solid var(--border);background:#fff;border-radius:11px;text-align:left}
-.dark .photo-drop,.dark .pro-source,.dark .pro-command button{background:#111827;border-color:#263244;color:#fff}
-.dark .pro-source small{color:#94a3b8}
-@keyframes proFade{from{opacity:0}to{opacity:1}}
-@keyframes proPop{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}
-@keyframes proFloat{50%{transform:translateY(-24px) scale(1.04)}}
-@keyframes proShine{to{transform:translateX(100%)}}
-@keyframes proLoad{to{width:100%}}
-@keyframes proPulse{50%{box-shadow:0 0 0 8px rgba(34,197,94,.08)}}
-@media(max-width:800px){.pro-hero-grid{grid-template-columns:1fr}.pro-command{grid-template-columns:1fr}.photo-preview{grid-template-columns:repeat(2,1fr)}}
-
-</style>
-
-<style id="estateai-premium-motion">
-:root{--ease-premium:cubic-bezier(.16,1,.3,1)}
-@keyframes eaReveal{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
-@keyframes eaGlow{0%,100%{box-shadow:0 0 0 rgba(59,130,246,0)}50%{box-shadow:0 0 34px rgba(59,130,246,.18)}}
-@keyframes eaFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-8px,0)}}
-@keyframes eaShimmer{from{transform:translateX(-120%)}to{transform:translateX(120%)}}
-@keyframes eaPulse{0%,100%{opacity:.65;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
-.login-screen{overflow:hidden;position:relative;background:radial-gradient(circle at 15% 15%,rgba(56,189,248,.24),transparent 28%),radial-gradient(circle at 85% 80%,rgba(139,92,246,.25),transparent 30%),linear-gradient(135deg,#030712,#0f172a 48%,#111827)}
-.login-screen:before,.login-screen:after{content:"";position:absolute;border-radius:50%;filter:blur(8px);pointer-events:none;animation:eaFloat 7s ease-in-out infinite}.login-screen:before{width:320px;height:320px;left:-110px;top:-80px;background:rgba(34,211,238,.18)}.login-screen:after{width:420px;height:420px;right:-150px;bottom:-180px;background:rgba(124,58,237,.18);animation-delay:-3s}
-.login-box{position:relative;z-index:2;animation:eaReveal .8s var(--ease-premium) both;box-shadow:0 35px 100px rgba(0,0,0,.42),0 0 50px rgba(59,130,246,.08);backdrop-filter:blur(22px)}
-.login-box:after{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(120deg,rgba(255,255,255,.35),transparent 35%,rgba(56,189,248,.28),transparent 70%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
-.login-logo h1{letter-spacing:-2px;text-shadow:0 0 28px rgba(125,211,252,.22)}
-.login-box input{transition:.3s var(--ease-premium)}.login-box input:focus{transform:translateY(-2px);box-shadow:0 0 0 3px rgba(59,130,246,.12),0 12px 30px rgba(15,23,42,.08)}
-.login-box button{position:relative;overflow:hidden;transition:.35s var(--ease-premium)}.login-box button:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.35),transparent 70%);transform:translateX(-120%)}.login-box button:hover{transform:translateY(-3px);box-shadow:0 16px 32px rgba(37,99,235,.25)}.login-box button:hover:before{animation:eaShimmer .75s ease}
-.content{animation:eaReveal .55s var(--ease-premium) both}
-.content>.card,.content>.kpis,.content>.grid2,.content>.grid3,.content>.page-head{animation:eaReveal .55s var(--ease-premium) both}
-.kpis>.kpi,.kpi{transition:transform .35s var(--ease-premium),box-shadow .35s ease}.kpi:hover{transform:translateY(-7px) scale(1.015);animation:eaGlow 2.2s ease infinite}
-.property,.feature,.card{transition:transform .35s var(--ease-premium),box-shadow .35s ease,border-color .35s ease}.property:hover,.feature:hover{transform:translateY(-7px) scale(1.01);box-shadow:0 22px 55px rgba(15,23,42,.12)}
-.property img{transition:transform .7s var(--ease-premium),filter .5s ease}.property:hover img{transform:scale(1.045);filter:saturate(1.08)}
-.nav button{transition:transform .25s var(--ease-premium),background .25s ease,color .25s ease}.nav button:hover{transform:translateX(5px)}
-.nav button.active{box-shadow:inset 3px 0 0 currentColor}
-.topbar{backdrop-filter:blur(14px)}
-.modal-bg.show .modal{animation:eaReveal .4s var(--ease-premium) both}
-.modal-bg{backdrop-filter:blur(7px)}
-.toast{animation:eaReveal .45s var(--ease-premium) both}
-.pro-hero{animation:eaReveal .65s var(--ease-premium) both;overflow:hidden}.pro-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.11),transparent 65%);transform:translateX(-120%);animation:eaShimmer 2.8s ease-in-out infinite}.pro-quick>div{animation:eaFloat 4s ease-in-out infinite}.pro-quick>div:nth-child(2){animation-delay:-.7s}.pro-quick>div:nth-child(3){animation-delay:-1.4s}.pro-quick>div:nth-child(4){animation-delay:-2.1s}
-.badge.green{animation:eaPulse 2.4s ease-in-out infinite}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
-</style>
-<style id="estateai-high-level-graphics">
-/* =========================================================
-   ESTATEAI PRO — HIGH LEVEL MOTION SYSTEM
-   Section-specific visual language; no data/storage changes.
-========================================================= */
-:root{--ea-cyan:#35d9ff;--ea-blue:#6c7cff;--ea-purple:#a86cff;--ea-green:#2ee59d;--ea-gold:#ffc857;--ea-pink:#ff5f9e;--ea-bg:#07111f}
-body{overflow-x:hidden}
-.login-screen{background:radial-gradient(circle at 18% 18%,rgba(53,217,255,.16),transparent 28%),radial-gradient(circle at 82% 72%,rgba(168,108,255,.18),transparent 30%),linear-gradient(135deg,#030914,#081525 55%,#050914)!important;position:relative;isolation:isolate}
-.login-screen:before,.login-screen:after{content:"";position:absolute;inset:-25%;pointer-events:none;background:conic-gradient(from 0deg,transparent,rgba(53,217,255,.08),transparent,rgba(168,108,255,.08),transparent);animation:eaOrbit 18s linear infinite;z-index:-1}
-.login-screen:after{animation-duration:28s;animation-direction:reverse;filter:blur(22px)}
-.login-box{animation:eaLoginIn .85s cubic-bezier(.2,.8,.2,1),eaFloat 6s ease-in-out 1s infinite;backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.11);box-shadow:0 28px 90px rgba(0,0,0,.48),0 0 70px rgba(53,217,255,.09)!important}
-.login-logo h1{letter-spacing:-1px;text-shadow:0 0 28px rgba(53,217,255,.25)}
-.login-box input{transition:transform .25s,box-shadow .25s,border-color .25s}.login-box input:focus{transform:translateY(-2px);box-shadow:0 0 0 3px rgba(53,217,255,.08),0 12px 28px rgba(0,0,0,.18)!important}
-.primary{position:relative;overflow:hidden}.primary:after{content:"";position:absolute;top:-40%;left:-30%;width:22%;height:180%;background:rgba(255,255,255,.35);transform:skewX(-20deg);animation:eaShine 3.2s ease-in-out infinite;pointer-events:none}
-.app{animation:eaAppIn .7s ease-out}.sidebar{box-shadow:14px 0 50px rgba(0,0,0,.12)}
-.nav button{position:relative;overflow:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),background .28s,color .28s,box-shadow .28s}.nav button:before{content:"";position:absolute;left:0;top:15%;bottom:15%;width:3px;border-radius:0 4px 4px 0;transform:scaleY(0);transition:transform .3s}.nav button:hover{transform:translateX(5px)}.nav button:hover:before,.nav button.active:before{transform:scaleY(1)}.nav-icon{display:inline-flex;transition:transform .35s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 0 transparent)}.nav button:hover .nav-icon{transform:scale(1.2) rotate(-6deg);filter:drop-shadow(0 0 8px rgba(53,217,255,.35))}
-.content.ea-page-enter{animation:eaPageIn .58s cubic-bezier(.2,.75,.2,1)}
-.content.ea-page-enter .card,.content.ea-page-enter .kpi,.content.ea-page-enter .property,.content.ea-page-enter .feature{animation:eaCardIn .55s both cubic-bezier(.2,.8,.2,1)}
-.content.ea-page-enter .card:nth-child(2){animation-delay:.06s}.content.ea-page-enter .card:nth-child(3){animation-delay:.12s}.content.ea-page-enter .card:nth-child(4){animation-delay:.18s}
-.card,.kpi,.property,.feature{transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s,border-color .28s}.card:hover,.kpi:hover,.property:hover,.feature:hover{transform:translateY(-5px)}
-.property img{transition:transform .65s cubic-bezier(.2,.8,.2,1),filter .4s}.property:hover img{transform:scale(1.055);filter:saturate(1.12)}
-/* Unique page identities */
-body.ea-dashboard .content{background-image:radial-gradient(circle at 90% 5%,rgba(53,217,255,.07),transparent 24%)}
-body.ea-properties .content:before{content:"⌂";position:absolute;right:5%;top:8%;font-size:170px;opacity:.025;animation:eaHouse 5s ease-in-out infinite}
-body.ea-leads .content:before{content:"◌";position:absolute;right:8%;top:6%;font-size:190px;opacity:.035;animation:eaPulse 2.8s ease-in-out infinite}
-body.ea-buyers .content:before{content:"◎";position:absolute;right:8%;top:8%;font-size:180px;opacity:.04;animation:eaRadar 4s linear infinite}
-body.ea-sellers .content:before{content:"◆";position:absolute;right:9%;top:8%;font-size:160px;opacity:.035;animation:eaFloat 4s ease-in-out infinite}
-body.ea-matching .content:before{content:"⌾";position:absolute;right:8%;top:7%;font-size:180px;opacity:.035;animation:eaTarget 3.5s ease-in-out infinite}
-body.ea-followups .content:before{content:"◷";position:absolute;right:8%;top:7%;font-size:180px;opacity:.04;animation:eaClock 5s linear infinite}
-body.ea-visits .content:before{content:"⌖";position:absolute;right:8%;top:7%;font-size:180px;opacity:.04;animation:eaMap 3s ease-in-out infinite}
-body.ea-deals .content:before{content:"⇄";position:absolute;right:8%;top:7%;font-size:180px;opacity:.035;animation:eaDeal 2.8s ease-in-out infinite}
-body.ea-agents .content:before{content:"✦";position:absolute;right:8%;top:7%;font-size:180px;opacity:.035;animation:eaOrbit 8s linear infinite}
-body.ea-reports .content:before{content:"▥";position:absolute;right:8%;top:7%;font-size:180px;opacity:.035;animation:eaBars 2.8s ease-in-out infinite}
-body.ea-ai .content:before{content:"✣";position:absolute;right:8%;top:7%;font-size:180px;opacity:.035;animation:eaNeural 4s ease-in-out infinite}
-body.ea-admin .content:before,body.ea-masteradmin .content:before{content:"◈";position:absolute;right:8%;top:7%;font-size:180px;opacity:.04;animation:eaShield 3.8s ease-in-out infinite}
-body.ea-settings .content:before{content:"⚙";position:absolute;right:8%;top:7%;font-size:170px;opacity:.035;animation:eaGear 8s linear infinite}
-body.ea-social .content:before{content:"◉";position:absolute;right:8%;top:7%;font-size:180px;opacity:.035;animation:eaSocial 3s ease-in-out infinite}
-.content{position:relative;isolation:isolate}.content>*{position:relative;z-index:1}
-.ea-transition{position:fixed;inset:0;pointer-events:none;z-index:9999;background:radial-gradient(circle,rgba(53,217,255,.18),transparent 45%);opacity:0;animation:eaFlash .48s ease-out}
-.ea-toast-pulse{animation:eaToast .55s cubic-bezier(.2,.8,.2,1)!important}
-@keyframes eaLoginIn{from{opacity:0;transform:translateY(28px) scale(.96);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
-@keyframes eaAppIn{from{opacity:0}to{opacity:1}}@keyframes eaPageIn{from{opacity:.15;transform:translateY(12px)}to{opacity:1;transform:none}}
-@keyframes eaCardIn{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
-@keyframes eaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@keyframes eaOrbit{to{transform:rotate(360deg)}}
-@keyframes eaShine{0%,58%{left:-30%}78%,100%{left:125%}}@keyframes eaPulse{0%,100%{transform:scale(.92);opacity:.025}50%{transform:scale(1.08);opacity:.06}}
-@keyframes eaRadar{0%{transform:scale(.7);opacity:.02}50%{transform:scale(1.08);opacity:.06}100%{transform:scale(.7);opacity:.02}}
-@keyframes eaTarget{0%,100%{transform:scale(.9) rotate(-4deg)}50%{transform:scale(1.08) rotate(4deg)}}@keyframes eaClock{to{transform:rotate(360deg)}}
-@keyframes eaMap{0%,100%{transform:translate(0,0)}50%{transform:translate(8px,-8px)}}@keyframes eaDeal{0%,100%{transform:translateX(-4px)}50%{transform:translateX(8px)}}
-@keyframes eaBars{0%,100%{transform:scaleY(.85);transform-origin:bottom}50%{transform:scaleY(1.08);transform-origin:bottom}}@keyframes eaNeural{0%,100%{transform:scale(.92) rotate(0)}50%{transform:scale(1.08) rotate(8deg)}}
-@keyframes eaShield{0%,100%{transform:scale(.95)}50%{transform:scale(1.08)}}@keyframes eaGear{to{transform:rotate(360deg)}}@keyframes eaSocial{0%,100%{transform:scale(.9)}50%{transform:scale(1.12)}}
-@keyframes eaFlash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}@keyframes eaToast{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}}
+/* EstateAI Pro Secure Auth */
+#estateAuth{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 15% 20%,rgba(0,209,160,.16),transparent 35%),radial-gradient(circle at 85% 10%,rgba(255,184,0,.16),transparent 35%),linear-gradient(135deg,#071426,#0A1931 55%,#112555);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+#estateAuth.auth-hidden{display:none}
+.auth-card{width:min(460px,100%);background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.4);border-radius:28px;box-shadow:0 30px 100px rgba(0,0,0,.35);padding:30px;animation:authIn .6s ease both}
+@keyframes authIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+.auth-logo{width:52px;height:52px;border-radius:16px;background:#0A1931;color:#FFB800;display:grid;place-items:center;font:900 24px 'Plus Jakarta Sans';box-shadow:0 10px 30px rgba(10,25,49,.25)}
+.auth-title{font:800 25px 'Plus Jakarta Sans';color:#0A1931;margin-top:18px}
+.auth-sub{font-size:13px;color:#64748b;margin-top:5px}
+.auth-label{display:block;font-size:12px;font-weight:800;color:#334155;margin:18px 0 7px}
+.auth-input{width:100%;border:1px solid #dbe3ee;border-radius:14px;padding:13px 14px;font-size:14px;outline:none;transition:.2s;background:#fff}
+.auth-input:focus{border-color:#0A1931;box-shadow:0 0 0 4px rgba(10,25,49,.08);transform:translateY(-1px)}
+.auth-login{width:100%;margin-top:20px;border:0;border-radius:14px;padding:14px;background:#0A1931;color:#fff;font-weight:800;cursor:pointer;transition:.2s}
+.auth-login:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(10,25,49,.25)}
+.auth-login:disabled{opacity:.65;cursor:wait}
+.auth-error{display:none;margin-top:12px;padding:11px 12px;border-radius:12px;background:#fff1f2;border:1px solid #fecdd3;color:#be123c;font-size:12px;font-weight:700}
+.auth-security{margin-top:18px;padding:11px 12px;border-radius:12px;background:#f8fafc;color:#64748b;font-size:11px;line-height:1.5}
+.auth-status{margin-top:10px;text-align:center;font-size:11px;color:#64748b}
 </style>
 </head>
+<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased">
 
-<body>
+<!-- Secure Login -->
+<div id="estateAuth">
+  <div class="auth-card">
+    <div class="auth-logo">E</div>
+    <div class="auth-title">EstateAI Pro</div>
+    <div class="auth-sub">Secure India Real Estate CRM</div>
+    <form id="estateLoginForm" autocomplete="on">
+      <label class="auth-label" for="estateLoginId">Admin ID / Email</label>
+      <input id="estateLoginId" class="auth-input" autocomplete="username" placeholder="Enter Admin ID or email" required>
+      <label class="auth-label" for="estateLoginPassword">Password</label>
+      <input id="estateLoginPassword" type="password" class="auth-input" autocomplete="current-password" placeholder="Enter password" required>
+      <button id="estateLoginBtn" class="auth-login" type="submit">🔐 Secure Login</button>
+      <div id="estateLoginError" class="auth-error"></div>
+      <div class="auth-security"><i class="fa-solid fa-shield-halved"></i> Login is verified by Supabase Auth. Passwords are not stored in this HTML. Session tokens are handled by Supabase.</div>
+      <div id="estateAuthStatus" class="auth-status">Checking secure connection…</div>
+    </form>
+  </div>
+</div>
+<div id="estateApp" style="display:none">
 
-<!-- LOGIN -->
-<div id="loginScreen" class="login-screen">
-  <div class="login-box">
-    <div class="login-logo">
-      <h1>Estate<span>AI</span></h1>
-      <p>India Real Estate CRM</p>
+<!-- Top Bar -->
+<div class="bg-brand-900 text-white text-xs py-2 px-4 hidden md:flex justify-between items-center">
+  <div class="flex items-center gap-6 mx-auto max-w-[1280px] w-full justify-between">
+    <div class="flex items-center gap-4">
+      <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle text-teal text-[8px] live-dot rounded-full"></i> Auto-Sync Active — 2,847 listings synced today</span>
+      <span class="hidden lg:inline opacity-60">|</span>
+      <span class="hidden lg:inline opacity-80"><i class="fa-solid fa-location-dot mr-1"></i> Mumbai • Delhi • Bengaluru • Hyderabad • Pune</span>
     </div>
-
-    <div id="loginError" class="login-error hidden"></div>
-
-    <label>Username</label>
-    <input id="loginUser" placeholder="User ID or email">
-
-    <label>Password</label>
-    <input id="loginPass" type="password" placeholder="••••••••"
-      onkeydown="if(event.key==='Enter')login()">
-
-    <button class="primary" onclick="login()">Login</button>
-
-    <p style="font-size:12px;color:#667085;margin-top:15px;text-align:center">
-      Secure cloud authentication
-    </p>
+    <div class="flex items-center gap-4">
+      <span><i class="fa-brands fa-whatsapp text-teal mr-1"></i> +91 98 7654 3210</span>
+      <a href="#" class="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition">Partner Login</a>
+    </div>
   </div>
 </div>
 
-<!-- APP -->
-<div id="app" class="app hidden">
-
-<aside class="sidebar">
-  <div class="logo">
-    <h1>Estate<span>AI</span></h1>
-    <p>India Real Estate CRM</p>
-  </div>
-
-  <nav class="nav" id="nav"></nav>
-
-  <div class="sidebar-bottom">
-    <div class="profile">
-      <div class="avatar" id="sideAvatar">A</div>
-      <div class="profile-text">
-        <strong id="sideName">Admin</strong><br>
-        <small style="color:#98a2b3" id="sideRole">Administrator</small>
+<!-- Nav -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200">
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-[68px]">
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-brand-900 flex items-center justify-center text-white font-display font-800 text-lg">E</div>
+          <div>
+            <div class="font-display font-800 text-[18px] leading-none text-brand-900">EstateAI<span class="text-accent"> Pro</span></div>
+            <div class="text-[10px] tracking-[0.14em] font-700 text-slate-500 uppercase">India Real Estate CRM</div>
+          </div>
+          <span class="hidden md:inline-flex ml-2 bg-teal text-white text-[10px] font-800 tracking-widest px-2 py-1 rounded-md">AI POWERED</span>
+        </div>
+        <nav class="hidden lg:flex items-center gap-1 text-sm font-600">
+          <a href="#platform" class="px-3 py-2 rounded-lg hover:bg-slate-100">Platform <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-40"></i></a>
+          <a href="#automations" class="px-3 py-2 rounded-lg hover:bg-slate-100">Automations</a>
+          <a href="#live-sync" class="px-3 py-2 rounded-lg bg-slate-900 text-white">Live Sync <span class="ml-1 w-2 h-2 bg-teal rounded-full inline-block live-dot"></span></a>
+          <a href="#crm" class="px-3 py-2 rounded-lg hover:bg-slate-100">CRM</a>
+          <a href="#pricing" class="px-3 py-2 rounded-lg hover:bg-slate-100">Pricing</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openConnectModal()" class="hidden md:inline-flex items-center gap-2 border border-slate-200 px-4 py-2.5 rounded-full font-700 text-sm hover:bg-slate-50"><i class="fa-solid fa-plug text-slate-500"></i> Connect Socials</button>
+        <a href="#live-sync" class="hidden sm:inline-flex bg-accent text-brand-900 px-5 py-2.5 rounded-full font-800 text-sm hover:bg-[#FFC533] transition shadow-glow">Start Free Trial</a>
+        <button id="mobileBtn" class="lg:hidden w-10 h-10 rounded-full border flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
       </div>
     </div>
   </div>
-</aside>
+  <div id="mobileMenu" class="hidden lg:hidden border-t bg-white px-4 py-4 space-y-2">
+    <a href="#platform" class="block py-2 font-600">Platform</a>
+    <a href="#automations" class="block py-2 font-600">Automations</a>
+    <a href="#live-sync" class="block py-2 font-600 text-teal">Live Sync Demo</a>
+    <a href="#crm" class="block py-2 font-600">CRM Pipeline</a>
+    <a href="#pricing" class="block py-2 font-600">Pricing</a>
+  </div>
+</header>
 
-<main class="main">
-  <header class="topbar">
-    <div class="search">
-      <span>🔍</span>
-      <input id="globalSearch" placeholder="Search properties, buyers, sellers, leads..."
-        oninput="globalSearch(this.value)">
+<!-- Hero -->
+<section class="relative overflow-hidden bg-white">
+  <div class="absolute inset-0 bg-gradient-to-br from-[#F8FAFF] via-white to-[#FFF7E6]"></div>
+  <div class="absolute -top-32 -right-32 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl"></div>
+  <div class="absolute -bottom-40 -left-40 w-[700px] h-[700px] bg-teal/10 rounded-full blur-3xl"></div>
+  <div class="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 lg:pt-14 lg:pb-20">
+    <div class="grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-brand-900 text-white rounded-full pl-1 pr-4 py-1 text-xs font-700">
+          <span class="bg-accent text-brand-900 px-2.5 py-1 rounded-full">NEW</span>
+          Auto-sync Facebook Marketplace + Instagram Reels → Website
+          <i class="fa-solid fa-arrow-right ml-1 text-accent"></i>
+        </div>
+        <h1 class="font-display font-800 text-[36px] sm:text-[46px] lg:text-[54px] leading-[0.95] tracking-tight text-brand-900 mt-5">
+          Your listings<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-700 to-teal">sell themselves.</span>
+        </h1>
+        <p class="text-slate-600 text-[16px] lg:text-[17px] leading-relaxed mt-4 max-w-[560px]">
+          EstateAI Pro automatically pulls selling details from <b>Facebook</b> & <b>Instagram Reels</b> and publishes them as SEO-ready listings on your website. No manual upload. No double work.
+        </p>
+        <div class="flex flex-wrap gap-3 mt-7">
+          <button onclick="document.getElementById('live-sync').scrollIntoView({behavior:'smooth'})" class="bg-brand-900 text-white px-7 py-3.5 rounded-full font-800 flex items-center gap-2 hover:bg-black transition"><i class="fa-solid fa-bolt text-accent"></i> See Live Auto-Sync</button>
+          <button onclick="openConnectModal()" class="bg-white border border-slate-200 px-6 py-3.5 rounded-full font-700 flex items-center gap-2 hover:bg-slate-50"><i class="fa-brands fa-meta text-[#0866FF]"></i> Connect in 30 seconds</button>
+        </div>
+        <div class="flex items-center gap-6 mt-8">
+          <div class="flex -space-x-2">
+            <img src="https://i.pravatar.cc/100?img=11" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="https://i.pravatar.cc/100?img=14" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="https://i.pravatar.cc/100?img=32" class="w-8 h-8 rounded-full border-2 border-white">
+            <div class="w-8 h-8 rounded-full bg-accent border-2 border-white flex items-center justify-center text-xs font-800">+2k</div>
+          </div>
+          <div class="text-sm">
+            <div class="flex text-accent text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><span class="text-slate-900 font-800 ml-1">4.9/5</span></div>
+            <div class="text-slate-500 font-500">Trusted by 3,200+ brokers across India</div>
+          </div>
+          <div class="hidden sm:flex items-center gap-2 text-xs font-700 border-l pl-6">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" class="w-5 h-5"> Meta Partner
+            <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+            <i class="fa-brands fa-instagram text-pink-600 text-base"></i> Graph API
+          </div>
+        </div>
+      </div>
+      <!-- Hero Dashboard Mock -->
+      <div class="relative lg:h-[520px]">
+        <div class="bg-white rounded-[28px] shadow-[0_20px_60px_rgba(10,25,49,0.12)] border border-slate-200 overflow-hidden">
+          <div class="h-11 flex items-center justify-between px-4 border-b bg-slate-50/80">
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-400"></span><span class="w-3 h-3 rounded-full bg-yellow-400"></span><span class="w-3 h-3 rounded-full bg-green-400"></span><span class="ml-3 text-xs font-700 tracking-widest text-slate-500">ESTATEAI PRO — LIVE DASHBOARD</span></div>
+            <span class="text-xs bg-teal text-white px-2.5 py-1 rounded-full font-700 flex items-center gap-1"><span class="w-2 h-2 bg-white rounded-full live-dot"></span> SYNCING</span>
+          </div>
+          <div class="p-4 grid grid-cols-3 gap-3">
+            <div class="bg-brand-900 text-white rounded-2xl p-3">
+              <div class="text-[11px] opacity-70 font-600 tracking-widest">TODAY'S AUTO IMPORTS</div>
+              <div class="text-2xl font-800 mt-1 flex items-center gap-2">47 <span class="text-teal text-xs bg-white/15 px-2 py-0.5 rounded-full">+12 now</span></div>
+              <div class="text-xs opacity-60 mt-1">Facebook 28 • Instagram 19</div>
+            </div>
+            <div class="bg-accent rounded-2xl p-3">
+              <div class="text-[11px] font-700 tracking-widest text-brand-900/70">LEADS GENERATED</div>
+              <div class="text-2xl font-800 text-brand-900">128</div>
+              <div class="text-xs font-600 text-brand-900/60">₹ 4.2Cr pipeline</div>
+            </div>
+            <div class="bg-white border rounded-2xl p-3">
+              <div class="text-[11px] font-700 tracking-widest text-slate-400">WEBSITE VIEWS</div>
+              <div class="text-2xl font-800">18.4k</div>
+              <div class="text-xs text-teal font-700">↑ 34% vs yesterday</div>
+            </div>
+          </div>
+          <div class="px-4 pb-4">
+            <div class="rounded-2xl border overflow-hidden">
+              <div class="bg-slate-900 text-white text-xs flex items-center justify-between px-3 py-2">
+                <span class="font-700 tracking-widest flex items-center gap-2"><i class="fa-brands fa-instagram text-pink-400"></i> INSTAGRAM REEL DETECTED → AUTO LISTING CREATED</span>
+                <span class="bg-teal text-white px-2 py-1 rounded-full text-[10px] font-800">LIVE ON WEBSITE</span>
+              </div>
+              <div class="grid grid-cols-5 gap-0">
+                <div class="col-span-2 relative bg-slate-100">
+                  <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400" class="w-full h-[160px] object-cover">
+                  <div class="absolute inset-0 reel-gradient"></div>
+                  <div class="absolute bottom-2 left-2 right-2 text-white">
+                    <div class="text-[11px] bg-white/20 backdrop-blur px-2 py-1 rounded-full inline-flex gap-1 items-center"><i class="fa-solid fa-play"></i> 24.5K views • 1.2K likes</div>
+                    <div class="font-700 text-sm leading-tight mt-1">3BHK Sea View — Bandra West</div>
+                  </div>
+                  <div class="absolute top-2 left-2 bg-black/70 text-white text-[10px] px-2 py-1 rounded-full font-700">REEL • 00:18</div>
+                </div>
+                <div class="col-span-3 p-3 bg-white">
+                  <div class="flex items-center gap-2 text-[11px] font-800 tracking-widest text-teal"><i class="fa-solid fa-wand-magic-sparkles"></i> AI EXTRACTED DETAILS</div>
+                  <div class="mt-1 font-800 text-brand-900">₹ 4.75 Cr • 1,450 sq.ft • Bandra West</div>
+                  <div class="text-xs text-slate-500 mt-1">AI parsed caption: "Sunset views, modular kitchen, 5 min to Carter Road..." → auto-filled 14 fields</div>
+                  <div class="flex gap-2 mt-3">
+                    <span class="text-[10px] bg-slate-100 border px-2 py-1 rounded-full font-600">3 BHK</span>
+                    <span class="text-[10px] bg-slate-100 border px-2 py-1 rounded-full font-600">Sea View</span>
+                    <span class="text-[10px] bg-teal/10 text-teal border border-teal/20 px-2 py-1 rounded-full font-700">Verified</span>
+                  </div>
+                  <div class="flex gap-2 mt-3">
+                    <button class="flex-1 bg-brand-900 text-white text-xs font-700 py-2 rounded-full">View on Website →</button>
+                    <button class="w-8 h-8 rounded-full border flex items-center justify-center"><i class="fa-regular fa-pen-to-square text-xs"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <div class="border rounded-xl p-2.5 flex gap-2.5 items-center bg-[#EFF6FF]">
+                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200" class="w-12 h-12 rounded-lg object-cover">
+                <div><div class="text-xs font-800">2BHK Powai — FB Marketplace</div><div class="text-[11px] text-slate-500">Synced 2m ago • ₹ 1.85 Cr</div><div class="text-[11px] text-[#0866FF] font-700">facebook.com/marketplace</div></div>
+              </div>
+              <div class="border rounded-xl p-2.5 flex gap-2.5 items-center">
+                <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=200" class="w-12 h-12 rounded-lg object-cover">
+                <div><div class="text-xs font-800">Villa Whitefield — Reel</div><div class="text-[11px] text-slate-500">Synced 5m ago • ₹ 2.95 Cr</div><div class="text-[11px] text-pink-600 font-700">instagram.com/reel/...</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Floating badge -->
+        <div class="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-card border p-3 hidden lg:flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-teal flex items-center justify-center text-white"><i class="fa-solid fa-check"></i></div>
+          <div><div class="text-xs font-800">Website updated automatically</div><div class="text-xs text-slate-500">No manual entry needed</div></div>
+        </div>
+        <div class="absolute -top-3 -right-3 bg-accent rounded-2xl px-3 py-2 shadow-glow hidden lg:block">
+          <div class="text-[11px] font-800 tracking-widest">AI ACCURACY</div><div class="text-xl font-900 leading-none">98.7%</div>
+        </div>
+      </div>
     </div>
-    <div class="top-actions">
-      <button class="icon-btn" onclick="showNotifications()">🔔</button>
-      <button class="icon-btn" onclick="toggleTheme()">🌙</button>
-      <button class="icon-btn" onclick="logout()">↪</button>
-      <div class="avatar" id="topAvatar">A</div>
+    <!-- Trusted -->
+    <div class="mt-10 border-t pt-6 flex flex-wrap gap-6 items-center justify-between opacity-60 text-xs font-700 tracking-widest">
+      <span>INTEGRATES WITH</span>
+      <div class="flex flex-wrap gap-6 items-center text-sm font-800 tracking-normal">
+        <span class="flex items-center gap-1.5"><i class="fa-brands fa-facebook text-[#0866FF] text-lg"></i> Facebook Marketplace</span>
+        <span class="flex items-center gap-1.5"><i class="fa-brands fa-instagram text-pink-600 text-lg"></i> Instagram Graph API</span>
+        <span class="flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-600 text-lg"></i> WhatsApp Cloud</span>
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-magnifying-glass"></i> 99acres</span>
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-house"></i> MagicBricks</span>
+      </div>
     </div>
-  </header>
+  </div>
+</section>
 
-  <div class="content" id="content"></div>
-</main>
-</div>
-
-<div class="modal-bg" id="modalBg">
-  <div class="modal">
-    <div class="modal-head">
-      <h3 id="modalTitle">Modal</h3>
-      <button class="icon-btn" onclick="closeModal()">✕</button>
+<!-- Automation Hub -->
+<section id="automations" class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+    <div>
+      <div class="inline-flex bg-accent/15 text-brand-900 text-xs font-800 tracking-widest px-3 py-1 rounded-full">AUTOMATION ENGINE</div>
+      <h2 class="font-display font-800 text-3xl lg:text-[36px] text-brand-900 mt-3 leading-tight">Every “automatic option” you asked for.<br> And 20 more you didn’t know you needed.</h2>
     </div>
-    <div class="modal-body" id="modalBody"></div>
+    <div class="text-sm text-slate-600 max-w-md">Turn Facebook posts & Instagram Reels into revenue without lifting a finger. EstateAI handles fetching, parsing, publishing, and lead capture.</div>
+  </div>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <!-- Card 1 -->
+    <div class="bg-white rounded-[20px] border p-5 shadow-card hover:shadow-lg transition relative overflow-hidden group">
+      <div class="w-11 h-11 rounded-xl bg-[#0866FF] flex items-center justify-center text-white text-lg"><i class="fa-brands fa-facebook"></i></div>
+      <div class="absolute top-5 right-5 flex items-center gap-2">
+        <span class="text-[11px] font-800 tracking-widest text-teal">ACTIVE</span>
+        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer" onchange="toggleSync('fb',this)"><div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal"></div></label>
+      </div>
+      <h3 class="font-800 text-[15px] mt-4">Facebook Auto-Import</h3>
+      <p class="text-sm text-slate-600 mt-1 leading-relaxed">Sync Marketplace, Page posts & groups. AI reads price, location, BHK, area and creates a draft listing in 8 seconds.</p>
+      <div class="mt-4 bg-slate-50 rounded-xl p-3 text-xs font-600 flex justify-between"><span>Last sync: 43 sec ago</span><span class="text-teal">28 today</span></div>
+      <div class="mt-3 flex flex-wrap gap-1.5"><span class="text-[11px] bg-blue-50 text-[#0866FF] px-2 py-1 rounded-full font-700">Marketplace</span><span class="text-[11px] bg-slate-100 px-2 py-1 rounded-full">Page Posts</span><span class="text-[11px] bg-slate-100 px-2 py-1 rounded-full">Comments → Leads</span></div>
+    </div>
+    <!-- Card 2 -->
+    <div class="bg-white rounded-[20px] border p-5 shadow-card hover:shadow-lg transition relative overflow-hidden">
+      <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#515BD4] flex items-center justify-center text-white text-lg"><i class="fa-brands fa-instagram"></i></div>
+      <div class="absolute top-5 right-5 flex items-center gap-2">
+        <span class="text-[11px] font-800 tracking-widest text-teal">ACTIVE</span>
+        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer" onchange="toggleSync('ig',this)"><div class="w-10 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal"></div></label>
+      </div>
+      <h3 class="font-800 text-[15px] mt-4">Instagram Reels → Listings</h3>
+      <p class="text-sm text-slate-600 mt-1 leading-relaxed">Every Reel with #ForSale auto-becomes a property page. Thumbnail, views, likes & caption become gallery, stats & description.</p>
+      <div class="mt-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-xl p-3 text-xs font-600 flex justify-between"><span>Last Reel: 2 min ago</span><span class="text-pink-600">19 Reels today</span></div>
+      <div class="mt-3 flex flex-wrap gap-1.5"><span class="text-[11px] bg-pink-50 text-pink-600 px-2 py-1 rounded-full font-700">Reels</span><span class="text-[11px] bg-slate-100 px-2 py-1 rounded-full">Stories</span><span class="text-[11px] bg-slate-100 px-2 py-1 rounded-full">DM → Lead</span></div>
+    </div>
+    <!-- Card 3 -->
+    <div class="bg-brand-900 text-white rounded-[20px] p-5 shadow-card relative overflow-hidden">
+      <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+      <div class="w-11 h-11 rounded-xl bg-accent flex items-center justify-center text-brand-900 text-lg"><i class="fa-solid fa-globe"></i></div>
+      <h3 class="font-800 text-[15px] mt-4">Auto-Publish to Website</h3>
+      <p class="text-sm text-white/70 mt-1 leading-relaxed">Instant SEO page with schema, sitemap & WhatsApp CTA. No “Save” button needed — it’s live the moment we detect it.</p>
+      <label class="mt-4 flex items-center justify-between bg-white/10 rounded-xl px-3 py-2 cursor-pointer"><span class="text-sm font-600">Publish without approval</span><input type="checkbox" checked class="accent-accent w-4 h-4" id="autoPublish"></label>
+      <div class="mt-3 text-xs bg-white text-brand-900 rounded-full px-3 py-1.5 inline-flex font-700">Live URL: estateaipro.in/p/bandra-sea-view-3bhk</div>
+    </div>
+    <!-- Card 4 -->
+    <div class="bg-white rounded-[20px] border p-5 shadow-card">
+      <div class="w-11 h-11 rounded-xl bg-teal flex items-center justify-center text-white text-lg"><i class="fa-brands fa-whatsapp"></i></div>
+      <h3 class="font-800 text-[15px] mt-4">WhatsApp + AI Auto-Reply</h3>
+      <p class="text-sm text-slate-600 mt-1">Comments & DMs get instant reply with brochure, location & site visit link. Lead created in CRM automatically.</p>
+      <div class="mt-4 space-y-2 text-xs">
+        <div class="flex justify-between bg-slate-50 rounded-lg px-3 py-2"><span>Auto-reply on FB comment</span><span class="text-teal font-800">ON</span></div>
+        <div class="flex justify-between bg-slate-50 rounded-lg px-3 py-2"><span>Auto-reply on IG DM</span><span class="text-teal font-800">ON</span></div>
+      </div>
+    </div>
+    <!-- Card 5 -->
+    <div class="bg-white rounded-[20px] border p-5 shadow-card">
+      <div class="w-11 h-11 rounded-xl bg-slate-900 flex items-center justify-center text-white text-lg"><i class="fa-solid fa-brain"></i></div>
+      <h3 class="font-800 text-[15px] mt-4">AI Enrichment</h3>
+      <p class="text-sm text-slate-600 mt-1">Parses price (“1.85cr”, “85L”), BHK, amenities, and rewrites caption into premium listing copy in English, Hindi or Hinglish.</p>
+      <div class="mt-4 flex gap-2"><span class="flex-1 bg-slate-900 text-white text-center text-xs font-700 py-2 rounded-full">Hindi</span><span class="flex-1 border text-xs font-700 py-2 rounded-full text-center">English</span><span class="flex-1 border text-xs font-700 py-2 rounded-full text-center">Hinglish</span></div>
+    </div>
+    <!-- Card 6 -->
+    <div class="bg-white rounded-[20px] border p-5 shadow-card">
+      <div class="w-11 h-11 rounded-xl bg-amber-500 flex items-center justify-center text-white text-lg"><i class="fa-solid fa-users-gear"></i></div>
+      <h3 class="font-800 text-[15px] mt-4">Smart Lead Routing</h3>
+      <p class="text-sm text-slate-600 mt-1">New leads auto-assigned by city, budget, source. SLAs, reminders & follow-up sequences on WhatsApp & email.</p>
+      <div class="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+        <div class="bg-slate-50 rounded-xl py-2"><div class="font-800">Mumbai</div><div class="text-slate-500">Riya →</div></div>
+        <div class="bg-slate-50 rounded-xl py-2"><div class="font-800">Delhi</div><div class="text-slate-500">Aman →</div></div>
+        <div class="bg-slate-50 rounded-xl py-2"><div class="font-800">Blr</div><div class="text-slate-500">Kiran →</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Live Sync Demo -->
+<section id="live-sync" class="bg-brand-900 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none"></div>
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 text-white text-xs font-800 tracking-widest px-3 py-1.5 rounded-full"><span class="w-2 h-2 bg-teal rounded-full live-dot"></span> LIVE SOCIAL COMMERCE SYNC</div>
+        <h2 class="font-display font-800 text-3xl text-white mt-3">Watch Facebook & Instagram become your website.</h2>
+        <p class="text-white/60 text-sm mt-2 max-w-2xl">Toggle auto-sync, connect pages, and see listings appear in real-time. Everything below is interactive — try pausing a source or adding a Reel.</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="addRandomListing()" class="bg-accent text-brand-900 px-5 py-2.5 rounded-full font-800 text-sm flex items-center gap-2 hover:bg-[#FFC533]"><i class="fa-solid fa-plus"></i> Simulate New Post</button>
+        <button onclick="openConnectModal()" class="bg-white text-brand-900 px-5 py-2.5 rounded-full font-700 text-sm hidden sm:inline-flex">Manage Connections</button>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-[340px_1fr] gap-6">
+      <!-- Left Control Panel -->
+      <div class="bg-white rounded-[24px] p-5 shadow-card h-fit">
+        <h3 class="font-800 text-brand-900">Connections</h3>
+        <p class="text-xs text-slate-500 mt-1">OAuth via Meta Graph API. Encrypted tokens, auto-refresh.</p>
+
+        <div id="fbConnection" class="mt-4 border rounded-2xl p-3 flex items-center justify-between bg-blue-50/50 border-blue-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#0866FF] flex items-center justify-center text-white"><i class="fa-brands fa-facebook"></i></div>
+            <div><div class="text-sm font-800 flex items-center gap-1.5">Facebook Page <i class="fa-solid fa-circle-check text-teal text-xs"></i></div><div class="text-xs text-slate-500">sunshine.properties • 12.4k</div></div>
+          </div>
+          <span class="text-[11px] bg-teal text-white px-2.5 py-1 rounded-full font-800">CONNECTED</span>
+        </div>
+
+        <div id="igConnection" class="mt-3 border rounded-2xl p-3 flex items-center justify-between bg-pink-50/60 border-pink-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-600 flex items-center justify-center text-white"><i class="fa-brands fa-instagram"></i></div>
+            <div><div class="text-sm font-800 flex items-center gap-1.5">Instagram Business <i class="fa-solid fa-circle-check text-teal text-xs"></i></div><div class="text-xs text-slate-500">@sunshine.properties • 8.9k</div></div>
+          </div>
+          <span class="text-[11px] bg-teal text-white px-2.5 py-1 rounded-full font-800">CONNECTED</span>
+        </div>
+
+        <div class="mt-5 space-y-3">
+          <h4 class="text-xs font-800 tracking-widest text-slate-500">AUTOMATION RULES</h4>
+          <label class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-3 cursor-pointer border">
+            <span class="text-sm font-600">Auto-create website listing</span>
+            <input type="checkbox" checked class="w-4 h-4 accent-brand-900">
+          </label>
+          <label class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-3 cursor-pointer border">
+            <span class="text-sm font-600">Auto-generate AI description</span>
+            <input type="checkbox" checked class="w-4 h-4 accent-brand-900">
+          </label>
+          <label class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-3 cursor-pointer border">
+            <span class="text-sm font-600">Require approval before publish</span>
+            <input type="checkbox" id="requireApproval" class="w-4 h-4 accent-brand-900">
+          </label>
+          <label class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-3 cursor-pointer border">
+            <span class="text-sm font-600">Extract price & location via AI</span>
+            <input type="checkbox" checked class="w-4 h-4 accent-brand-900">
+          </label>
+        </div>
+
+        <div class="mt-5 bg-brand-900 rounded-2xl p-4 text-white">
+          <div class="text-xs font-800 tracking-widest opacity-60">SYNC HEALTH</div>
+          <div class="flex items-center justify-between mt-2"><span class="text-sm">Facebook</span><span class="text-teal text-sm font-700">● Operational</span></div>
+          <div class="w-full bg-white/10 h-1.5 rounded-full mt-1"><div class="bg-teal h-1.5 rounded-full w-[92%]"></div></div>
+          <div class="flex items-center justify-between mt-3"><span class="text-sm">Instagram</span><span class="text-teal text-sm font-700">● Operational</span></div>
+          <div class="w-full bg-white/10 h-1.5 rounded-full mt-1"><div class="bg-pink-500 h-1.5 rounded-full w-[88%]"></div></div>
+          <div class="text-xs opacity-60 mt-3">Next sync in <span id="countdown">08</span>s • Webhook active</div>
+        </div>
+
+        <button onclick="openConnectModal()" class="w-full mt-4 border-2 border-dashed rounded-xl py-2.5 text-sm font-700 text-slate-600 hover:bg-slate-50"><i class="fa-solid fa-plus mr-1"></i> Connect Another Page</button>
+      </div>
+
+      <!-- Right Feed -->
+      <div class="bg-[#F8FAFC] rounded-[24px] p-4 lg:p-5 shadow-card">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex bg-white border rounded-full p-1 text-sm font-700">
+            <button onclick="filterFeed('all')" id="tab-all" class="px-4 py-1.5 rounded-full bg-brand-900 text-white">All Syncs</button>
+            <button onclick="filterFeed('facebook')" id="tab-facebook" class="px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-50"><i class="fa-brands fa-facebook text-[#0866FF] mr-1"></i> Facebook</button>
+            <button onclick="filterFeed('instagram')" id="tab-instagram" class="px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-50"><i class="fa-brands fa-instagram text-pink-600 mr-1"></i> Instagram Reels</button>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="relative"><input id="searchInput" oninput="renderFeed()" placeholder="Search Bandra, 2BHK, ₹..." class="pl-9 pr-4 py-2 rounded-full border text-sm w-[220px] focus:outline-none focus:ring-2 focus:ring-brand-900/20"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i></div>
+            <select id="statusFilter" onchange="renderFeed()" class="border rounded-full px-3 py-2 text-sm font-600 bg-white"><option value="all">All Status</option><option value="live">Live on Website</option><option value="draft">Draft</option></select>
+          </div>
+        </div>
+
+        <div class="mt-3 flex items-center gap-2 text-xs">
+          <span class="bg-teal text-white px-2.5 py-1 rounded-full font-800 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-white rounded-full live-dot"></span> AUTO-SYNC ON</span>
+          <span class="text-slate-500">Showing <span id="feedCount">0</span> auto-generated listings</span>
+          <span class="ml-auto flex items-center gap-1 text-slate-500"><i class="fa-solid fa-arrows-rotate"></i> Updates every 10s</span>
+        </div>
+
+        <div id="feedGrid" class="grid md:grid-cols-2 gap-4 mt-4">
+          <!-- JS rendered -->
+        </div>
+
+        <!-- Website Preview Toggle -->
+        <div class="mt-6 bg-white rounded-2xl border p-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-800 text-sm flex items-center gap-2"><i class="fa-solid fa-desktop text-brand-700"></i> How it appears on your public website</h4>
+            <span class="text-xs bg-accent px-2.5 py-1 rounded-full font-800">SEO + SCHEMA READY</span>
+          </div>
+          <div class="mt-3 grid md:grid-cols-3 gap-3 text-sm">
+            <div class="md:col-span-2">
+              <div class="rounded-xl overflow-hidden border">
+                <img id="previewImg" src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800" class="w-full h-48 object-cover">
+                <div class="p-3">
+                  <div class="flex items-center gap-2 text-xs font-700"><span class="bg-teal text-white px-2 py-0.5 rounded-full">FOR SALE</span><span class="text-slate-500">Bandra West • 5 mins to Sea Link</span></div>
+                  <div id="previewTitle" class="font-800 text-base mt-1">3BHK Sea View Apartments — Bandra West</div>
+                  <div id="previewPrice" class="text-brand-700 font-800 text-lg">₹ 4.75 Cr <span class="text-slate-400 font-500 text-sm">• 1,450 sq.ft</span></div>
+                  <div class="flex gap-2 mt-2 text-xs"><span class="bg-slate-100 px-2 py-1 rounded-full">3 BHK</span><span class="bg-slate-100 px-2 py-1 rounded-full">2 Bath</span><span class="bg-slate-100 px-2 py-1 rounded-full">Covered Parking</span></div>
+                  <div class="mt-3 flex gap-2">
+                    <a class="flex-1 bg-teal text-white text-center py-2 rounded-full font-700 text-sm flex items-center justify-center gap-2"><i class="fa-brands fa-whatsapp"></i> WhatsApp Now</a>
+                    <a class="flex-1 border text-center py-2 rounded-full font-700 text-sm">Book Site Visit</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-3 border">
+              <div class="text-xs font-800 tracking-widest text-slate-500">EMBEDDED REEL</div>
+              <div class="mt-2 rounded-xl overflow-hidden relative bg-black">
+                <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400" class="w-full h-36 object-cover opacity-80">
+                <div class="absolute inset-0 flex items-center justify-center"><div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center"><i class="fa-solid fa-play ml-0.5"></i></div></div>
+                <div class="absolute bottom-1 left-2 right-2 text-white text-xs flex justify-between"><span>24.5K views</span><span>♥ 1.2K</span></div>
+              </div>
+              <div class="text-xs text-slate-600 mt-2">Reel is embedded and auto-updates views. Google indexes the video for richer search results.</div>
+              <div class="mt-3 bg-white border rounded-lg p-2 text-xs"><div class="font-700">Original caption</div><div class="text-slate-500">“DM for price — Sunset balcony, modular kitchen 😍 #mumbaihomes”</div><div class="text-teal font-700 mt-1">→ AI rewrote for website in 3 sec</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CRM Pipeline -->
+<section id="crm" class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="flex flex-wrap justify-between items-end gap-4 mb-6">
+    <div>
+      <h2 class="font-display font-800 text-3xl text-brand-900">Leads flow in automatically. You just close.</h2>
+      <p class="text-slate-600 text-sm mt-2">Every comment, DM, and Marketplace inquiry becomes a lead with property attached, auto-assigned, and nurtured.</p>
+    </div>
+    <div class="flex items-center gap-2 text-sm">
+      <span class="bg-white border px-3 py-2 rounded-full font-700">Pipeline Value: <b class="text-brand-700">₹ 18.4 Cr</b></span>
+      <button onclick="addRandomLead()" class="bg-brand-900 text-white px-4 py-2 rounded-full font-700">+ Simulate New Lead</button>
+    </div>
+  </div>
+  <div class="grid lg:grid-cols-5 gap-4 overflow-x-auto pb-2">
+    <!-- Columns generated by JS -->
+    <div id="kanban" class="contents"></div>
+  </div>
+</section>
+
+<!-- Properties -->
+<section id="platform" class="bg-white border-y">
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+      <h2 class="font-display font-800 text-2xl text-brand-900">All Website Listings <span class="text-slate-400 font-600 text-base">— auto-created from socials</span></h2>
+      <div class="flex gap-2">
+        <select id="cityFilter" onchange="renderProperties()" class="border rounded-full px-4 py-2 text-sm font-600 bg-white"><option value="all">All Cities</option><option>Mumbai</option><option>Delhi</option><option>Bengaluru</option><option>Hyderabad</option><option>Pune</option></select>
+        <button onclick="renderProperties()" class="border rounded-full px-4 py-2 text-sm font-700 hover:bg-slate-50"><i class="fa-solid fa-rotate mr-1"></i> Refresh</button>
+      </div>
+    </div>
+    <div id="propertyGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- JS -->
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="text-center max-w-2xl mx-auto">
+    <div class="inline-flex bg-brand-900 text-white text-xs font-800 tracking-widest px-3 py-1 rounded-full">PRICING IN INR • GST EXTRA</div>
+    <h2 class="font-display font-800 text-3xl lg:text-4xl text-brand-900 mt-3">Start free. Pay as your listings grow.</h2>
+    <p class="text-slate-600 mt-2">All plans include Facebook & Instagram auto-sync. No per-listing fees. Cancel anytime.</p>
+  </div>
+  <div class="grid lg:grid-cols-3 gap-6 mt-8 max-w-5xl mx-auto">
+    <div class="bg-white rounded-[24px] border p-6 shadow-card">
+      <div class="text-xs font-800 tracking-widest text-slate-500">STARTER</div>
+      <div class="text-3xl font-900 mt-1">₹2,999<span class="text-sm font-600 text-slate-500">/mo</span></div>
+      <div class="text-sm text-slate-500">For solo brokers</div>
+      <ul class="mt-5 space-y-2.5 text-sm">
+        <li class="flex gap-2"><i class="fa-solid fa-check text-teal mt-0.5"></i> 100 auto-imports / mo</li>
+        <li class="flex gap-2"><i class="fa-solid fa-check text-teal mt-0.5"></i> 1 FB Page + 1 IG Account</li>
+        <li class="flex gap-2"><i class="fa-solid fa-check text-teal mt-0.5"></i> Auto-website + WhatsApp reply</li>
+        <li class="flex gap-2 opacity-50"><i class="fa-solid fa-xmark mt-0.5"></i> AI rewriting (limited)</li>
+      </ul>
+      <button class="w-full mt-6 border-2 border-brand-900 text-brand-900 py-3 rounded-full font-800">Start 14-Day Free Trial</button>
+    </div>
+    <div class="bg-brand-900 text-white rounded-[24px] p-6 shadow-glow relative overflow-hidden lg:scale-[1.03]">
+      <div class="absolute top-4 right-4 bg-accent text-brand-900 text-xs font-800 px-3 py-1 rounded-full">MOST POPULAR</div>
+      <div class="text-xs font-800 tracking-widest opacity-60">GROWTH</div>
+      <div class="text-3xl font-900 mt-1">₹7,499<span class="text-sm font-600 opacity-60">/mo</span></div>
+      <div class="text-sm opacity-60">For teams & agencies</div>
+      <ul class="mt-5 space-y-2.5 text-sm">
+        <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i> 1,000 auto-imports / mo</li>
+        <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i> 5 Pages + 5 IG Accounts</li>
+        <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i> Unlimited AI descriptions (English/Hindi)</li>
+        <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i> Advanced routing & drip campaigns</li>
+      </ul>
+      <button onclick="openConnectModal()" class="w-full mt-6 bg-accent text-brand-900 py-3 rounded-full font-800">Connect Facebook & Start</button>
+      <div class="text-xs text-center opacity-60 mt-2">Setup in 30 seconds • No card needed</div>
+    </div>
+    <div class="bg-white rounded-[24px] border p-6 shadow-card">
+      <div class="text-xs font-800 tracking-widest text-slate-500">ENTERPRISE</div>
+      <div class="text-3xl font-900 mt-1">Custom</div>
+      <div class="text-sm text-slate-500">For builders & franchises</div>
+      <ul class="mt-5 space-y-2.5 text-sm">
+        <li class="flex gap-2"><i class="fa-solid fa-check text-teal mt-0.5"></i> Unlimited syncs & accounts</li>
+        <li class="flex gap-2"><i class="fa-solid fa-check text-teal mt-0.5"></i> 99acres / MagicBricks sync</li>
+        <li class="flex gap-2"><i class="fa-solid fa-check text-teal mt-0.5"></i> White-label website + API</li>
+        <li class="flex gap-2"><i class="fa-solid fa-check text-teal mt-0.5"></i> Dedicated success manager</li>
+      </ul>
+      <button class="w-full mt-6 bg-white border py-3 rounded-full font-800">Talk to Sales</button>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-brand-900 text-white">
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="grid md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-brand-900 font-800">E</div>
+          <div><div class="font-display font-800">EstateAI Pro</div><div class="text-xs opacity-60 tracking-widest">INDIA REAL ESTATE CRM</div></div>
+        </div>
+        <p class="text-sm opacity-60 mt-3 leading-relaxed">Auto-sync for ambitious brokers. From Reel to revenue in seconds. Built for India, priced in INR, supported in Hindi & English.</p>
+        <div class="flex gap-2 mt-4"><a class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i class="fa-brands fa-instagram"></i></a><a class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i class="fa-brands fa-facebook"></i></a><a class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i class="fa-brands fa-whatsapp"></i></a><a class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"><i class="fa-brands fa-youtube"></i></a></div>
+      </div>
+      <div><div class="font-700 text-sm tracking-widest opacity-80">AUTOMATIONS</div><ul class="mt-3 space-y-2 text-sm opacity-60"><li>Facebook Marketplace Sync</li><li>Instagram Reels to Listings</li><li>WhatsApp Auto-Reply</li><li>AI Description Writer</li><li>Lead Routing</li></ul></div>
+      <div><div class="font-700 text-sm tracking-widest opacity-80">COMPANY</div><ul class="mt-3 space-y-2 text-sm opacity-60"><li>About Us</li><li>Meta Partner Program</li><li>Security & Privacy</li><li>Help Center</li><li>Contact: support@estateaipro.in</li></ul></div>
+      <div class="bg-white/5 rounded-2xl p-4 border border-white/10">
+        <div class="font-800">Get started in 30 seconds</div><div class="text-sm opacity-60 mt-1">Connect your Facebook Page & Instagram Business. We’ll pull last 30 posts instantly.</div>
+        <button onclick="openConnectModal()" class="w-full mt-3 bg-accent text-brand-900 py-2.5 rounded-full font-800 text-sm">Connect My Socials →</button>
+        <div class="text-xs opacity-50 mt-2 text-center">No credit card • Cancel anytime • Hindi support</div>
+      </div>
+    </div>
+    <div class="border-t border-white/10 mt-8 pt-6 flex flex-wrap justify-between gap-3 text-xs opacity-50">
+      <span>© 2025 EstateAI Pro • Made for Bharat • Mumbai • Delhi • Bengaluru</span>
+      <span>Meta API • WhatsApp Cloud API • Not affiliated with 99acres / MagicBricks</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Connect Modal -->
+<div id="connectModal" class="fixed inset-0 hidden z-50">
+  <div class="absolute inset-0 bg-brand-900/60 backdrop-blur-sm" onclick="closeConnectModal()"></div>
+  <div class="relative max-w-lg mx-auto mt-[5vh] bg-white rounded-[24px] shadow-2xl overflow-hidden m-4">
+    <div class="p-6">
+      <div class="flex justify-between items-start">
+        <div><h3 class="font-800 text-xl text-brand-900">Connect Facebook & Instagram</h3><p class="text-sm text-slate-500 mt-1">One-click OAuth. We only request permissions to read posts & messages.</p></div>
+        <button onclick="closeConnectModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mt-6 space-y-3">
+        <button onclick="simulateConnect('facebook')" id="fbBtn" class="w-full flex items-center justify-between border-2 rounded-2xl p-4 hover:bg-blue-50 transition">
+          <span class="flex items-center gap-3"><span class="w-10 h-10 rounded-xl bg-[#0866FF] flex items-center justify-center text-white"><i class="fa-brands fa-facebook"></i></span><span class="text-left"><span class="font-800 text-sm block">Continue with Facebook</span><span class="text-xs text-slate-500">Pages, Marketplace, Groups</span></span></span>
+          <span class="text-xs font-800 bg-teal text-white px-3 py-1 rounded-full" id="fbBtnState">CONNECTED</span>
+        </button>
+        <button onclick="simulateConnect('instagram')" id="igBtn" class="w-full flex items-center justify-between border-2 rounded-2xl p-4 hover:bg-pink-50 transition">
+          <span class="flex items-center gap-3"><span class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-600 flex items-center justify-center text-white"><i class="fa-brands fa-instagram"></i></span><span class="text-left"><span class="font-800 text-sm block">Continue with Instagram</span><span class="text-xs text-slate-500">Business / Creator account</span></span></span>
+          <span class="text-xs font-800 bg-teal text-white px-3 py-1 rounded-full" id="igBtnState">CONNECTED</span>
+        </button>
+      </div>
+      <div class="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs leading-relaxed">
+        <div class="font-800 flex items-center gap-1"><i class="fa-solid fa-shield-halved text-amber-600"></i> Permissions we request</div>
+        <div class="text-slate-600 mt-1">• pages_read_engagement, pages_manage_posts, instagram_basic, instagram_manage_comments — to auto-create listings & capture leads. You can revoke anytime in Meta Business Settings.</div>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button onclick="closeConnectModal()" class="flex-1 bg-brand-900 text-white py-3 rounded-full font-800">Done → Go to Live Sync</button>
+        <button onclick="closeConnectModal()" class="px-5 border rounded-full font-700">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-full text-sm font-600 shadow-xl hidden items-center gap-2 z-50"><i class="fa-solid fa-check bg-teal w-6 h-6 rounded-full flex items-center justify-center text-xs"></i><span id="toastMsg">Synced successfully</span></div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-window.ESTATEAI_SUPABASE_URL="https://butmgtzgxllieevzgsqo.supabase.co";
-window.ESTATEAI_SUPABASE_KEY="sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
-window.estateaiSupabase=window.supabase.createClient(window.ESTATEAI_SUPABASE_URL,window.ESTATEAI_SUPABASE_KEY);
-window.ESTATEAI_ADMIN_FUNCTION_URL=window.ESTATEAI_SUPABASE_URL+"/functions/v1/admin-users";
-</script>
-<script>
-/* =========================================================
-   ESTATEAI CRM
-   Browser-only version
-   Data persists permanently in Supabase Cloud
-========================================================= */
+(function(){
+  "use strict";
+  const SUPABASE_URL="https://butmgtzgxllieevzgsqo.supabase.co";
+  const SUPABASE_KEY="sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
+  const ADMIN_EMAIL="admin@estateai.local";
+  const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  window.estateaiSupabase=sb;
+  const $=id=>document.getElementById(id);
+  const status=$("estateAuthStatus"), error=$("estateLoginError"), btn=$("estateLoginBtn");
 
-const STORAGE="estateai_rajkot_v3";
-let currentUser=null;
-let currentPage="dashboard";
+  function showError(msg){ error.textContent=msg; error.style.display="block"; }
+  function clearError(){ error.textContent=""; error.style.display="none"; }
 
-const defaultData={
-  properties:[
-   {id:1,title:"Premium 3 BHK Apartment",type:"Apartment",purpose:"Sale",city:"Rajkot",locality:"Kalawad Road",price:"₹78 L",area:"1650 Sq Ft",bhk:"3",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
-   {id:2,title:"Luxury 4 BHK Villa",type:"Villa",purpose:"Sale",city:"Rajkot",locality:"Raiya Road",price:"₹1.85 Cr",area:"3100 Sq Ft",bhk:"4",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
-   {id:3,title:"Residential Plot",type:"Plot",purpose:"Sale",city:"Rajkot",locality:"Mavdi",price:"₹62 L",area:"180 Sq Yd",bhk:"",status:"Active",verified:false,owner:"Demo Seller",updated:"Yesterday"},
-   {id:4,title:"Modern 2 BHK Flat",type:"Apartment",purpose:"Rent",city:"Rajkot",locality:"Nana Mava",price:"₹18,000/mo",area:"1150 Sq Ft",bhk:"2",status:"Active",verified:true,owner:"Demo Owner",updated:"Today"},
-   {id:5,title:"Commercial Office",type:"Commercial",purpose:"Sale",city:"Rajkot",locality:"150 Feet Ring Road",price:"₹1.20 Cr",area:"2100 Sq Ft",bhk:"",status:"Active",verified:true,owner:"Demo Seller",updated:"Today"},
-   {id:6,title:"3 BHK Family Home",type:"Apartment",purpose:"Sale",city:"Rajkot",locality:"University Road",price:"₹72 L",area:"1550 Sq Ft",bhk:"3",status:"Active",verified:false,owner:"Demo Seller",updated:"2 days ago"}
-  ],
-  leads:[
-   {id:101,name:"Demo Buyer 1",type:"Buyer",phone:"",location:"Kalawad Road",budget:"₹70L-₹90L",requirement:"3 BHK",status:"New",source:"Demo",score:82},
-   {id:102,name:"Demo Buyer 2",type:"Buyer",phone:"",location:"Raiya Road",budget:"₹1Cr-₹2Cr",requirement:"4 BHK Villa",status:"Qualified",source:"Demo",score:91},
-   {id:103,name:"Demo Seller 1",type:"Seller",phone:"",location:"Mavdi",budget:"₹60L",requirement:"Sell 3 BHK",status:"Contacted",source:"Demo",score:75},
-   {id:104,name:"Demo Buyer 3",type:"Buyer",phone:"",location:"Nana Mava",budget:"₹15K-₹25K",requirement:"2 BHK Rent",status:"Site Visit",source:"Demo",score:88}
-  ],
-  followups:[
-   {id:1,lead:"Demo Buyer 1",task:"Call regarding 3 BHK",due:"Today 4:00 PM",status:"Pending"},
-   {id:2,lead:"Demo Buyer 2",task:"Send Villa details",due:"Today 5:00 PM",status:"Pending"},
-   {id:3,lead:"Demo Seller 1",task:"Property valuation",due:"Tomorrow 11:00 AM",status:"Pending"},
-   {id:4,lead:"Demo Buyer 3",task:"Confirm site visit",due:"Tomorrow 2:00 PM",status:"Completed"}
-  ],
-  visits:[
-   {id:1,customer:"Demo Buyer 1",property:"Premium 3 BHK Apartment",time:"Today 5:30 PM",status:"Scheduled"},
-   {id:2,customer:"Demo Buyer 2",property:"Luxury 4 BHK Villa",time:"Today 6:30 PM",status:"Scheduled"}
-  ],
-  agents:[
-   {id:1,name:"Aarav Patel",role:"Senior Agent",location:"Rajkot",deals:42,revenue:"₹4.8 Cr"},
-   {id:2,name:"Riya Shah",role:"Sales Agent",location:"Rajkot",deals:36,revenue:"₹3.2 Cr"},
-   {id:3,name:"Karan Mehta",role:"Property Consultant",location:"Rajkot",deals:29,revenue:"₹2.4 Cr"}
-  ],
-  users:[
-   {id:1,name:"Admin User",username:"admin",password:"admin123",role:"Admin",active:true},
-   {id:2,name:"Sales Agent",username:"agent",password:"agent123",role:"Agent",active:true}
-  ],
-  activities:[
-   {text:"Demo property inventory loaded",time:"Just now"},
-   {text:"CRM initialized",time:"Just now"}
-  ],
-  settings:{
-   company:"EstateAI Realty",
-   city:"India",
-   currency:"INR ₹",
-   timezone:"Asia/Kolkata",
-   theme:"light"
+  async function enter(user){
+    if(!user) throw new Error("No authenticated user returned.");
+    // Admin is determined server-side by the configured Auth identity.
+    const isAdmin=(user.email||"").toLowerCase()===ADMIN_EMAIL;
+    if(!isAdmin){
+      // Allow future authenticated agents, but do not grant Admin from client input.
+      status.textContent="Authenticated user session detected.";
+    } else status.textContent="Admin identity verified.";
+    $("estateAuth").classList.add("auth-hidden");
+    $("estateApp").style.display="";
+    document.body.dataset.authenticated="true";
+    window.estateaiCurrentUser={id:user.id,email:user.email,role:isAdmin?"Admin":"Agent"};
+    window.dispatchEvent(new CustomEvent("estateai:authenticated",{detail:window.estateaiCurrentUser}));
   }
-};
 
-// Cloud-first mode: Supabase Cloud is the source of truth; browser storage is not used for CRM persistence.
-const ESTATEAI_ADMIN_EMAIL="admin@estateai.local";
-const ESTATEAI_ADMIN_EMAIL_ALT="admin@estateai.in";
-const ESTATEAI_ADMIN_ID="1";
-const ESTATEAI_ADMIN_PASSWORD="Krunal@195";
-// Never seed demo CRM records.
-defaultData.properties=[]; defaultData.leads=[]; defaultData.followups=[]; defaultData.visits=[]; defaultData.deals=[]; defaultData.agents=[]; defaultData.users=[]; defaultData.activities=[]; defaultData.socialInbox=[];
-let db=loadDB();
-proEnsureArray();
-
-function clone(x){return JSON.parse(JSON.stringify(x))}
-function loadDB(){
-  try{
-    const base=clone(defaultData);
-    return base;
-  }catch(e){ return clone(defaultData); }
-}
-let cloudSaveTimer=null;
-let cloudSaveChain=Promise.resolve();
-let cloudLastSavedAt=0;
-async function cloudLoadState(userId){
-  const {data,error}=await estateaiSupabase.from("estateai_state").select("state").eq("user_id",userId).maybeSingle();
-  if(error) throw error;
-  if(data?.state && typeof data.state === "object"){
-    db={...clone(defaultData),...data.state};
-    proEnsureArray();
-  } else {
-    db=clone(defaultData);
-    proEnsureArray();
-    await cloudSaveState(userId);
-  }
-  return db;
-}
-function cloudSaveState(userId){
-  if(!userId)return Promise.resolve();
-  const state=clone(db);
-  cloudSaveChain=cloudSaveChain.catch(()=>{}).then(async()=>{
-    const {error}=await estateaiSupabase.from("estateai_state").upsert(
-      {user_id:userId,state,updated_at:new Date().toISOString()},
-      {onConflict:"user_id"}
-    );
-    if(error){
-      console.error("Cloud save failed",error);
-      toast("Cloud save failed: "+error.message);
-      throw error;
-    }
-    cloudLastSavedAt=Date.now();
-  });
-  return cloudSaveChain;
-}
-function saveDB(){
-  if(!currentUser?.auth_id)return;
-  clearTimeout(cloudSaveTimer);
-  // Short debounce + serialized writes: every CRM change reaches Supabase without
-  // overlapping requests that could otherwise overwrite a newer state with an older one.
-  cloudSaveTimer=setTimeout(()=>{ cloudSaveState(currentUser.auth_id).catch(()=>{}); },150);
-}
-function uid(){
-  return Date.now()+Math.floor(Math.random()*1000);
-}
-function esc(v){
-  const d=document.createElement("div");
-  d.textContent=v==null?"":String(v);
-  return d.innerHTML;
-}
-function toast(msg){
-  const old=document.querySelector(".toast");
-  if(old)old.remove();
-  const t=document.createElement("div");
-  t.className="toast";
-  t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),2500);
-}
-function addActivity(text){
-  db.activities.unshift({text,time:new Date().toLocaleString("en-IN")});
-  db.activities=db.activities.slice(0,30);
-  saveDB();
-}
-
-/* =========================================================
-   AUTH
-========================================================= */
-
-function authEmailFromInput(v){
-  const x=String(v||"").trim();
-  return x==="1" ? ESTATEAI_ADMIN_EMAIL : x;
-}
-async function login(){
-  const input=document.getElementById("loginUser").value.trim();
-  const password=document.getElementById("loginPass").value;
-  const errorEl=document.getElementById("loginError");
-  errorEl.classList.add("hidden");
-  if(!input||!password){ errorEl.textContent="Enter your login details."; errorEl.classList.remove("hidden"); return; }
-
-  // Admin ID 1 accepts the current .local Auth account and the older .in account
-  // so an existing EstateAI setup does not get locked out after migration.
-  const emails = input==="1"
-    ? [ESTATEAI_ADMIN_EMAIL,ESTATEAI_ADMIN_EMAIL_ALT]
-    : [authEmailFromInput(input)];
-
-  let lastError=null;
-  for(const email of emails){
+  async function restore(){
     try{
-      const {data,error}=await estateaiSupabase.auth.signInWithPassword({email,password});
-      if(!error && data?.user){
-        await enterAuthenticatedApp(data.user);
-        return;
-      }
-      lastError=error;
-    }catch(e){ lastError=e; }
+      const r=await sb.auth.getSession();
+      if(r.error) throw r.error;
+      if(r.data.session?.user) await enter(r.data.session.user);
+      else status.textContent="Secure connection ready. Please sign in.";
+    }catch(e){
+      status.textContent="Secure connection unavailable.";
+      console.warn("Auth restore:",e);
+    }
   }
 
-  const msg=String(lastError?.message||"").toLowerCase();
-  if(msg.includes("email not confirmed"))
-    errorEl.textContent="Email confirm nahi hua. Supabase Authentication → Users me Admin user ko confirm karo.";
-  else if(msg.includes("invalid login credentials"))
-    errorEl.textContent="Admin ID/password match nahi hua. ID 1 aur password Krunal@195 use karo.";
-  else
-    errorEl.textContent=lastError?.message || "Login failed. Supabase Auth user check karo.";
-  errorEl.classList.remove("hidden");
-}
-async function enterAuthenticatedApp(authUser){
-  await cloudLoadState(authUser.id);
-  let profile=null;
-  const q=await estateaiSupabase.from("user_profiles").select("id,name,email,role,active").eq("id",authUser.id).maybeSingle();
-  if(q.error) console.warn(q.error); else profile=q.data;
-  const isAdminUser=[ESTATEAI_ADMIN_EMAIL,ESTATEAI_ADMIN_EMAIL_ALT].includes(String(authUser.email||"").toLowerCase());
-  if(profile?.active===false){ await estateaiSupabase.auth.signOut(); throw new Error("Account disabled"); }
-  currentUser={
-    auth_id:authUser.id,id:authUser.id,name:profile?.name||authUser.user_metadata?.name||authUser.email.split("@")[0],
-    username:isAdminUser?"1":authUser.email.split("@")[0],email:authUser.email,
-    role:isAdminUser?"Admin":(profile?.role||"Agent"),active:true
+  $("estateLoginForm").addEventListener("submit",async function(ev){
+    ev.preventDefault(); clearError();
+    const id=$("estateLoginId").value.trim(), pw=$("estateLoginPassword").value;
+    if(!id||!pw){showError("Admin ID/email and password are required.");return;}
+    const email=id==="1"?ADMIN_EMAIL:id;
+    btn.disabled=true; btn.textContent="⏳ Verifying securely…"; status.textContent="Authenticating with Supabase…";
+    try{
+      const r=await sb.auth.signInWithPassword({email,password:pw});
+      if(r.error) throw r.error;
+      await enter(r.data.user);
+      btn.textContent="✓ Login successful";
+    }catch(e){
+      const msg=String(e?.message||"Login failed");
+      let friendly=msg;
+      if(/invalid login credentials/i.test(msg)) friendly="Invalid Admin ID/email or password.";
+      else if(/email not confirmed/i.test(msg)) friendly="Email is not confirmed. In Supabase Auth, confirm this admin account or enable auto-confirm.";
+      else if(/fetch|network|failed to fetch/i.test(msg)) friendly="Internet/Supabase connection problem. Check your internet and try again.";
+      showError(friendly);
+      status.textContent="Login failed — please check your details.";
+      btn.disabled=false; btn.textContent="🔐 Secure Login";
+    }
+  });
+
+  sb.auth.onAuthStateChange((event,session)=>{
+    if(session?.user && event==="SIGNED_IN"){
+      enter(session.user).catch(console.error);
+    }
+  });
+
+  window.estateaiSecureLogout=async function(){
+    await sb.auth.signOut();
+    location.reload();
   };
-  await estateaiSupabase.from("user_profiles").upsert({id:authUser.id,name:currentUser.name,email:authUser.email,role:currentUser.role,active:true,updated_at:new Date().toISOString()},{onConflict:"id"});
-  document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  buildNav(); updateProfile(); showPage("dashboard"); setTimeout(proWelcome,120);
-  startEstateAIRealtime();
-}
-async function restoreSession(){
-  try{
-    const {data}=await estateaiSupabase.auth.getSession();
-    if(data?.session?.user) await enterAuthenticatedApp(data.session.user);
-  }catch(e){ console.warn("Session restore failed",e); }
-}
-async function logout(){
-  stopEstateAIRealtime();
-  await estateaiSupabase.auth.signOut(); currentUser=null; location.reload();
-}
+  restore();
+})();
+</script>
 
-function isAdmin(){
-  return currentUser?.role==="Admin";
-}
+<script>
+// Data
+let fbEnabled = true;
+let igEnabled = true;
+let activeTab = 'all';
+let listings = [
+  {id:1, source:'instagram', title:'3BHK Sea View — Bandra West', price:47500000, loc:'Bandra West, Mumbai', city:'Mumbai', bhk:'3 BHK', area:'1,450 sq.ft', img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600', views:'24.5K', likes:'1.2K', time:'2 min ago', status:'live', tag:'Reel • 00:18'},
+  {id:2, source:'facebook', title:'2BHK Smart Home — Powai', price:18500000, loc:'Powai, Mumbai', city:'Mumbai', bhk:'2 BHK', area:'980 sq.ft', img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600', views:'8.1K', likes:'342', time:'7 min ago', status:'live', tag:'Marketplace'},
+  {id:3, source:'instagram', title:'Villa with Garden — Whitefield', price:29500000, loc:'Whitefield, Bengaluru', city:'Bengaluru', bhk:'4 BHK', area:'2,400 sq.ft', img:'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600', views:'18.2K', likes:'892', time:'14 min ago', status:'live', tag:'Reel • 00:22'},
+  {id:4, source:'facebook', title:'1BHK Investment — Dwarka Mor', price:5200000, loc:'Dwarka, Delhi', city:'Delhi', bhk:'1 BHK', area:'650 sq.ft', img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600', views:'3.4K', likes:'128', time:'21 min ago', status:'draft', tag:'Page Post'},
+  {id:5, source:'instagram', title:'Luxury 3BHK — Banjara Hills', price:38500000, loc:'Banjara Hills, Hyderabad', city:'Hyderabad', bhk:'3 BHK', area:'1,820 sq.ft', img:'https://images.unsplash.com/photo-1600607687644-c7171b42498b?w=600', views:'31K', likes:'2.4K', time:'32 min ago', status:'live', tag:'Reel • 00:15'},
+  {id:6, source:'facebook', title:'2.5BHK — Kothrud, Pune', price:11200000, loc:'Kothrud, Pune', city:'Pune', bhk:'2.5 BHK', area:'1,100 sq.ft', img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600', views:'5.7K', likes:'410', time:'48 min ago', status:'live', tag:'Marketplace'},
+];
 
-function updateProfile(){
-  if(!currentUser)return;
-  const letter=currentUser.name.charAt(0).toUpperCase();
-  document.getElementById("sideAvatar").textContent=letter;
-  document.getElementById("topAvatar").textContent=letter;
-  document.getElementById("sideName").textContent=currentUser.name;
-  document.getElementById("sideRole").textContent=currentUser.role;
-}
+let leads = [
+  {name:'Rohit Sharma', phone:'+91 98*** 1234', src:'IG Reel', prop:'Bandra 3BHK', city:'Mumbai', stage:0, time:'2m', budget:'4-5 Cr'},
+  {name:'Ananya Patel', phone:'+91 99*** 5678', src:'Facebook', prop:'Powai 2BHK', city:'Mumbai', stage:0, time:'6m', budget:'1-2 Cr'},
+  {name:'Vikram Singh', phone:'+91 98*** 9012', src:'IG DM', prop:'Whitefield Villa', city:'Bengaluru', stage:1, time:'12m', budget:'2-3 Cr'},
+  {name:'Sneha Reddy', phone:'+91 97*** 3456', src:'FB Comment', prop:'Banjara Hills', city:'Hyderabad', stage:1, time:'18m', budget:'3-4 Cr'},
+  {name:'Aman Gupta', phone:'+91 99*** 7890', src:'IG Reel', prop:'Dwarka 1BHK', city:'Delhi', stage:2, time:'1h', budget:'50-60L'},
+  {name:'Pooja Mehta', phone:'+91 98*** 2345', src:'Facebook', prop:'Kothrud 2.5BHK', city:'Pune', stage:3, time:'2h', budget:'1-1.2Cr'},
+  {name:'Karan Johar', phone:'+91 97*** 6789', src:'IG Reel', prop:'Bandra 3BHK', city:'Mumbai', stage:4, time:'3h', budget:'4.75Cr • Won'},
+];
 
-function buildNav(){
-  const items=[
-   ["dashboard","📊","Dashboard",true],
-   ["properties","🏠","Properties",true],
-   ["leads","👥","Leads",true],
-   ["buyers","🧑","Buyers",true],
-   ["sellers","🏷️","Sellers",true],
-   ["matching","🎯","Buyer Matching",true],
-   ["followups","📅","Follow-ups",true],
-   ["visits","📍","Site Visits",true],
-   ["deals","🤝","Deals",true],
-   ["agents","👨‍💼","Agents",true],
-   ["reports","📈","Reports",true],
-   ["ai","🤖","AI Assistant",true],
-   ["admin","🛡️","Admin Control",isAdmin()],
-   ["settings","⚙️","Settings",true]
-  ];
-  document.getElementById("nav").innerHTML=items.filter(x=>x[3]).map(x=>`
-    <button onclick="showPage('${x[0]}',this)">
-      <span class="nav-icon">${x[1]}</span><span>${x[2]}</span>
-    </button>
-  `).join("");
+const stages = ['New Leads','Contacted','Site Visit','Negotiation','Closed Won'];
+const stageColors = ['bg-slate-100','bg-blue-50','bg-amber-50','bg-purple-50','bg-teal/10'];
+
+function formatPrice(n){
+  if(n>=10000000) return '₹ '+(n/10000000).toFixed(2)+' Cr';
+  if(n>=100000) return '₹ '+(n/100000).toFixed(1)+' L';
+  return '₹ '+n.toLocaleString('en-IN');
 }
 
-/* =========================================================
-   ROUTER
-========================================================= */
-
-const pages={
- dashboard:dashboardPage,
- properties:propertiesPage,
- leads:leadsPage,
- buyers:buyersPage,
- sellers:sellersPage,
- matching:matchingPage,
- followups:followupsPage,
- visits:visitsPage,
- deals:dealsPage,
- agents:agentsPage,
- reports:reportsPage,
- ai:aiPage,
- admin:adminPage,
- settings:settingsPage
-};
-
-function showPage(page,button){
-  if(page==="admin"&&!isAdmin()){
-    toast("Admin access required");
-    return;
-  }
-
-  currentPage=page;
-  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-  if(button)button.classList.add("active");
-  else{
-    const b=[...document.querySelectorAll(".nav button")]
-      .find(x=>x.getAttribute("onclick")?.includes("'"+page+"'"));
-    if(b)b.classList.add("active");
-  }
-
-  document.getElementById("content").innerHTML=pages[page]?pages[page]():page404();
-  window.scrollTo(0,0);
-}
-
-function page404(){
- return `<div class="card"><h2>Page not found</h2></div>`;
-}
-
-/* =========================================================
-   DASHBOARD
-========================================================= */
-
-function dashboardPage(){
- const active=db.properties.filter(p=>p.status==="Active").length;
- const buyers=db.leads.filter(l=>l.type==="Buyer").length;
- const sellers=db.leads.filter(l=>l.type==="Seller").length;
- const pending=db.followups.filter(x=>x.status!=="Completed").length;
-
- return `
- <div class="page-head">
-  <div>
-   <h2>India Real Estate Dashboard</h2>
-   <p>Welcome, ${esc(currentUser.name)}. Manage your real-estate business from one place.</p>
-  </div>
-  <button class="primary" onclick="openPropertyModal()">+ Add Property</button>
- </div>
-
- <div class="kpis">
-  ${kpi("🏠","Active Properties",active,"Inventory")}
-  ${kpi("👥","Buyer Leads",buyers,"Buyer enquiries")}
-  ${kpi("🏷️","Seller Leads",sellers,"Seller enquiries")}
-  ${kpi("📅","Pending Follow-ups",pending,"Requires attention")}
- </div>
-
- <div class="grid2">
-  <div class="card">
-   <h3>Sales Activity</h3>
-   <p style="color:#667085;font-size:13px;margin-top:4px">Monthly CRM activity</p>
-   <div class="chart">
-    <div class="bar" style="height:42%"><span>May</span></div>
-    <div class="bar" style="height:55%"><span>Jun</span></div>
-    <div class="bar" style="height:62%"><span>Jul</span></div>
-    <div class="bar" style="height:70%"><span>Aug</span></div>
-    <div class="bar" style="height:81%"><span>Sep</span></div>
-    <div class="bar" style="height:94%"><span>Oct</span></div>
-   </div>
-  </div>
-
-  <div class="card">
-   <h3>Recent Activity</h3>
-   ${db.activities.slice(0,6).map(a=>`
-    <div class="activity-item">
-     <div class="dot"></div>
-     <div><strong>${esc(a.text)}</strong><p style="font-size:11px;color:#667085">${esc(a.time)}</p></div>
+function renderFeed(){
+  const grid=document.getElementById('feedGrid');
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const status=document.getElementById('statusFilter').value;
+  let filtered=listings.filter(l=>{
+    if(activeTab!=='all' && l.source!==activeTab) return false;
+    if(!fbEnabled && l.source==='facebook') return false;
+    if(!igEnabled && l.source==='instagram') return false;
+    if(status!=='all' && l.status!==status) return false;
+    if(q && !(l.title.toLowerCase().includes(q) || l.loc.toLowerCase().includes(q) || formatPrice(l.price).toLowerCase().includes(q))) return false;
+    return true;
+  });
+  document.getElementById('feedCount').innerText=filtered.length;
+  grid.innerHTML=filtered.map(l=>`
+    <div class="bg-white rounded-2xl border overflow-hidden hover:shadow-lg transition cursor-pointer flex flex-col" onclick="setPreview(${l.id})">
+      <div class="relative">
+        <img src="${l.img}" class="w-full h-40 object-cover">
+        <div class="absolute top-2 left-2 flex gap-1.5">
+          <span class="text-[11px] font-800 px-2.5 py-1 rounded-full ${l.source==='instagram'?'bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white':'bg-[#0866FF] text-white'} flex items-center gap-1"><i class="fa-brands ${l.source==='instagram'?'fa-instagram':'fa-facebook'}"></i> ${l.source==='instagram'?'Instagram Reel':'Facebook'}</span>
+          <span class="text-[11px] font-700 bg-black/70 text-white px-2 py-1 rounded-full">${l.tag}</span>
+        </div>
+        <div class="absolute top-2 right-2 ${l.status==='live'?'bg-teal text-white':'bg-amber-400 text-brand-900'} text-[10px] font-800 px-2 py-1 rounded-full">${l.status==='live'?'LIVE ON WEBSITE':'DRAFT'}</div>
+        ${l.source==='instagram'?`<div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur text-white text-xs px-2 py-1 rounded-full flex items-center gap-2"><i class="fa-solid fa-play text-[10px]"></i> ${l.views} • ♥ ${l.likes}</div>`:''}
+      </div>
+      <div class="p-3 flex-1 flex flex-col">
+        <div class="font-800 text-[14px] leading-tight text-brand-900">${l.title}</div>
+        <div class="text-xs text-slate-500 mt-1 flex items-center gap-1"><i class="fa-solid fa-location-dot text-[11px]"></i> ${l.loc} • ${l.time}</div>
+        <div class="mt-2 flex items-center justify-between">
+          <div><div class="font-800 text-brand-700">${formatPrice(l.price)}</div><div class="text-[11px] text-slate-500">${l.bhk} • ${l.area}</div></div>
+          <button class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-black"><i class="fa-solid fa-arrow-up-right-from-square text-xs"></i></button>
+        </div>
+        <div class="mt-3 flex gap-1.5">
+          <span class="text-[11px] bg-slate-100 border px-2 py-1 rounded-full font-600">${l.bhk}</span>
+          <span class="text-[11px] bg-teal/10 text-teal border border-teal/20 px-2 py-1 rounded-full font-700">AI Parsed ✓</span>
+          <span class="text-[11px] bg-white border px-2 py-1 rounded-full">SEO ✓</span>
+        </div>
+      </div>
     </div>
-   `).join("")}
-  </div>
- </div>
-
- <div class="card" style="margin-top:18px">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
-   <h3>India Property Inventory</h3>
-   <button class="secondary" onclick="showPage('properties')">View All</button>
-  </div>
-  <div class="table-wrap">
-   <table>
-    <thead><tr><th>Property</th><th>Location</th><th>Purpose</th><th>Price</th><th>Verified</th></tr></thead>
-    <tbody>
-     ${db.properties.slice(0,7).map(p=>`
-      <tr>
-       <td><strong>${esc(p.title)}</strong></td>
-       <td>${esc(p.locality)}</td>
-       <td><span class="badge blue">${esc(p.purpose)}</span></td>
-       <td>${esc(p.price)}</td>
-       <td>${p.verified?'<span class="badge green">Verified</span>':'<span class="badge orange">Unverified</span>'}</td>
-      </tr>
-     `).join("")}
-    </tbody>
-   </table>
-  </div>
- </div>
- `;
+  `).join('') || `<div class="col-span-2 text-center py-10 text-slate-500 text-sm bg-white rounded-2xl border border-dashed">No listings for this filter. <button onclick="addRandomListing()" class="text-brand-700 font-700 underline">Simulate a new post</button></div>`;
 }
 
-function kpi(icon,title,value,sub){
- return `<div class="kpi"><span class="kpi-icon">${icon}</span><p>${title}</p><h3>${value}</h3><span class="up">${sub}</span></div>`;
+function setPreview(id){
+  const l=listings.find(x=>x.id===id);
+  if(!l) return;
+  document.getElementById('previewImg').src=l.img;
+  document.getElementById('previewTitle').innerText=l.title;
+  document.getElementById('previewPrice').innerHTML=`${formatPrice(l.price)} <span class="text-slate-400 font-500 text-sm">• ${l.area}</span>`;
+  window.scrollTo({top: document.getElementById('live-sync').offsetTop + 600, behavior:'smooth'});
 }
 
-/* =========================================================
-   PROPERTIES
-========================================================= */
-
-function propertiesPage(){
- return `
- <div class="page-head">
-  <div><h2>India Property Inventory</h2><p>Buy, sell and rent inventory.</p></div>
-  <button class="primary" onclick="openPropertyModal()">+ Add Property</button>
- </div>
-
- <div class="toolbar">
-  <input id="propertySearch" class="filter" style="flex:1"
-   placeholder="Search property, locality, owner..."
-   oninput="renderProperties()">
-  <select id="propertyPurpose" class="filter" onchange="renderProperties()">
-   <option>All</option><option>Sale</option><option>Rent</option>
-  </select>
-  <select id="propertyType" class="filter" onchange="renderProperties()">
-   <option>All Types</option><option>Apartment</option><option>Villa</option>
-   <option>Plot</option><option>Commercial</option><option>Office</option><option>Shop</option>
-  </select>
-  <select id="propertyLocality" class="filter" onchange="renderProperties()">
-   <option>All Rajkot Areas</option>
-   ${rajkotAreas().map(x=>`<option>${x}</option>`).join("")}
-  </select>
- </div>
-
- <div class="property-grid" id="propertyGrid">${propertyCards(db.properties)}</div>
- `;
+function filterFeed(tab){
+  activeTab=tab;
+  document.querySelectorAll('[id^="tab-"]').forEach(b=>{b.className="px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-50"});
+  document.getElementById('tab-'+tab).className="px-4 py-1.5 rounded-full bg-brand-900 text-white";
+  renderFeed();
 }
-
-function rajkotAreas(){
- return ["Raiya Road","Kalawad Road","150 Feet Ring Road","Mavdi","Nana Mava",
- "Kothariya","University Road","Gondal Road","Bhakti Nagar","Dhebar Road",
- "Astron Chowk","Amin Marg","Other Rajkot"];
-}
-
-function propertyCards(list){
- if(!list.length)return `<div class="card" style="grid-column:1/-1;text-align:center">No properties found.</div>`;
- return list.map(p=>`
- <div class="property">
-  <div class="property-img">${p.type==="Plot"?"🌳":p.type==="Commercial"?"🏢":"🏠"}</div>
-  <div class="property-body">
-   <span class="badge ${p.purpose==="Sale"?"blue":"purple"}">${esc(p.purpose)}</span>
-   ${p.verified?'<span class="badge green">✓ Verified</span>':'<span class="badge orange">Unverified</span>'}
-   <h3>${esc(p.title)}</h3>
-   <p>📍 ${esc(p.locality||"")}${p.city?`, ${esc(p.city)}`:""}${p.state?`, ${esc(p.state)}`:""}${p.pincode?` • ${esc(p.pincode)}`:""}</p>
-   <p>📐 ${esc(p.area)} ${p.bhk?` · ${esc(p.bhk)} BHK`:""}</p>
-   <p>👤 ${esc(p.owner||"Owner")}</p>
-   <div class="property-footer">
-    <strong style="font-size:18px">${esc(p.price)}</strong>
-    <span class="badge green">${esc(p.status)}</span>
-   </div>
-   <div style="display:flex;gap:7px;margin-top:13px">
-    <button class="secondary" style="flex:1" onclick="editProperty(${p.id})">Edit</button>
-    <button class="secondary" onclick="viewProperty(${p.id})">View</button>
-    ${isAdmin()?`<button class="danger" onclick="deleteProperty(${p.id})">🗑</button>`:""}
-   </div>
-  </div>
- </div>
- `).join("");
+function toggleSync(platform, el){
+  if(platform==='fb') fbEnabled=el.checked;
+  if(platform==='ig') igEnabled=el.checked;
+  showToast(`${platform==='fb'?'Facebook':'Instagram'} auto-sync ${el.checked?'enabled':'paused'}`);
+  renderFeed();
 }
 
 function renderProperties(){
- const q=(document.getElementById("propertySearch")?.value||"").toLowerCase();
- const purpose=document.getElementById("propertyPurpose")?.value||"All";
- const type=document.getElementById("propertyType")?.value||"All Types";
- const loc=document.getElementById("propertyLocality")?.value||"All Rajkot Areas";
-
- const list=db.properties.filter(p=>{
-  const text=`${p.title} ${p.locality} ${p.city} ${p.owner}`.toLowerCase();
-  return (!q||text.includes(q))
-   &&(purpose==="All"||p.purpose===purpose)
-   &&(type==="All Types"||p.type===type)
-   &&(loc==="All Rajkot Areas"||p.locality===loc);
- });
- document.getElementById("propertyGrid").innerHTML=propertyCards(list);
+  const city=document.getElementById('cityFilter').value;
+  let filtered=listings.filter(l=> city==='all' || l.city===city);
+  document.getElementById('propertyGrid').innerHTML=filtered.map(l=>`
+    <div class="bg-white rounded-[20px] border overflow-hidden shadow-card hover:shadow-lg transition">
+      <div class="relative"><img src="${l.img}" class="w-full h-48 object-cover"><span class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-700">${l.city}</span><span class="absolute top-3 right-3 ${l.source==='instagram'?'bg-pink-600':'bg-[#0866FF]'} text-white text-xs px-2.5 py-1 rounded-full font-700 flex items-center gap-1"><i class="fa-brands ${l.source==='instagram'?'fa-instagram':'fa-facebook'}"></i> ${l.source==='instagram'?'Reel':'FB'}</span></div>
+      <div class="p-4">
+        <div class="font-800 leading-tight">${l.title}</div>
+        <div class="text-sm text-slate-500 flex items-center gap-1 mt-1"><i class="fa-solid fa-location-dot text-xs"></i> ${l.loc}</div>
+        <div class="flex items-end justify-between mt-3"><div><div class="font-800 text-lg text-brand-700">${formatPrice(l.price)}</div><div class="text-xs text-slate-500">${l.area} • ${l.bhk}</div></div><button class="bg-brand-900 text-white px-4 py-2 rounded-full text-xs font-700">View Details</button></div>
+      </div>
+    </div>
+  `).join('');
 }
 
-function openPropertyModal(property=null){
- document.getElementById("modalTitle").textContent=property?"Edit Property":"Add Property";
- document.getElementById("modalBody").innerHTML=`
- <form onsubmit="saveProperty(event,${property?property.id:"null"})">
-  <div class="form-grid">
-   <div class="form-group full"><label>Property Title</label>
-    <input id="pTitle" required value="${esc(property?.title||"")}" placeholder="Premium 3 BHK Apartment"></div>
-
-   <div class="form-group"><label>Property Type</label>
-    <select id="pType">${["Apartment","Villa","Plot","Commercial","Office","Shop","Agricultural Land"].map(x=>`<option ${property?.type===x?"selected":""}>${x}</option>`).join("")}</select>
-   </div>
-
-   <div class="form-group"><label>Purpose</label>
-    <select id="pPurpose"><option ${property?.purpose==="Sale"||!property?"selected":""}>Sale</option><option ${property?.purpose==="Rent"?"selected":""}>Rent</option></select>
-   </div>
-
-   <div class="form-group"><label>Price</label>
-    <input id="pPrice" required value="${esc(property?.price||"")}" placeholder="₹85 L"></div>
-
-   <div class="form-group"><label>Area</label>
-    <input id="pArea" value="${esc(property?.area||"")}" placeholder="1600 Sq Ft"></div>
-
-   <div class="form-group"><label>BHK</label>
-    <select id="pBhk"><option value="">N/A</option>${["1","2","3","4","5+"].map(x=>`<option ${property?.bhk===x?"selected":""}>${x}</option>`).join("")}</select>
-   </div>
-
-   <div class="form-group"><label>Locality</label>
-    <select id="pLocality">${rajkotAreas().map(x=>`<option ${property?.locality===x?"selected":""}>${x}</option>`).join("")}</select>
-   </div>
-
-   <div class="form-group"><label>Owner / Seller</label>
-    <input id="pOwner" value="${esc(property?.owner||"")}" placeholder="Seller name"></div>
-
-   <div class="form-group"><label>Status</label>
-    <select id="pStatus"><option ${!property||property.status==="Active"?"selected":""}>Active</option><option ${property?.status==="Sold"?"selected":""}>Sold</option><option ${property?.status==="On Hold"?"selected":""}>On Hold</option></select>
-   </div>
-
-   <div class="form-group"><label>Verification</label>
-    <select id="pVerified"><option value="yes" ${property?.verified?"selected":""}>Verified</option><option value="no" ${property&&!property.verified?"selected":""}>Unverified</option></select>
-   </div>
-
-   <div class="form-group full"><label>Notes</label>
-    <textarea id="pNotes">${esc(property?.notes||"")}</textarea></div>
-  </div>
-
-  <div class="form-actions">
-   <button type="button" class="secondary" onclick="closeModal()">Cancel</button>
-   <button class="primary">${property?"Update Property":"Create Property"}</button>
-  </div>
- </form>`;
- openModal();
+function renderKanban(){
+  const container=document.getElementById('kanban');
+  container.innerHTML=stages.map((s,idx)=>{
+    const items=leads.filter(l=>l.stage===idx);
+    return `
+    <div class="bg-white rounded-2xl border p-3 min-w-[220px] lg:min-w-0 ${stageColors[idx]}">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-800 text-sm flex items-center gap-2">${s} <span class="bg-white border px-2 py-0.5 rounded-full text-xs">${items.length}</span></div>
+        <i class="fa-solid fa-ellipsis text-slate-400"></i>
+      </div>
+      <div class="space-y-3">
+        ${items.map(l=>`
+          <div class="bg-white rounded-xl border p-3 shadow-sm hover:shadow-md transition cursor-pointer" onclick="moveLead('${l.name}')">
+            <div class="flex justify-between items-start">
+              <div class="font-700 text-sm">${l.name}</div>
+              <span class="text-[10px] font-800 tracking-widest px-2 py-1 rounded-full ${l.src.includes('IG')?'bg-pink-50 text-pink-600 border border-pink-100':'bg-blue-50 text-[#0866FF] border border-blue-100'}">${l.src}</span>
+            </div>
+            <div class="text-xs text-slate-500 mt-1">${l.phone} • ${l.time} ago</div>
+            <div class="text-xs bg-slate-50 border rounded-lg px-2 py-1.5 mt-2"><div class="font-600">${l.prop}</div><div class="text-slate-500">${l.city} • Budget ${l.budget}</div></div>
+            <div class="mt-2 flex gap-1.5">
+              <button class="flex-1 bg-teal text-white text-xs font-700 py-1.5 rounded-full"><i class="fa-brands fa-whatsapp mr-1"></i> WhatsApp</button>
+              <button class="w-8 h-8 rounded-full border flex items-center justify-center"><i class="fa-solid fa-phone text-xs"></i></button>
+            </div>
+          </div>
+        `).join('') || `<div class="text-xs text-slate-400 text-center py-6 border-2 border-dashed rounded-xl bg-white/60">No leads</div>`}
+      </div>
+      <button onclick="addRandomLead()" class="w-full mt-3 border-2 border-dashed rounded-xl py-2 text-xs font-700 text-slate-500 hover:bg-white">+ Add lead</button>
+    </div>`
+  }).join('');
 }
 
-function saveProperty(e,id){
- e.preventDefault();
- const obj={
-  id:id||uid(),
-  title:document.getElementById("pTitle").value,
-  type:document.getElementById("pType").value,
-  purpose:document.getElementById("pPurpose").value,
-  price:document.getElementById("pPrice").value,
-  area:document.getElementById("pArea").value,
-  bhk:document.getElementById("pBhk").value,
-  city:"Rajkot",
-  locality:document.getElementById("pLocality").value,
-  owner:document.getElementById("pOwner").value,
-  status:document.getElementById("pStatus").value,
-  verified:document.getElementById("pVerified").value==="yes",
-  updated:"Just now",
-  notes:document.getElementById("pNotes").value
- };
- if(id){
-  const i=db.properties.findIndex(p=>p.id===id);
-  if(i>=0)db.properties[i]=obj;
-  addActivity("Property updated: "+obj.title);
- }else{
-  db.properties.unshift(obj);
-  addActivity("Property added: "+obj.title);
- }
- saveDB();closeModal();showPage("properties");toast("Property saved");
-}
-
-function editProperty(id){
- const p=db.properties.find(x=>x.id===id);
- if(p)openPropertyModal(p);
-}
-function deleteProperty(id){
- if(!isAdmin())return toast("Admin access required");
- const p=db.properties.find(x=>x.id===id);
- if(!p)return;
- if(confirm("Delete this property?")){
-  db.properties=db.properties.filter(x=>x.id!==id);
-  addActivity("Property deleted: "+p.title);
-  saveDB();showPage("properties");toast("Property deleted");
- }
-}
-function viewProperty(id){
- const p=db.properties.find(x=>x.id===id);
- if(!p)return;
- document.getElementById("modalTitle").textContent="Property Details";
- document.getElementById("modalBody").innerHTML=`
-  <div class="grid2">
-   <div class="stat-mini"><strong>Property</strong><p>${esc(p.title)}</p></div>
-   <div class="stat-mini"><strong>Price</strong><p>${esc(p.price)}</p></div>
-   <div class="stat-mini"><strong>Location</strong><p>${esc(p.locality||"")}${p.city?`, ${esc(p.city)}`:""}${p.state?`, ${esc(p.state)}`:""}${p.pincode?` • ${esc(p.pincode)}`:""}</p></div>
-   <div class="stat-mini"><strong>Type</strong><p>${esc(p.type)}</p></div>
-   <div class="stat-mini"><strong>Purpose</strong><p>${esc(p.purpose)}</p></div>
-   <div class="stat-mini"><strong>Area</strong><p>${esc(p.area)}</p></div>
-  </div>
-  <div style="margin-top:18px"><strong>Data status:</strong>
-   ${p.verified?'<span class="badge green">Verified</span>':'<span class="badge orange">Unverified</span>'}
-  </div>
-  <div style="margin-top:18px;text-align:right"><button class="primary" onclick="closeModal()">Close</button></div>
- `;
- openModal();
-}
-
-/* =========================================================
-   LEADS
-========================================================= */
-
-const leadStages=["New","Contacted","Qualified","Site Visit","Negotiation","Won","Lost"];
-
-function leadsPage(){
- return `
- <div class="page-head">
-  <div><h2>Lead Pipeline</h2><p>Buyer and seller enquiries.</p></div>
-  <button class="primary" onclick="openLeadModal()">+ Add Lead</button>
- </div>
- <div class="toolbar">
-  <input id="leadSearch" class="filter" style="flex:1" placeholder="Search lead..." oninput="renderLeads()">
-  <select id="leadTypeFilter" class="filter" onchange="renderLeads()"><option>All</option><option>Buyer</option><option>Seller</option><option>Tenant</option><option>Investor</option></select>
- </div>
- <div class="kanban" id="leadBoard">${leadBoard(db.leads)}</div>`;
-}
-
-function leadBoard(list){
- return leadStages.map(stage=>`
-  <div class="column">
-   <div class="column-head"><strong>${stage}</strong><span class="badge blue">${list.filter(l=>l.status===stage).length}</span></div>
-   ${list.filter(l=>l.status===stage).map(leadCard).join("")}
-  </div>`).join("");
-}
-
-function leadCard(l){
- return `<div class="lead-card">
-  <h4>${esc(l.name)}</h4>
-  <p>👤 ${esc(l.type)}</p>
-  ${l.phone?`<p>📞 ${esc(l.phone)}</p>`:"<p>📞 Phone not provided</p>"}
-  <p>📍 ${esc(l.location||"Rajkot")}</p>
-  <p>💰 ${esc(l.budget||"Not specified")}</p>
-  <p>🎯 Score: <strong>${l.score||0}/100</strong></p>
-  <select class="filter" style="width:100%;margin-top:9px" onchange="changeLeadStatus(${l.id},this.value)">
-   ${leadStages.map(s=>`<option ${l.status===s?"selected":""}>${s}</option>`).join("")}
-  </select>
-  <div style="display:flex;gap:6px;margin-top:8px">
-   <button class="secondary" style="flex:1" onclick="editLead(${l.id})">Edit</button>
-   ${isAdmin()?`<button class="danger" onclick="deleteLead(${l.id})">🗑</button>`:""}
-  </div>
- </div>`;
-}
-
-function renderLeads(){
- const q=(document.getElementById("leadSearch")?.value||"").toLowerCase();
- const type=document.getElementById("leadTypeFilter")?.value||"All";
- const list=db.leads.filter(l=>{
-  return (!q||`${l.name} ${l.location} ${l.phone}`.toLowerCase().includes(q))
-   &&(type==="All"||l.type===type);
- });
- document.getElementById("leadBoard").innerHTML=leadBoard(list);
-}
-
-function openLeadModal(lead=null){
- document.getElementById("modalTitle").textContent=lead?"Edit Lead":"Add Lead";
- document.getElementById("modalBody").innerHTML=`
- <form onsubmit="saveLead(event,${lead?lead.id:"null"})">
-  <div class="form-grid">
-   <div class="form-group"><label>Name</label><input id="lName" required value="${esc(lead?.name||"")}"></div>
-   <div class="form-group"><label>Phone</label><input id="lPhone" value="${esc(lead?.phone||"")}"></div>
-   <div class="form-group"><label>Lead Type</label><select id="lType">${["Buyer","Seller","Tenant","Investor"].map(x=>`<option ${lead?.type===x?"selected":""}>${x}</option>`).join("")}</select></div>
-   <div class="form-group"><label>Location</label><input id="lLocation" value="${esc(lead?.location||"Rajkot")}"></div>
-   <div class="form-group"><label>Budget</label><input id="lBudget" value="${esc(lead?.budget||"")}"></div>
-   <div class="form-group"><label>Lead Source</label><select id="lSource">${["Website","WhatsApp","Facebook","Instagram","Referral","Walk-in","Broker","Demo"].map(x=>`<option ${lead?.source===x?"selected":""}>${x}</option>`).join("")}</select></div>
-   <div class="form-group"><label>Lead Status</label><select id="lStatus">${leadStages.map(x=>`<option ${lead?.status===x?"selected":""}>${x}</option>`).join("")}</select></div>
-   <div class="form-group"><label>Lead Score</label><input id="lScore" type="number" min="0" max="100" value="${lead?.score||50}"></div>
-   <div class="form-group full"><label>Requirement</label><textarea id="lReq">${esc(lead?.requirement||"")}</textarea></div>
-  </div>
-  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">${lead?"Update Lead":"Create Lead"}</button></div>
- </form>`;
- openModal();
-}
-
-function saveLead(e,id){
- e.preventDefault();
- const obj={
-  id:id||uid(),name:document.getElementById("lName").value,phone:document.getElementById("lPhone").value,
-  type:document.getElementById("lType").value,location:document.getElementById("lLocation").value,
-  budget:document.getElementById("lBudget").value,source:document.getElementById("lSource").value,
-  status:document.getElementById("lStatus").value,score:Number(document.getElementById("lScore").value)||0,
-  requirement:document.getElementById("lReq").value
- };
- if(id){
-  const i=db.leads.findIndex(l=>l.id===id);if(i>=0)db.leads[i]=obj;
-  addActivity("Lead updated: "+obj.name);
- }else{
-  db.leads.unshift(obj);addActivity("New lead added: "+obj.name);
- }
- saveDB();closeModal();showPage("leads");toast("Lead saved");
-}
-function editLead(id){const l=db.leads.find(x=>x.id===id);if(l)openLeadModal(l)}
-function deleteLead(id){
- if(!isAdmin())return toast("Admin access required");
- const l=db.leads.find(x=>x.id===id);
- if(confirm("Delete this lead?")){
-  db.leads=db.leads.filter(x=>x.id!==id);saveDB();showPage("leads");toast("Lead deleted");
- }
-}
-function changeLeadStatus(id,status){
- const l=db.leads.find(x=>x.id===id);
- if(l){l.status=status;addActivity(`${l.name} moved to ${status}`);saveDB();showPage("leads")}
-}
-
-/* =========================================================
-   BUYERS / SELLERS
-========================================================= */
-
-function buyersPage(){
- const buyers=db.leads.filter(l=>l.type==="Buyer"||l.type==="Tenant"||l.type==="Investor");
- return peoplePage("Buyers","Buyer requirements and purchasing enquiries.",buyers,"Buyer");
-}
-function sellersPage(){
- const sellers=db.leads.filter(l=>l.type==="Seller");
- return peoplePage("Sellers","Owners and seller enquiries.",sellers,"Seller");
-}
-function peoplePage(title,sub,list,type){
- return `
- <div class="page-head">
-  <div><h2>${title}</h2><p>${sub}</p></div>
-  <button class="primary" onclick="openLeadModal()">+ Add ${type}</button>
- </div>
- <div class="card">
-  <div class="table-wrap">
-   <table>
-    <thead><tr><th>Name</th><th>Phone</th><th>Location</th><th>Budget</th><th>Requirement</th><th>Score</th><th>Status</th><th>Action</th></tr></thead>
-    <tbody>
-     ${list.length?list.map(l=>`
-      <tr>
-       <td><strong>${esc(l.name)}</strong></td><td>${esc(l.phone||"-")}</td>
-       <td>${esc(l.location||"-")}</td><td>${esc(l.budget||"-")}</td>
-       <td>${esc(l.requirement||"-")}</td><td><span class="badge green">${l.score||0}</span></td>
-       <td><span class="badge blue">${esc(l.status)}</span></td>
-       <td><button class="secondary" onclick="editLead(${l.id})">Edit</button></td>
-      </tr>`).join(""):`<tr><td colspan="8">No records found.</td></tr>`}
-    </tbody>
-   </table>
-  </div>
- </div>`;
-}
-
-/* =========================================================
-   MATCHING
-========================================================= */
-
-function matchingPage(){
- const buyers=db.leads.filter(l=>l.type==="Buyer"||l.type==="Tenant"||l.type==="Investor");
- const selected=buyers[0]?.id||"";
- return `
- <div class="page-head">
-  <div><h2>🎯 Buyer Matching</h2><p>Find properties that fit a buyer's requirement.</p></div>
- </div>
- <div class="card">
-  <div class="form-group">
-   <label>Select Buyer</label>
-   <select id="matchBuyer" onchange="renderMatches()">
-    ${buyers.map(b=>`<option value="${b.id}">${esc(b.name)} — ${esc(b.location||"Rajkot")} — ${esc(b.budget||"Budget N/A")}</option>`).join("")}
-   </select>
-  </div>
-  <div id="matches" style="margin-top:20px">${selected?matchesFor(selected):"<p>No buyer leads available.</p>"}</div>
- </div>`;
-}
-
-function parseMoney(s){
- if(!s)return null;
- const m=String(s).replace(/,/g,"").match(/([\d.]+)\s*(Cr|crore|L|lakh|K|k)?/i);
- if(!m)return null;
- let n=Number(m[1]),unit=(m[2]||"").toLowerCase();
- if(unit==="cr"||unit==="crore")n*=10000000;
- else if(unit==="l"||unit==="lakh")n*=100000;
- else if(unit==="k")n*=1000;
- return n;
-}
-function buyerBudgetNumber(budget){
- const nums=String(budget||"").match(/[\d.]+\s*(?:Cr|L|K)?/gi);
- if(!nums)return null;
- const values=nums.map(parseMoney).filter(Boolean);
- return values.length?Math.max(...values):null;
-}
-function matchesFor(id){
- const b=db.leads.find(x=>x.id===Number(id));
- if(!b)return "";
- const budget=buyerBudgetNumber(b.budget);
- const req=(b.requirement||"").toLowerCase();
- const loc=(b.location||"").toLowerCase();
-
- const results=db.properties.map(p=>{
-  let score=0;
-  if(loc && (p.locality||"").toLowerCase().includes(loc))score+=35;
-  else if(loc && "rajkot".includes(loc))score+=15;
-  const price=parseMoney(p.price);
-  if(budget&&price){
-   if(price<=budget)score+=40;
-   else if(price<=budget*1.15)score+=25;
-  }else score+=15;
-  if(req){
-   if(req.includes(String(p.bhk||"").toLowerCase()))score+=15;
-   if(req.includes((p.type||"").toLowerCase()))score+=10;
-  }else score+=10;
-  if(p.purpose==="Rent" && b.type==="Tenant")score+=10;
-  if(p.purpose==="Sale" && b.type!=="Tenant")score+=10;
-  return {...p,match:Math.min(100,score)};
- }).sort((a,c)=>c.match-a.match).slice(0,8);
-
- return results.map(p=>`
-  <div class="match">
-   <div style="display:flex;justify-content:space-between;gap:10px">
-    <div><strong>${esc(p.title)}</strong><p style="font-size:12px;color:#667085">${esc(p.locality)} · ${esc(p.price)}</p></div>
-    <span class="badge ${p.match>=75?"green":p.match>=50?"blue":"orange"}">${p.match}% Match</span>
-   </div>
-   <div class="progress"><div style="width:${p.match}%"></div></div>
-   <div style="margin-top:10px"><button class="secondary" onclick="viewProperty(${p.id})">View Property</button></div>
-  </div>`).join("");
-}
-function renderMatches(){
- const id=document.getElementById("matchBuyer").value;
- document.getElementById("matches").innerHTML=matchesFor(id);
-}
-
-/* =========================================================
-   FOLLOWUPS
-========================================================= */
-
-function followupsPage(){
- return `
- <div class="page-head">
-  <div><h2>Follow-ups</h2><p>Never miss a customer follow-up.</p></div>
-  <button class="primary" onclick="openFollowupModal()">+ Schedule Follow-up</button>
- </div>
- <div class="card">
-  <div class="table-wrap">
-   <table><thead><tr><th>Lead</th><th>Task</th><th>Due</th><th>Status</th><th>Action</th></tr></thead>
-   <tbody>
-   ${db.followups.map((f,i)=>`
-    <tr><td><strong>${esc(f.lead)}</strong></td><td>${esc(f.task)}</td><td>${esc(f.due)}</td>
-    <td><span class="badge ${f.status==="Completed"?"green":"orange"}">${f.status}</span></td>
-    <td><button class="secondary" onclick="completeFollowup(${i})">${f.status==="Completed"?"Undo":"Mark Done"}</button></td></tr>
-   `).join("")}</tbody></table>
-  </div>
- </div>`;
-}
-function openFollowupModal(){
- document.getElementById("modalTitle").textContent="Schedule Follow-up";
- document.getElementById("modalBody").innerHTML=`
- <form onsubmit="saveFollowup(event)">
-  <div class="form-grid">
-   <div class="form-group"><label>Lead</label><select id="fLead">${db.leads.map(l=>`<option>${esc(l.name)}</option>`).join("")}</select></div>
-   <div class="form-group"><label>Due</label><input id="fDue" required placeholder="Today 5:00 PM"></div>
-   <div class="form-group full"><label>Task</label><textarea id="fTask" required placeholder="Call customer..."></textarea></div>
-  </div>
-  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Save</button></div>
- </form>`;
- openModal();
-}
-function saveFollowup(e){
- e.preventDefault();
- db.followups.push({id:uid(),lead:document.getElementById("fLead").value,task:document.getElementById("fTask").value,due:document.getElementById("fDue").value,status:"Pending"});
- saveDB();addActivity("Follow-up scheduled");closeModal();showPage("followups");toast("Follow-up created");
-}
-function completeFollowup(i){
- db.followups[i].status=db.followups[i].status==="Completed"?"Pending":"Completed";
- saveDB();showPage("followups");
-}
-
-/* =========================================================
-   VISITS
-========================================================= */
-
-function visitsPage(){
- return `
- <div class="page-head">
-  <div><h2>Site Visits</h2><p>Manage buyer property visits.</p></div>
-  <button class="primary" onclick="openVisitModal()">+ Schedule Visit</button>
- </div>
- <div class="kpis">
-  ${kpi("📍","Scheduled",db.visits.filter(x=>x.status==="Scheduled").length,"Upcoming")}
-  ${kpi("✅","Completed",db.visits.filter(x=>x.status==="Completed").length,"Finished")}
-  ${kpi("❌","Cancelled",db.visits.filter(x=>x.status==="Cancelled").length,"Cancelled")}
-  ${kpi("🏠","Properties",db.properties.length,"Inventory")}
- </div>
- <div class="card"><div class="table-wrap">
- <table><thead><tr><th>Customer</th><th>Property</th><th>Date/Time</th><th>Status</th><th>Action</th></tr></thead>
- <tbody>${db.visits.map(v=>`
-  <tr><td><strong>${esc(v.customer)}</strong></td><td>${esc(v.property)}</td><td>${esc(v.time)}</td>
-  <td><span class="badge blue">${esc(v.status)}</span></td>
-  <td><button class="secondary" onclick="cycleVisit(${v.id})">Change Status</button></td></tr>`).join("")}</tbody></table>
- </div></div>`;
-}
-function openVisitModal(){
- document.getElementById("modalTitle").textContent="Schedule Site Visit";
- document.getElementById("modalBody").innerHTML=`
- <form onsubmit="saveVisit(event)">
- <div class="form-grid">
-  <div class="form-group"><label>Customer</label><select id="vCustomer">${db.leads.filter(l=>l.type!=="Seller").map(l=>`<option>${esc(l.name)}</option>`).join("")}</select></div>
-  <div class="form-group"><label>Property</label><select id="vProperty">${db.properties.filter(p=>p.status==="Active").map(p=>`<option>${esc(p.title)}</option>`).join("")}</select></div>
-  <div class="form-group full"><label>Date / Time</label><input id="vTime" required placeholder="Tomorrow 5:00 PM"></div>
- </div>
- <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Schedule</button></div>
- </form>`;
- openModal();
-}
-function saveVisit(e){
- e.preventDefault();
- db.visits.push({id:uid(),customer:document.getElementById("vCustomer").value,property:document.getElementById("vProperty").value,time:document.getElementById("vTime").value,status:"Scheduled"});
- saveDB();addActivity("New site visit scheduled");closeModal();showPage("visits");toast("Visit scheduled");
-}
-function cycleVisit(id){
- const v=db.visits.find(x=>x.id===id);if(!v)return;
- v.status=v.status==="Scheduled"?"Completed":v.status==="Completed"?"Cancelled":"Scheduled";
- saveDB();showPage("visits");
-}
-
-/* =========================================================
-   DEALS
-========================================================= */
-
-function dealsPage(){
- const stages=[["New Deal",5,"₹2.4 Cr"],["Site Visit",8,"₹3.8 Cr"],["Negotiation",6,"₹4.2 Cr"],["Documentation",3,"₹2.1 Cr"],["Closed",12,"₹8.4 Cr"]];
- return `
- <div class="page-head"><div><h2>Deals Pipeline</h2><p>Track transactions from enquiry to closing.</p></div>
- <button class="primary" onclick="openDealModal()">+ Create Deal</button></div>
- <div class="grid3">${stages.map(s=>`<div class="kpi"><p>${s[0]}</p><h3>${s[1]}</h3><strong>${s[2]}</strong></div>`).join("")}</div>
- <div class="card" style="margin-top:18px">
-  <h3>Current Deal Board</h3>
-  <div class="kanban" style="margin-top:15px">
-   ${stages.map(s=>`<div class="column"><div class="column-head"><strong>${s[0]}</strong><span class="badge blue">${s[1]}</span></div>
-    ${["Demo Buyer 1","Demo Buyer 2","Demo Seller 1"].map((n,i)=>`
-     <div class="lead-card"><h4>${n}</h4><p>🏠 Property transaction</p><p>💰 ${["₹78 L","₹1.85 Cr","₹62 L"][i]}</p><p>👨‍💼 Assigned Agent</p></div>
-    `).join("")}
-   </div>`).join("")}
-  </div>
- </div>`;
-}
-function openDealModal(){
- document.getElementById("modalTitle").textContent="Create Deal";
- document.getElementById("modalBody").innerHTML=`
- <form onsubmit="event.preventDefault();closeModal();toast('Deal created')">
-  <div class="form-grid">
-   <div class="form-group"><label>Customer</label><select>${db.leads.map(l=>`<option>${esc(l.name)}</option>`).join("")}</select></div>
-   <div class="form-group"><label>Property</label><select>${db.properties.map(p=>`<option>${esc(p.title)}</option>`).join("")}</select></div>
-   <div class="form-group"><label>Deal Value</label><input required placeholder="₹85 L"></div>
-   <div class="form-group"><label>Stage</label><select><option>New Deal</option><option>Site Visit</option><option>Negotiation</option><option>Documentation</option><option>Closed</option></select></div>
-  </div>
-  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Create Deal</button></div>
- </form>`;
- openModal();
-}
-
-/* =========================================================
-   AGENTS
-========================================================= */
-
-function agentsPage(){
- return `
- <div class="page-head"><div><h2>Agents</h2><p>Manage your sales team.</p></div>
- <button class="primary" onclick="openUserModal()">+ Add User</button></div>
- <div class="card"><div class="table-wrap"><table>
- <thead><tr><th>Agent</th><th>Role</th><th>Location</th><th>Deals</th><th>Revenue</th><th>Action</th></tr></thead>
- <tbody>${db.agents.map(a=>`
-  <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${a.name[0]}</div><strong>${esc(a.name)}</strong></div></td>
-  <td>${esc(a.role)}</td><td>${esc(a.location)}</td><td>${a.deals}</td><td><strong>${esc(a.revenue)}</strong></td>
-  <td><button class="secondary" onclick="alert('Agent profile: ${esc(a.name)}')">View</button></td></tr>
- `).join("")}</tbody></table></div></div>`;
-}
-
-/* =========================================================
-   REPORTS
-========================================================= */
-
-function reportsPage(){
- const total=db.leads.length;
- const buyers=db.leads.filter(l=>l.type==="Buyer").length;
- const sellers=db.leads.filter(l=>l.type==="Seller").length;
- return `
- <div class="page-head"><div><h2>Reports & Analytics</h2><p>CRM performance overview.</p></div>
- <button class="primary" onclick="exportLeadsCSV()">Export Leads CSV</button></div>
- <div class="kpis">
-  ${kpi("👥","Total Leads",total,"CRM records")}
-  ${kpi("🧑","Buyers",buyers,"Buyer leads")}
-  ${kpi("🏷️","Sellers",sellers,"Seller leads")}
-  ${kpi("🏠","Properties",db.properties.length,"Inventory")}
- </div>
- <div class="grid2">
-  <div class="card"><h3>Lead Funnel</h3>
-   ${leadStages.slice(0,5).map((s,i)=>{
-    const n=db.leads.filter(l=>l.status===s).length;
-    const pct=total?Math.max(4,n/total*100):4;
-    return `<div style="margin:17px 0"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${s}</span><strong>${n}</strong></div>
-    <div class="progress"><div style="width:${pct}%;background:${["#2563eb","#3b82f6","#60a5fa","#f59e0b","#16a34a"][i]}"></div></div></div>`;
-   }).join("")}
-  </div>
-  <div class="card"><h3>Rajkot Areas</h3>
-   ${rajkotAreas().slice(0,8).map(a=>`<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
-    <span>${a}</span><strong>${db.properties.filter(p=>p.locality===a).length} listings</strong></div>`).join("")}
-  </div>
- </div>`;
-}
-
-/* =========================================================
-   AI ASSISTANT
-========================================================= */
-
-function aiPage(){
- return `
- <div class="page-head"><div><h2>🤖 AI Assistant</h2><p>CRM insights and quick commands.</p></div></div>
- <div class="card" style="max-width:900px;margin:auto">
-  <div id="chat" style="min-height:330px;max-height:430px;overflow:auto;padding:8px">
-   <div style="background:#eff6ff;padding:14px;border-radius:10px">
-    <strong>EstateAI</strong>
-    <p style="margin-top:6px">Namaste! Try: "How many properties in Rajkot?", "show buyers", or "pending followups".</p>
-   </div>
-  </div>
-  <div style="display:flex;gap:9px;border-top:1px solid var(--border);padding-top:14px">
-   <input id="aiInput" class="filter" style="flex:1" placeholder="Ask about your CRM..." onkeydown="if(event.key==='Enter')askAI()">
-   <button class="primary" onclick="askAI()">Ask AI</button>
-  </div>
- </div>`;
-}
-function askAI(){
- const input=document.getElementById("aiInput");if(!input||!input.value.trim())return;
- const q=input.value.trim();const low=q.toLowerCase();
- let answer="";
- if(low.includes("property")||low.includes("properties")){
-  answer=`There are ${db.properties.length} properties in the CRM, including ${db.properties.filter(p=>p.purpose==="Sale").length} sale and ${db.properties.filter(p=>p.purpose==="Rent").length} rent listings.`;
- }else if(low.includes("buyer")){
-  answer=`There are ${db.leads.filter(l=>l.type==="Buyer").length} buyer leads currently stored.`;
- }else if(low.includes("seller")){
-  answer=`There are ${db.leads.filter(l=>l.type==="Seller").length} seller leads currently stored.`;
- }else if(low.includes("follow")){
-  answer=`${db.followups.filter(f=>f.status!=="Completed").length} follow-ups are pending.`;
- }else if(low.includes("rajkot")){
-  answer=`The CRM is configured for Rajkot. ${db.properties.length} inventory records are currently loaded.`;
- }else{
-  answer="I can currently answer CRM summary questions about properties, buyers, sellers, leads and follow-ups. For advanced AI analysis, connect an AI API/backend.";
- }
- const chat=document.getElementById("chat");
- chat.innerHTML+=`
- <div style="background:#f8fafc;padding:12px;border-radius:10px;margin:9px 0;text-align:right"><strong>You</strong><p>${esc(q)}</p></div>
- <div style="background:#eff6ff;padding:12px;border-radius:10px;margin:9px 0"><strong>EstateAI</strong><p style="margin-top:5px">${esc(answer)}</p></div>`;
- input.value="";chat.scrollTop=chat.scrollHeight;
-}
-
-/* =========================================================
-   ADMIN CONTROL
-========================================================= */
-
-function adminPage(){
- if(!isAdmin())return `<div class="card"><h2>Access denied</h2></div>`;
- return `
- <div class="page-head">
-  <div><h2>🛡️ Admin Control Center</h2><p>Manage CRM data and users without coding.</p></div>
-  <button class="primary" onclick="backupData()">Download Backup</button>
- </div>
-
- <div class="grid3">
-  <div class="card"><h3>Inventory</h3><p style="color:#667085;margin-top:7px">${db.properties.length} properties</p>
-   <button class="secondary" style="margin-top:12px" onclick="showPage('properties')">Manage</button></div>
-  <div class="card"><h3>Users</h3><p style="color:#667085;margin-top:7px">${db.users.length} users</p>
-   <button class="secondary" style="margin-top:12px" onclick="openUserModal()">Add User</button></div>
-  <div class="card"><h3>Leads</h3><p style="color:#667085;margin-top:7px">${db.leads.length} leads</p>
-   <button class="secondary" style="margin-top:12px" onclick="showPage('leads')">Manage</button></div>
- </div>
-
- <div class="card" style="margin-top:18px">
-  <h3>User & Permission Management</h3>
-  <div class="table-wrap" style="margin-top:14px"><table>
-   <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
-   <tbody>${db.users.map(u=>`
-    <tr><td><strong>${esc(u.name)}</strong></td><td>${esc(u.username)}</td><td><span class="badge purple">${u.role}</span></td>
-    <td><span class="badge ${u.active?"green":"red"}">${u.active?"Active":"Disabled"}</span></td>
-    <td>
-     <button class="secondary" onclick="editUser(${u.id})">Edit</button>
-     ${u.id!==currentUser.id?`<button class="danger" onclick="toggleUser(${u.id})">${u.active?"Disable":"Enable"}</button>`:""}
-    </td></tr>
-   `).join("")}</tbody>
-  </table></div>
- </div>
-
- <div class="card" style="margin-top:18px">
-  <h3>Data Tools</h3>
-  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
-   <button class="secondary" onclick="exportAllJSON()">Export Full JSON</button>
-   <button class="secondary" onclick="document.getElementById('importFile').click()">Import JSON</button>
-   <button class="danger" onclick="resetDemoData()">Reset Demo Data</button>
-   <input id="importFile" type="file" accept=".json" class="hidden" onchange="importJSON(event)">
-  </div>
- </div>
-
- <div class="card" style="margin-top:18px">
-  <h3>Audit Log</h3>
-  ${db.activities.slice(0,15).map(a=>`<div class="activity-item"><div class="dot"></div><div><strong>${esc(a.text)}</strong><p style="font-size:11px;color:#667085">${esc(a.time)}</p></div></div>`).join("")}
- </div>`;
-}
-
-function openUserModal(user=null){
- if(!isAdmin())return toast("Admin only");
- document.getElementById("modalTitle").textContent=user?"Edit User":"Add User";
- document.getElementById("modalBody").innerHTML=`
- <form onsubmit="saveUser(event,${user?user.id:"null"})">
- <div class="form-grid">
-  <div class="form-group"><label>Name</label><input id="uName" required value="${esc(user?.name||"")}"></div>
-  <div class="form-group"><label>Username</label><input id="uUsername" required value="${esc(user?.username||"")}"></div>
-  <div class="form-group"><label>Password</label><input id="uPassword" required value="${esc(user?.password||"")}"></div>
-  <div class="form-group"><label>Role</label><select id="uRole"><option ${user?.role==="Agent"?"selected":""}>Agent</option><option ${user?.role==="Admin"?"selected":""}>Admin</option></select></div>
-  <div class="form-group"><label>Status</label><select id="uActive"><option value="yes" ${!user||user.active?"selected":""}>Active</option><option value="no" ${user&&!user.active?"selected":""}>Disabled</option></select></div>
- </div>
- <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Save User</button></div>
- </form>`;
- openModal();
-}
-function saveUser(e,id){
- e.preventDefault();
- const obj={id:id||uid(),name:document.getElementById("uName").value,username:document.getElementById("uUsername").value,password:document.getElementById("uPassword").value,role:document.getElementById("uRole").value,active:document.getElementById("uActive").value==="yes"};
- const duplicate=db.users.find(u=>u.username===obj.username&&u.id!==obj.id);
- if(duplicate)return toast("Username already exists");
- if(id){
-  const i=db.users.findIndex(u=>u.id===id);if(i>=0)db.users[i]=obj;
- }else db.users.push(obj);
- saveDB();closeModal();buildNav();updateProfile();showPage("admin");toast("User saved");
-}
-function editUser(id){const u=db.users.find(x=>x.id===id);if(u)openUserModal(u)}
-function toggleUser(id){
- const u=db.users.find(x=>x.id===id);if(!u)return;
- u.active=!u.active;saveDB();showPage("admin");toast("User status updated");
-}
-function backupData(){
- const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
- downloadBlob(blob,"estateai-backup.json");
-}
-function exportAllJSON(){backupData()}
-function importJSON(e){
- const file=e.target.files[0];if(!file)return;
- const reader=new FileReader();
- reader.onload=()=>{
-  try{
-   const data=JSON.parse(reader.result);
-   if(!data.properties||!data.leads)throw new Error();
-   db=data;saveDB();location.reload();
-  }catch(err){alert("Invalid EstateAI backup file.")}
- };
- reader.readAsText(file);
-}
-function resetDemoData(){ toast("Automatic/demo reset is disabled. Use an explicit cloud admin delete workflow."); }
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-function settingsPage(){
- return `
- <div class="page-head"><div><h2>Settings</h2><p>Configure your CRM without coding.</p></div>
- <button class="primary" onclick="saveSettings()">Save Changes</button></div>
-
- <div class="card">
-  <h3>Company Configuration</h3>
-  <div class="form-grid" style="margin-top:18px">
-   <div class="form-group"><label>Company Name</label><input id="sCompany" value="${esc(db.settings.company)}"></div>
-   <div class="form-group"><label>Primary City</label><input id="sCity" value="${esc(db.settings.city)}"></div>
-   <div class="form-group"><label>Currency</label><select id="sCurrency"><option>INR ₹</option><option>USD $</option><option>EUR €</option></select></div>
-   <div class="form-group"><label>Timezone</label><select id="sTimezone"><option>Asia/Kolkata</option><option>Asia/Dubai</option></select></div>
-  </div>
- </div>
-
- <div class="card" style="margin-top:18px">
-  <h3>Enabled CRM Modules</h3>
-  <div class="feature-grid" style="margin-top:16px">
-   ${[
-    ["🏠","Property Management"],["👥","Lead Management"],["🎯","Buyer Matching"],
-    ["🏷️","Seller Management"],["📅","Follow-up Automation"],["📍","Site Visits"],
-    ["🤝","Deals"],["📊","Reports"],["💬","Communications"],["🤖","AI Assistant"],
-    ["👨‍💼","Agent Management"],["🔔","Notifications"]
-   ].map(x=>`<div class="feature"><div style="font-size:25px">${x[0]}</div><strong>${x[1]}</strong><p>Enabled</p></div>`).join("")}
-  </div>
- </div>
-
- <div class="card" style="margin-top:18px">
-  <h3>Data Safety</h3>
-  <p style="color:#667085;margin-top:7px">All CRM records are stored in Supabase Cloud.</p>
-  <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
-   <button class="secondary" onclick="backupData()">Download Backup</button>
-   <button class="secondary" onclick="document.getElementById('importFile2').click()">Restore Backup</button>
-   <input id="importFile2" type="file" accept=".json" class="hidden" onchange="importJSON(event)">
-  </div>
- </div>`;
-}
-function saveSettings(){
- db.settings.company=document.getElementById("sCompany").value;
- db.settings.city=document.getElementById("sCity").value;
- db.settings.currency=document.getElementById("sCurrency").value;
- db.settings.timezone=document.getElementById("sTimezone").value;
- saveDB();toast("Settings saved");
-}
-
-/* =========================================================
-   SEARCH / NOTIFICATIONS / THEME
-========================================================= */
-
-function globalSearch(value){
- const q=value.trim().toLowerCase();
- if(!q)return;
- const p=db.properties.filter(x=>`${x.title} ${x.locality} ${x.owner}`.toLowerCase().includes(q));
- const l=db.leads.filter(x=>`${x.name} ${x.location} ${x.phone}`.toLowerCase().includes(q));
- if(p.length||l.length){
-  if(currentPage==="properties"){
-   const grid=document.getElementById("propertyGrid");
-   if(grid)grid.innerHTML=propertyCards(p);
+function moveLead(name){
+  const lead=leads.find(l=>l.name===name);
+  if(lead && lead.stage<4){
+    lead.stage+=1;
+    renderKanban();
+    showToast(`${lead.name} moved to ${stages[lead.stage]}`);
   }
- }
-}
-function showNotifications(){
- const pending=db.followups.filter(x=>x.status!=="Completed").length;
- alert(`EstateAI Notifications\n\n• ${pending} pending follow-ups\n• ${db.visits.filter(x=>x.status==="Scheduled").length} scheduled site visits\n• ${db.leads.filter(x=>x.status==="New").length} new leads`);
-}
-function toggleTheme(){
- document.body.classList.toggle("dark");
- db.settings.theme=document.body.classList.contains("dark")?"dark":"light";
- saveDB();
-}
-function applyTheme(){
- if(db.settings.theme==="dark")document.body.classList.add("dark");
 }
 
-/* =========================================================
-   CSV
-========================================================= */
-
-function exportLeadsCSV(){
- const rows=[
-  ["Name","Type","Phone","Location","Budget","Requirement","Status","Source","Score"],
-  ...db.leads.map(l=>[l.name,l.type,l.phone,l.location,l.budget,l.requirement,l.status,l.source,l.score])
- ];
- const csv=rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
- downloadBlob(new Blob([csv],{type:"text/csv"}),"estateai-leads.csv");
- toast("CSV exported");
-}
-function downloadBlob(blob,name){
- const url=URL.createObjectURL(blob);
- const a=document.createElement("a");a.href=url;a.download=name;
- document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+function addRandomListing(){
+  const samples=[
+    {source:'instagram', title:'2BHK Cozy — Andheri West', city:'Mumbai', loc:'Andheri West, Mumbai', price:16500000, area:'1,050 sq.ft', bhk:'2 BHK', img:'https://images.unsplash.com/photo-1600596543528-5d78f1ecfb96?w=600', tag:'Reel • 00:20'},
+    {source:'facebook', title:'3BHK Builder Floor — South Delhi', city:'Delhi', loc:'Green Park, Delhi', price:32000000, area:'1,600 sq.ft', bhk:'3 BHK', img:'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600', tag:'Marketplace'},
+    {source:'instagram', title:'Duplex Villa — Sarjapur Road', city:'Bengaluru', loc:'Sarjapur, Bengaluru', price:21000000, area:'1,900 sq.ft', bhk:'3 BHK', img:'https://images.unsplash.com/photo-1600047509358-9dc75507daeb?w=600', tag:'Reel • 00:25'},
+  ];
+  const s=samples[Math.floor(Math.random()*samples.length)];
+  const requireApproval=document.getElementById('requireApproval')?.checked;
+  listings.unshift({id:Date.now(), source:s.source, title:s.title, price:s.price, loc:s.loc, city:s.city, bhk:s.bhk, area:s.area, img:s.img, views:(Math.floor(Math.random()*30)+5)+'K', likes:Math.floor(Math.random()*2000)+200, time:'just now', status: requireApproval?'draft':'live', tag:s.tag});
+  renderFeed(); renderProperties();
+  showToast(`New ${s.source==='instagram'?'Reel':'Facebook post'} detected → listing ${requireApproval?'drafted':'published'}!`);
+  if(!requireApproval) {
+    // flash preview
+    setPreview(listings[0].id);
+  }
 }
 
-/* =========================================================
-   MODAL
-========================================================= */
+function addRandomLead(){
+  const names=['Aarav Mehta','Ishita Das','Rahul Verma','Neha Kapoor','Siddharth Rao'];
+  const props=['Bandra 3BHK','Powai 2BHK','Whitefield Villa','Dwarka 1BHK'];
+  const n=names[Math.floor(Math.random()*names.length)];
+  leads.unshift({name:n, phone:'+91 98*** '+Math.floor(1000+Math.random()*8999), src: Math.random()>0.5?'IG Reel':'Facebook', prop: props[Math.floor(Math.random()*props.length)], city:'Mumbai', stage:0, time:'now', budget:'1-3 Cr'});
+  renderKanban();
+  showToast(`New lead ${n} auto-captured from ${Math.random()>0.5?'Instagram DM':'Facebook comment'}`);
+}
 
-function openModal(){document.getElementById("modalBg").classList.add("show")}
-function closeModal(){document.getElementById("modalBg").classList.remove("show")}
-document.getElementById("modalBg").addEventListener("click",e=>{
- if(e.target.id==="modalBg")closeModal();
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').innerText=msg;
+  t.classList.remove('hidden'); t.classList.add('flex');
+  setTimeout(()=>{t.classList.add('hidden'); t.classList.remove('flex')},3000);
+}
+
+function openConnectModal(){document.getElementById('connectModal').classList.remove('hidden')}
+function closeConnectModal(){document.getElementById('connectModal').classList.add('hidden')}
+function simulateConnect(which){
+  const btnState=document.getElementById(which==='facebook'?'fbBtnState':'igBtnState');
+  if(btnState.innerText==='CONNECTED'){
+    btnState.innerText='CONNECT';
+    btnState.className='text-xs font-800 bg-slate-900 text-white px-3 py-1 rounded-full';
+    showToast(`${which==='facebook'?'Facebook':'Instagram'} disconnected`);
+    if(which==='facebook') fbEnabled=false; else igEnabled=false;
+  } else {
+    btnState.innerText='CONNECTED';
+    btnState.className='text-xs font-800 bg-teal text-white px-3 py-1 rounded-full';
+    showToast(`${which==='facebook'?'Facebook':'Instagram'} connected — syncing last 30 posts...`);
+    if(which==='facebook') fbEnabled=true; else igEnabled=true;
+    setTimeout(()=>{ addRandomListing(); },1200);
+  }
+  renderFeed();
+}
+
+// Mobile menu
+document.getElementById('mobileBtn')?.addEventListener('click',()=>{
+  document.getElementById('mobileMenu').classList.toggle('hidden');
 });
 
-/* =========================================================
-   INIT
-========================================================= */
+// Countdown fake
+let cd=8;
+setInterval(()=>{cd--; if(cd<0) cd=10; document.getElementById('countdown').innerText=String(cd).padStart(2,'0'); if(cd===10 && fbEnabled && igEnabled && Math.random()>0.6) addRandomListing();},1000);
 
-document.addEventListener("DOMContentLoaded",()=>{
- applyTheme();
- restoreSession();
-});
-
-/* =========================================================
-   SUPABASE REALTIME CLOUD SYNC
-========================================================= */
-let estateaiRealtimeChannel=null;
-let estateaiRealtimeStartedFor="";
-async function startEstateAIRealtime(){
-  if(!currentUser?.auth_id || estateaiRealtimeStartedFor===currentUser.auth_id)return;
-  stopEstateAIRealtime();
-  estateaiRealtimeStartedFor=currentUser.auth_id;
-  const channelName="estateai-live-"+currentUser.auth_id+"-"+Date.now();
-  const ch=estateaiSupabase.channel(channelName);
-  ch.on("postgres_changes",{event:"*",schema:"public",table:"estateai_state",filter:isAdmin()?undefined:`user_id=eq.${currentUser.auth_id}`},async payload=>{
-    const changedId=payload.new?.user_id||payload.old?.user_id;
-    if(!changedId)return;
-    if(changedId===currentUser.auth_id){
-      try{await cloudLoadState(currentUser.auth_id); if(currentUser)showPage(currentPage); }catch(e){console.warn("Realtime state refresh failed",e);}
-    }
-    if(isAdmin() && currentPage==="masteradmin") renderAdminUsers();
-  });
-  ch.on("postgres_changes",{event:"*",schema:"public",table:"user_profiles",filter:isAdmin()?undefined:`id=eq.${currentUser.auth_id}`},async payload=>{
-    const id=payload.new?.id||payload.old?.id;
-    if(id===currentUser.auth_id){
-      const p=payload.new||{};
-      if(p.active===false){toast("Your account was disabled by Admin");setTimeout(logout,900);return;}
-      currentUser.name=p.name||currentUser.name; currentUser.role=p.role||currentUser.role; updateProfile(); buildNav();
-    }
-    if(isAdmin() && currentPage==="masteradmin") renderAdminUsers();
-  });
-  estateaiRealtimeChannel=ch;
-  ch.subscribe(status=>{
-    if(status==="SUBSCRIBED")console.log("EstateAI Supabase Realtime connected");
-  });
-}
-function stopEstateAIRealtime(){
-  if(estateaiRealtimeChannel){try{estateaiSupabase.removeChannel(estateaiRealtimeChannel);}catch(e){}}
-  estateaiRealtimeChannel=null;estateaiRealtimeStartedFor="";
-}
-
-/* =========================================================
-   ESTATEAI PRO EXTENSION
-   - authentic welcome animation
-   - photo uploads use cloud storage when configured
-   - live same-browser sync using BroadcastChannel
-   - admin command center
-   - social/API connector readiness
-   - AI assistant configuration hook
-========================================================= */
-const ESTATEAI_PRO_VERSION="5.0.0";
-let proChannel=null;
-
-function proEnsureArray(){
-  db.properties=db.properties||[];
-  db.leads=db.leads||[];
-  db.activities=db.activities||[];
-  db.socialInbox=db.socialInbox||[];
-  db.settings=db.settings||{};
-  db.settings.integrations=db.settings.integrations||{
-    facebook:false,instagram:false,google:false,webhook:false,ai:false
-  };
-}
-proEnsureArray();
-
-function proPersist(){
-  saveDB();
-  try{ if(proChannel) proChannel.postMessage({type:"estateai-update",at:Date.now()}); }catch(e){}
-}
-
-function proSync(){
-  try{
-    if("BroadcastChannel" in window){
-      proChannel=new BroadcastChannel("estateai-pro-live");
-      proChannel.onmessage=()=>{ if(currentUser) cloudLoadState(currentUser.auth_id).then(()=>showPage(currentPage)).catch(()=>{}); };
-    }
-  }catch(e){}
-}
-
-function proWelcome(){
-  const old=document.getElementById("proWelcome");
-  if(old)old.remove();
-  const el=document.createElement("div");
-  el.id="proWelcome";el.className="pro-welcome";
-  const name=(currentUser?.name||"Administrator").split(" ")[0];
-  el.innerHTML=`
-   <div class="pro-orb o1"></div><div class="pro-orb o2"></div>
-   <div class="pro-welcome-box">
-    <div class="pro-welcome-icon">🏙️</div>
-    <h1>Welcome, <span>${esc(name)}</span></h1>
-    <p>EstateAI Pro is preparing your India-wide real-estate command center.</p>
-    <div class="pro-welcome-status">
-      <span class="pro-pill">✓ Secure Session</span>
-      <span class="pro-pill">⚡ Live Sync</span>
-      <span class="pro-pill">🤖 AI Ready</span>
-      <span class="pro-pill">🛡️ ${isAdmin()?"Full Admin":"Agent"} Access</span>
-    </div>
-    <div class="pro-loading"><div></div></div>
-   </div>`;
-  document.body.appendChild(el);
-  setTimeout(()=>el.classList.add("hidden"),1700);
-  setTimeout(()=>el.remove(),2150);
-}
-
-function proDashboardEnhance(){
-  if(currentPage!=="dashboard")return;
-  const c=document.getElementById("content"); if(!c)return;
-  const head=c.querySelector(".page-head"); if(!head || c.querySelector(".pro-hero"))return;
-  const hero=document.createElement("div");hero.className="pro-hero";
-  hero.innerHTML=`
-   <div class="pro-hero-grid">
-    <div><h2>EstateAI Pro Command Center</h2>
-    <p><span class="pro-live-dot"></span>Live CRM workspace • India • ${ESTATEAI_PRO_VERSION}</p>
-    <div class="pro-command">
-      <button onclick="showPage('properties')">🏠 <b>Inventory</b><br><small>Manage properties</small></button>
-      <button onclick="showPage('leads')">👥 <b>Lead Center</b><br><small>Buyers & sellers</small></button>
-      <button onclick="showPage('ai')">🤖 <b>AI Assistant</b><br><small>CRM intelligence</small></button>
-    </div></div>
-    <div class="pro-quick">
-      <div><strong>${db.properties.length}</strong><small>Properties</small></div>
-      <div><strong>${db.leads.length}</strong><small>Leads</small></div>
-      <div><strong>${db.socialInbox.length}</strong><small>Social Inbox</small></div>
-      <div><strong>${isAdmin()?"FULL":"LIMITED"}</strong><small>Admin Control</small></div>
-    </div>
-   </div>`;
-  c.insertBefore(hero,head.nextSibling);
-}
-
-function proPhotoFields(property=null){
- return `
- <div class="form-group full">
-  <label>Property Photos</label>
-  <label class="photo-drop">
-   📷 Click to add photos (JPG/PNG/WebP)
-   <input id="pPhotos" type="file" accept="image/*" multiple style="display:none"
-     onchange="proPreviewPhotos(event)">
-  </label>
-  <div id="photoPreview" class="photo-preview">
-   ${(property?.photos||[]).map(x=>`<img src="${esc(x)}" alt="Property photo">`).join("")}
-  </div>
-  <small style="color:#667085">Photos are stored in this browser. For cloud/public storage, connect a backend/storage service.</small>
- </div>`;
-}
-
-function proPreviewPhotos(e){
- const files=[...e.target.files||[]].slice(0,8);
- const box=document.getElementById("photoPreview");if(!box)return;
- box.innerHTML="";
- files.forEach(f=>{
-   const r=new FileReader();
-   r.onload=()=>{const img=document.createElement("img");img.src=r.result;box.appendChild(img);};
-   r.readAsDataURL(f);
- });
-}
-
-async function proReadPhotoFiles(){
- const input=document.getElementById("pPhotos");
- if(!input||!input.files.length)return [];
- const files=[...input.files].slice(0,8);
- return Promise.all(files.map(f=>new Promise(resolve=>{
-   const r=new FileReader();r.onload=()=>resolve(r.result);r.readAsDataURL(f);
- })));
-}
-
-/* Replace property modal with a photo-enabled version. */
-const _openPropertyModal=window.openPropertyModal;
-window.openPropertyModal=async function(property=null){
- document.getElementById("modalTitle").textContent=property?"Edit Property":"Add Property";
- document.getElementById("modalBody").innerHTML=`
- <form onsubmit="proSaveProperty(event,${property?property.id:"null"})">
-  <div class="form-grid">
-   <div class="form-group full"><label>Property Title</label>
-    <input id="pTitle" required value="${esc(property?.title||"")}" placeholder="Premium 3 BHK Apartment"></div>
-   <div class="form-group"><label>Property Type</label>
-    <select id="pType">${["Apartment","Villa","Plot","Commercial","Office","Shop","Agricultural Land"].map(x=>`<option ${property?.type===x?"selected":""}>${x}</option>`).join("")}</select></div>
-   <div class="form-group"><label>Purpose</label>
-    <select id="pPurpose"><option ${property?.purpose==="Sale"||!property?"selected":""}>Sale</option><option ${property?.purpose==="Rent"?"selected":""}>Rent</option></select></div>
-   <div class="form-group"><label>Price</label><input id="pPrice" required value="${esc(property?.price||"")}" placeholder="₹85 L"></div>
-   <div class="form-group"><label>Area</label><input id="pArea" value="${esc(property?.area||"")}" placeholder="1600 Sq Ft"></div>
-   <div class="form-group"><label>BHK</label><select id="pBhk"><option value="">N/A</option>${["1","2","3","4","5+"].map(x=>`<option ${property?.bhk===x?"selected":""}>${x}</option>`).join("")}</select></div>
-   <div class="form-group"><label>State</label><input id="pState" value="${esc(property?.state||"")}" placeholder="Gujarat"></div>
-   <div class="form-group"><label>City</label><input id="pCity" value="${esc(property?.city||"")}" placeholder="Rajkot / Ahmedabad / Mumbai"></div>
-   <div class="form-group"><label>Locality / Area</label><input id="pLocality" value="${esc(property?.locality||"")}" placeholder="Area / locality"></div>
-   <div class="form-group"><label>PIN Code</label><input id="pPincode" inputmode="numeric" maxlength="6" value="${esc(property?.pincode||"")}" placeholder="360001"></div>
-   <div class="form-group"><label>Owner / Seller</label><input id="pOwner" value="${esc(property?.owner||"")}" placeholder="Seller name"></div>
-   <div class="form-group"><label>Status</label><select id="pStatus"><option ${!property||property.status==="Active"?"selected":""}>Active</option><option ${property?.status==="Sold"?"selected":""}>Sold</option><option ${property?.status==="On Hold"?"selected":""}>On Hold</option></select></div>
-   <div class="form-group"><label>Verification</label><select id="pVerified"><option value="yes" ${property?.verified?"selected":""}>Verified</option><option value="no" ${property&&!property.verified?"selected":""}>Unverified</option></select></div>
-   ${proPhotoFields(property)}
-   <div class="form-group full"><label>Notes / Full Details</label><textarea id="pNotes">${esc(property?.notes||"")}</textarea></div>
-  </div>
-  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">${property?"Update Property":"Create Property"}</button></div>
- </form>`;
- openModal();
-};
-
-window.proSaveProperty=async function(e,id){
- e.preventDefault();
- const old=id?db.properties.find(p=>p.id===id):null;
- const uploaded=await proReadPhotoFiles();
- const obj={
-  id:id||uid(),title:document.getElementById("pTitle").value,type:document.getElementById("pType").value,
-  purpose:document.getElementById("pPurpose").value,price:document.getElementById("pPrice").value,
-  area:document.getElementById("pArea").value,bhk:document.getElementById("pBhk").value,
-  state:document.getElementById("pState")?.value||"",city:document.getElementById("pCity")?.value||"",
-  locality:document.getElementById("pLocality")?.value||"",pincode:document.getElementById("pPincode")?.value||"",owner:document.getElementById("pOwner").value,
-  status:document.getElementById("pStatus").value,verified:document.getElementById("pVerified").value==="yes",
-  updated:"Just now",notes:document.getElementById("pNotes").value,
-  photos:uploaded.length?uploaded:(old?.photos||[])
- };
- if(id){const i=db.properties.findIndex(p=>p.id===id);if(i>=0)db.properties[i]=obj;addActivity("Property updated: "+obj.title)}
- else{db.properties.unshift(obj);addActivity("Property added: "+obj.title)}
- proPersist();closeModal();showPage("properties");toast("Property saved with photo support");
-};
-
-/* Photo gallery on view. */
-const _viewProperty=window.viewProperty;
-window.viewProperty=function(id){
- const p=db.properties.find(x=>x.id===id);if(!p)return;
- document.getElementById("modalTitle").textContent="Property Details";
- document.getElementById("modalBody").innerHTML=`
-  ${(p.photos||[]).length?`<div class="photo-preview" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">${p.photos.map(x=>`<img src="${esc(x)}" style="height:130px" alt="Property photo">`).join("")}</div>`:""}
-  <div class="grid2">
-   <div class="stat-mini"><strong>Property</strong><p>${esc(p.title)}</p></div>
-   <div class="stat-mini"><strong>Price</strong><p>${esc(p.price)}</p></div>
-   <div class="stat-mini"><strong>Location</strong><p>${esc(p.locality||"")}${p.city?`, ${esc(p.city)}`:""}${p.state?`, ${esc(p.state)}`:""}${p.pincode?` • ${esc(p.pincode)}`:""}</p></div>
-   <div class="stat-mini"><strong>Type</strong><p>${esc(p.type)}</p></div>
-   <div class="stat-mini"><strong>Purpose</strong><p>${esc(p.purpose)}</p></div>
-   <div class="stat-mini"><strong>Area</strong><p>${esc(p.area)}</p></div>
-  </div>
-  <div style="margin-top:18px"><strong>Verification:</strong> ${p.verified?'<span class="badge green">Verified</span>':'<span class="badge orange">Unverified</span>'}</div>
-  <div style="margin-top:18px;text-align:right"><button class="primary" onclick="closeModal()">Close</button></div>`;
- openModal();
-};
-
-/* Real-time local social inbox. External social networks must call a backend webhook/API. */
-function socialInboxPage(){
- proEnsureArray();
- return `
- <div class="page-head">
-  <div><h2>🌐 Social & Web Lead Center</h2><p>One inbox for buyer/seller signals and connected sources.</p></div>
-  ${isAdmin()?'<button class="primary" onclick="openConnectorModal()">⚙ Configure Connections</button>':""}
- </div>
- <div class="card">
-  <div class="pro-source"><div><b>🔵 Facebook</b><br><small>Official API/Webhook required</small></div><span class="badge ${db.settings.integrations.facebook?"green":"orange"}">${db.settings.integrations.facebook?"Connected":"Not Connected"}</span></div>
-  <div class="pro-source"><div><b>📸 Instagram</b><br><small>Official API/Webhook required</small></div><span class="badge ${db.settings.integrations.instagram?"green":"orange"}">${db.settings.integrations.instagram?"Connected":"Not Connected"}</span></div>
-  <div class="pro-source"><div><b>🔎 Google</b><br><small>Business/lead integration required</small></div><span class="badge ${db.settings.integrations.google?"green":"orange"}">${db.settings.integrations.google?"Connected":"Not Connected"}</span></div>
-  <div class="pro-source"><div><b>🔗 Your Webhook</b><br><small>Backend endpoint can push new leads here</small></div><span class="badge ${db.settings.integrations.webhook?"green":"orange"}">${db.settings.integrations.webhook?"Ready":"Not Configured"}</span></div>
- </div>
- <div class="card" style="margin-top:18px">
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-   <div><h3>Live Incoming Queue</h3><p style="color:#667085;margin-top:4px"><span class="pro-live-dot"></span>Updates automatically inside this browser session</p></div>
-   ${isAdmin()?'<button class="secondary" onclick="openSocialLeadModal()">+ Test Incoming Lead</button>':""}
-  </div>
-  <div style="margin-top:15px">
-   ${db.socialInbox.length?db.socialInbox.slice().reverse().map(x=>`
-    <div class="lead-card">
-     <div style="display:flex;justify-content:space-between;gap:8px"><h4>${esc(x.name||"Unknown")}</h4><span class="badge ${x.intent==="Sell"?"orange":"blue"}">${esc(x.intent||"Inquiry")}</span></div>
-     <p>📱 ${esc(x.phone||"Not provided")} • 📍 ${esc(x.location||"Rajkot")}</p>
-     <p>📝 ${esc(x.message||"")}</p><p>🌐 Source: ${esc(x.source||"Webhook")}</p>
-     <div style="margin-top:8px"><button class="secondary" onclick="convertSocialLead(${x.id})">Create CRM Lead</button></div>
-    </div>`).join(""):"<div class='stat-mini'>No incoming social leads yet.</div>"}
-  </div>
- </div>`;
-}
-
-function openConnectorModal(){
- if(!isAdmin())return toast("Admin only");
- document.getElementById("modalTitle").textContent="Integration Control Center";
- document.getElementById("modalBody").innerHTML=`
- <div class="card">
-  <h3>Connection switches</h3>
-  <p style="color:#667085;margin:8px 0 16px">These switches mark an integration as configured. They do not bypass Facebook/Instagram/Google permissions.</p>
-  ${["facebook","instagram","google","webhook","ai"].map(k=>`
-   <label style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border)">
-    <span><b>${k.toUpperCase()}</b><br><small>Official API / backend required</small></span>
-    <input id="int_${k}" type="checkbox" ${db.settings.integrations[k]?"checked":""}>
-   </label>`).join("")}
-  <div class="form-actions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveConnectors()">Save</button></div>
- </div>`;
- openModal();
-}
-function saveConnectors(){
- ["facebook","instagram","google","webhook","ai"].forEach(k=>db.settings.integrations[k]=document.getElementById("int_"+k).checked);
- proPersist();closeModal();showPage("social");toast("Integration settings saved");
-}
-function openSocialLeadModal(){
- document.getElementById("modalTitle").textContent="Simulate Incoming Social Lead";
- document.getElementById("modalBody").innerHTML=`
- <form onsubmit="saveSocialLead(event)">
-  <div class="form-grid">
-   <div class="form-group"><label>Name</label><input id="slName" required placeholder="Seller / Buyer name"></div>
-   <div class="form-group"><label>Phone</label><input id="slPhone" placeholder="+91..."></div>
-   <div class="form-group"><label>Intent</label><select id="slIntent"><option>Sell</option><option>Buy</option></select></div>
-   <div class="form-group"><label>Source</label><select id="slSource"><option>Facebook</option><option>Instagram</option><option>Google</option><option>Website</option></select></div>
-   <div class="form-group full"><label>Location</label><input id="slLocation" value="Rajkot"></div>
-   <div class="form-group full"><label>Post / Message</label><textarea id="slMessage" required placeholder="Want to sell my 3 BHK..."></textarea></div>
-  </div>
-  <div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Receive Lead</button></div>
- </form>`;
- openModal();
-}
-function saveSocialLead(e){
- e.preventDefault();
- db.socialInbox.push({id:uid(),name:slName.value,phone:slPhone.value,intent:slIntent.value,
- source:slSource.value,location:slLocation.value,message:slMessage.value,created:new Date().toISOString()});
- proPersist();closeModal();showPage("social");toast("Incoming lead received");
-}
-function convertSocialLead(id){
- const x=db.socialInbox.find(a=>a.id===id);if(!x)return;
- const lead={id:uid(),name:x.name,phone:x.phone,type:x.intent==="Sell"?"Seller":"Buyer",
- location:x.location,budget:"",requirement:x.message,status:"New",source:x.source,score:60};
- db.leads.unshift(lead);addActivity("Social lead converted: "+x.name);proPersist();showPage("leads");toast("CRM lead created");
-}
-
-/* AI: genuine API calls require a secure backend; never expose a production secret in frontend. */
-function aiPage(){
- return `
- <div class="page-head"><div><h2>🤖 EstateAI Intelligence</h2><p>CRM analysis + secure AI connection point.</p></div></div>
- <div class="grid2">
-  <div class="card">
-   <h3>CRM AI</h3><p style="color:#667085;margin:7px 0 15px">Ask about your local CRM data.</p>
-   <div id="chat" style="max-height:390px;overflow:auto"></div>
-   <div style="display:flex;gap:8px;margin-top:10px"><input id="aiInput" class="filter" style="flex:1" placeholder="e.g. How many seller leads?">
-   <button class="primary" onclick="askAI()">Ask</button></div>
-  </div>
-  <div class="card">
-   <h3>Real AI Connection</h3>
-   <p style="color:#667085;margin-top:7px">For production AI, use a backend proxy so your API key is never exposed to visitors.</p>
-   <div class="stat-mini" style="margin-top:15px"><b>Connection</b><p>${db.settings.integrations.ai?"Marked ready":"Not configured"}</p></div>
-   ${isAdmin()?'<button class="secondary" style="margin-top:12px" onclick="openConnectorModal()">Configure AI</button>':""}
-  </div>
- </div>`;
-}
-function askAI(){
- const input=document.getElementById("aiInput"),q=(input?.value||"").trim();if(!q)return;
- const low=q.toLowerCase();let answer="";
- if(low.includes("property"))answer=`There are ${db.properties.length} properties in the CRM. ${db.properties.filter(p=>p.status==="Active").length} are active.`;
- else if(low.includes("buyer"))answer=`There are ${db.leads.filter(l=>l.type==="Buyer").length} buyer leads.`;
- else if(low.includes("seller"))answer=`There are ${db.leads.filter(l=>l.type==="Seller").length} seller leads.`;
- else if(low.includes("lead"))answer=`There are ${db.leads.length} total CRM leads.`;
- else if(low.includes("follow"))answer=`${db.followups.filter(f=>f.status!=="Completed").length} follow-ups are pending.`;
- else if(low.includes("social"))answer=`${db.socialInbox.length} incoming social/web records are in the queue.`;
- else answer="I can analyze properties, buyers, sellers, leads, social inbox and follow-ups. Connect a secure backend AI endpoint for generative answers.";
- const chat=document.getElementById("chat");
- chat.innerHTML+=`<div style="background:#eff6ff;padding:12px;border-radius:10px;margin:9px 0"><b>EstateAI</b><p style="margin-top:5px">${esc(answer)}</p></div>`;
- input.value="";chat.scrollTop=chat.scrollHeight;
-}
-
-async function adminCloudUsers(){
-  if(!isAdmin()) return [];
-  const r=await adminCall("list",{});
-  return r?.users||[];
-}
-async function viewUserCloudData(userId){
-  if(!isAdmin()) return;
-  const r=await adminCall("view_state",{userId});
-  if(!r?.ok)return;
-  const st=r.state||{};
-  document.getElementById("modalTitle").textContent="User Cloud Data";
-  document.getElementById("modalBody").innerHTML=`<div class="kpis">${kpi("🏠","Properties",(st.properties||[]).length,"Cloud")}${kpi("👥","Leads",(st.leads||[]).length,"Cloud")}${kpi("📅","Follow-ups",(st.followups||[]).length,"Cloud")}${kpi("🤝","Deals",(st.deals||[]).length,"Cloud")}</div><div class="card"><p style="color:#667085">Last cloud update: ${esc(r.updated_at||"—")}</p><pre style="white-space:pre-wrap;max-height:450px;overflow:auto;margin-top:12px">${esc(JSON.stringify(st,null,2))}</pre></div>`;
-  openModal();
-}
-async function renderAdminUsers(){
-  const box=document.getElementById("adminCloudUsers"); if(!box)return;
-  box.innerHTML='<div class="card">⏳ Loading live cloud users...</div>';
-  const users=await adminCloudUsers();
-  if(!users.length){box.innerHTML='<div class="card">No registered users yet.</div>';return;}
-  box.innerHTML=users.map(u=>`
-   <div class="admin-user-row card" style="margin-top:10px;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap">
-    <div style="min-width:240px;flex:1"><strong>${esc(u.name||"User")}</strong><div style="color:#667085;font-size:13px;margin-top:4px">${esc(u.email||"")} · ${esc(u.role||"Agent")} · ${u.active===false?"Disabled":"Active"}</div><div style="color:#98a2b3;font-size:12px;margin-top:3px">Cloud: ${esc(u.cloud_updated_at||"No CRM data yet")}</div></div>
-    <div style="display:flex;gap:7px;flex-wrap:wrap">
-      <button class="secondary" onclick="viewUserCloudData('${u.id}')">View Data</button>
-      <button class="secondary" onclick="adminEditUser('${u.id}')">Edit</button>
-      <button class="secondary" onclick="adminResetPassword('${u.id}')">Reset Password</button>
-      <button class="secondary" onclick="adminClearUserData('${u.id}')">Clear CRM</button>
-      ${u.role!=="Admin"?`<button class="danger" onclick="adminDeleteUser('${u.id}')">Delete User</button>`:""}
-    </div>
-   </div>`).join("");
-}
-async function adminCall(action,payload={}){
-  if(!isAdmin()){toast("Admin access required");return null;}
-  const {data}=await estateaiSupabase.auth.getSession();
-  const token=data?.session?.access_token;
-  if(!token){toast("Admin session expired");return null;}
-  try{
-    const r=await fetch(window.ESTATEAI_ADMIN_FUNCTION_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({action,...payload})});
-    const out=await r.json().catch(()=>({ok:false,error:"Invalid server response"}));
-    if(!r.ok||out.ok===false){toast(out.error||"Admin action failed");return null;}
-    return out;
-  }catch(e){toast("Admin server unavailable");console.error(e);return null;}
-}
-function openAdminCreateUser(){
- document.getElementById("modalTitle").textContent="Create Cloud User";
- document.getElementById("modalBody").innerHTML=`<form onsubmit="return adminCreateUser(event)"><div class="form-grid"><div class="form-group"><label>Full Name</label><input id="auName" required></div><div class="form-group"><label>Email</label><input id="auEmail" type="email" required></div><div class="form-group"><label>Password</label><input id="auPass" type="password" minlength="8" required></div><div class="form-group"><label>Role</label><select id="auRole"><option>Agent</option><option>Admin</option></select></div></div><div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Create Cloud User</button></div></form>`;
- openModal();
-}
-async function adminCreateUser(e){
- e.preventDefault();
- const r=await adminCall("create",{name:document.getElementById("auName").value,email:document.getElementById("auEmail").value,password:document.getElementById("auPass").value,role:document.getElementById("auRole").value});
- if(r){closeModal();toast("Cloud user created");renderAdminUsers();}
- return false;
-}
-async function adminEditUser(id){
- const users=await adminCloudUsers(); const u=users.find(x=>x.id===id); if(!u)return;
- document.getElementById("modalTitle").textContent="Edit Cloud User";
- document.getElementById("modalBody").innerHTML=`<form onsubmit="return adminSaveUser(event,'${id}')"><div class="form-grid"><div class="form-group"><label>Name</label><input id="euName" value="${esc(u.name||"")}" required></div><div class="form-group"><label>Email</label><input value="${esc(u.email||"")}" disabled></div><div class="form-group"><label>Role</label><select id="euRole"><option ${u.role==="Agent"?"selected":""}>Agent</option><option ${u.role==="Admin"?"selected":""}>Admin</option></select></div><div class="form-group"><label>Status</label><select id="euActive"><option value="yes" ${u.active!==false?"selected":""}>Active</option><option value="no" ${u.active===false?"selected":""}>Disabled</option></select></div></div><div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Save Cloud User</button></div></form>`;
- openModal();
-}
-async function adminSaveUser(e,id){
- e.preventDefault();
- const r=await adminCall("update_profile",{userId:id,name:document.getElementById("euName").value,role:document.getElementById("euRole").value,active:document.getElementById("euActive").value==="yes"});
- if(r){closeModal();toast("Cloud user updated");renderAdminUsers(); if(id===currentUser?.auth_id){await enterAuthenticatedApp((await estateaiSupabase.auth.getUser()).data.user);}}
- return false;
-}
-async function adminResetPassword(id){
- const p=prompt("New password (minimum 8 characters):"); if(!p)return;
- const r=await adminCall("reset_password",{userId:id,password:p}); if(r)toast("Password reset successfully");
-}
-async function adminClearUserData(id){
- if(!confirm("Clear this user's complete CRM cloud data? This cannot be undone."))return;
- const r=await adminCall("clear_data",{userId:id}); if(r){toast("User CRM data cleared");renderAdminUsers();}
-}
-async function adminDeleteUser(id){
- if(!confirm("Delete this user and their cloud data permanently?"))return;
- const r=await adminCall("delete_user",{userId:id}); if(r){toast("User deleted");renderAdminUsers();}
-}
-
-/* Admin gets the complete operational surface. */
-function proAdminPage(){
- if(!isAdmin())return `<div class="card"><h2>Access denied</h2></div>`;
- return `
- <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>Full cloud control. Changes sync through Supabase and appear live on connected browsers.</p></div>
- <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" onclick="openAdminCreateUser()">＋ Create User</button><button class="primary" onclick="backupData()">⬇ Backup Everything</button></div></div>
- <div class="kpis">
-  ${kpi("🏠","My Properties",db.properties.length,"Cloud")}${kpi("👥","My Leads",db.leads.length,"Cloud")}${kpi("🌐","Social Inbox",db.socialInbox.length,"Live")}${kpi("🛡️","Admin","FULL","Control")}
- </div>
- <div class="grid3">
-  <div class="card"><h3>👥 User Control</h3><p style="color:#667085;margin-top:6px">Create, disable, role-change, password reset and delete non-Admin users.</p><button class="secondary" style="margin-top:12px" onclick="renderAdminUsers()">Refresh Users</button></div>
-  <div class="card"><h3>☁️ Cloud Control</h3><p style="color:#667085;margin-top:6px">View every user's CRM state stored in Supabase.</p><span class="badge green" style="margin-top:12px">LIVE SYNC</span></div>
-  <div class="card"><h3>⚡ Realtime</h3><p style="color:#667085;margin-top:6px">Cloud changes automatically refresh connected web sessions.</p><span class="badge green" style="margin-top:12px">ACTIVE</span></div>
- </div>
- <div class="card" style="margin-top:18px"><h3>👥 All Registered Users</h3><p style="color:#667085;margin-top:5px">Admin-only cloud directory. Passwords are never shown or stored here.</p><div id="adminCloudUsers"><div class="card">Loading live cloud users...</div></div></div>
- <div class="card" style="margin-top:18px"><h3>🔄 Live System Status</h3>
-  <div class="pro-source"><span>Supabase Cloud State</span><span class="badge green">CONNECTED</span></div>
-  <div class="pro-source"><span>Supabase Realtime</span><span class="badge green">LIVE</span></div>
-  <div class="pro-source"><span>Social official API</span><span class="badge ${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"green":"orange"}">${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"CONFIGURED":"REQUIRES API"}</span></div>
- </div>`;
-}
-
-/* Add the new pages to the router and nav while preserving all existing pages. */
-function proBuildNav(){
- buildNav();
- const nav=document.getElementById("nav");
- if(!nav)return;
- const add=(id,icon,label,adminOnly=false)=>{
-   if(adminOnly&&!isAdmin())return;
-   if([...nav.querySelectorAll("button")].some(b=>b.getAttribute("onclick")?.includes("'"+id+"'")))return;
-   nav.insertAdjacentHTML("beforeend",`<button onclick="showPage('${id}',this)"><span class="nav-icon">${icon}</span><span>${label}</span></button>`);
- };
- add("social","🌐","Social Lead Center");
- if(isAdmin())add("masteradmin","👑","Master Admin");
-}
-
-pages.social=socialInboxPage;
-pages.masteradmin=proAdminPage;
-
-const _showPage=window.showPage;
-window.showPage=function(page,button){
- if(page==="social" || page==="masteradmin"){
-   if(page==="masteradmin"&&!isAdmin()){toast("Admin access required");return}
-   currentPage=page;
-   document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-   if(button)button.classList.add("active");
-   else [...document.querySelectorAll(".nav button")].find(x=>x.getAttribute("onclick")?.includes("'"+page+"'"))?.classList.add("active");
-   document.getElementById("content").innerHTML=pages[page]();
-   if(page==="masteradmin")setTimeout(renderAdminUsers,50);
-   window.scrollTo(0,0);return;
- }
- _showPage(page,button);
- setTimeout(proDashboardEnhance,0);
-};
-
-/* Ensure the enhanced nav is used after login/session restore. */
-const _buildNav=window.buildNav;
-window.buildNav=function(){_buildNav();proBuildNav();};
-
-document.addEventListener("DOMContentLoaded",()=>{
- proEnsureArray();
- proSync();
- setTimeout(()=>{if(currentUser)proWelcome();},350);
-});
-
+// Init
+renderFeed();
+renderKanban();
+renderProperties();
 </script>
-
-
-<script id="estateai-premium-motion-js">
-(function(){
- const apply=()=>{document.querySelectorAll('#content>.card,#content>.kpi,#content>.property,#content>.feature,#content>.grid2>.card,#content>.grid3>.card').forEach((el,i)=>{el.style.animationDelay=Math.min(i*55,420)+'ms'});};
- document.addEventListener('click',e=>{const b=e.target.closest('button');if(b){b.style.transform='scale(.98)';setTimeout(()=>b.style.transform='',120)}});
- const obs=new MutationObserver(()=>requestAnimationFrame(apply));
- obs.observe(document.getElementById('content')||document.body,{childList:true,subtree:true});
- apply();
-})();
-</script>
-<script id="estateai-high-level-motion-js">
-(function(){
-  const map={dashboard:'ea-dashboard',properties:'ea-properties',leads:'ea-leads',buyers:'ea-buyers',sellers:'ea-sellers',matching:'ea-matching',followups:'ea-followups',visits:'ea-visits',deals:'ea-deals',agents:'ea-agents',reports:'ea-reports',ai:'ea-ai',admin:'ea-admin',masteradmin:'ea-masteradmin',settings:'ea-settings',social:'ea-social'};
-  function pageFx(page){
-    Object.values(map).forEach(c=>document.body.classList.remove(c));
-    if(map[page])document.body.classList.add(map[page]);
-    const content=document.getElementById('content'); if(!content)return;
-    content.classList.remove('ea-page-enter'); void content.offsetWidth; content.classList.add('ea-page-enter');
-    const flash=document.createElement('div'); flash.className='ea-transition'; document.body.appendChild(flash); setTimeout(()=>flash.remove(),520);
-  }
-  const original=window.showPage;
-  if(typeof original==='function'){
-    window.showPage=function(page,button){ original.apply(this,arguments); setTimeout(()=>pageFx(page),20); };
-  }
-  document.addEventListener('click',e=>{
-    const btn=e.target.closest('button'); if(!btn)return;
-    btn.classList.remove('ea-btn-pop'); void btn.offsetWidth; btn.classList.add('ea-btn-pop');
-    setTimeout(()=>btn.classList.remove('ea-btn-pop'),420);
-  });
-  const style=document.createElement('style'); style.textContent='.ea-btn-pop{animation:eaBtnPop .42s cubic-bezier(.2,.8,.2,1)}@keyframes eaBtnPop{0%{transform:scale(1)}35%{transform:scale(.94)}100%{transform:scale(1)}}'; document.head.appendChild(style);
-  window.addEventListener('load',()=>setTimeout(()=>pageFx(window.currentPage||'dashboard'),100));
-})();
-</script>
-
-<script id="estateai-india-reliability-v5">
-(function(){
-  "use strict";
-  const V="5.0.0";
-  const RETRIES=6;
-  const BACKOFF=[500,1000,2000,4000,8000,15000];
-  let dirty=false, saving=false, saveQueued=false, lastCloudAt=0, lastError="";
-  let saveVersion=0, activeSaveVersion=0;
-  let online=navigator.onLine;
-  const originalToast=window.toast;
-  function safeToast(m){try{if(typeof originalToast==='function')originalToast(m)}catch(_){} }
-  function statusText(){return online?(dirty?"Saving to cloud…":"Cloud saved") : "Offline — waiting for internet";}
-  function ensureBanner(){
-    let b=document.getElementById('estateaiCloudStatus');
-    if(!b){
-      b=document.createElement('div'); b.id='estateaiCloudStatus';
-      b.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;padding:9px 14px;border-radius:999px;background:#101828;color:#fff;font:600 12px Arial;box-shadow:0 8px 28px #0003;display:none;pointer-events:none';
-      document.body.appendChild(b);
-    }
-    return b;
-  }
-  function setStatus(msg,kind){
-    const b=ensureBanner(); b.textContent=msg;
-    b.style.background=kind==='bad'?'#b42318':kind==='warn'?'#b54708':'#101828';
-    b.style.display='block';
-    clearTimeout(setStatus.t); if(kind==='ok')setStatus.t=setTimeout(()=>b.style.display='none',1800);
-  }
-  window.estateAICloudStatus=()=>({online,dirty,saving,lastCloudAt,lastError,version:V});
-
-  function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-  async function withRetry(fn,label){
-    let last;
-    for(let i=0;i<RETRIES;i++){
-      try{return await fn();}
-      catch(e){last=e; if(i===RETRIES-1)break; await sleep(BACKOFF[i]);}
-    }
-    throw last||new Error(label+' failed');
-  }
-
-  // Cloud is the source of truth. Local browser storage is not used as a CRM database.
-  window.cloudLoadState=async function(userId){
-    if(!userId)throw new Error('Missing authenticated user');
-    const run=()=>estateaiSupabase.from('estateai_state').select('state,updated_at').eq('user_id',userId).maybeSingle();
-    let result;
-    try{ result=await withRetry(async()=>{const r=await run();if(r.error)throw r.error;return r;},'Cloud load'); }
-    catch(e){lastError=e?.message||String(e);setStatus('Cloud load failed — retrying', 'bad');throw e;}
-    const data=result?.data;
-    if(data?.state && typeof data.state==='object'){
-      db={...clone(defaultData),...data.state};
-      proEnsureArray();
-    }else{
-      db=clone(defaultData);proEnsureArray();
-      await window.cloudSaveState(userId);
-    }
-    dirty=false; lastError=""; lastCloudAt=Date.now();
-    setStatus('Cloud data loaded ✓','ok');
-    return db;
-  };
-
-  window.cloudSaveState=async function(userId){
-    if(!userId)return;
-    const myVersion=++saveVersion;
-    // Always snapshot immediately so a later UI mutation cannot change this request's payload.
-    const state=clone(db);
-    state.__estateai={schema:5,app:V,savedAt:new Date().toISOString()};
-    if(!navigator.onLine){dirty=true;setStatus('Offline — cloud save queued','warn');return;}
-    if(myVersion<activeSaveVersion)return;
-    activeSaveVersion=myVersion;saving=true;dirty=true;setStatus('Saving to cloud…','warn');
-    try{
-      await withRetry(async()=>{
-        const r=await estateaiSupabase.from('estateai_state').upsert(
-          {user_id:userId,state,updated_at:new Date().toISOString()},
-          {onConflict:'user_id'}
-        );
-        if(r.error)throw r.error;
-        return r;
-      },'Cloud save');
-      if(myVersion===saveVersion){dirty=false;lastCloudAt=Date.now();lastError="";setStatus('Cloud saved ✓','ok');}
-    }catch(e){
-      lastError=e?.message||String(e); dirty=true;
-      setStatus('Cloud save failed — will retry','bad');
-      throw e;
-    }finally{saving=false;}
-  };
-
-  window.saveDB=function(){
-    if(!currentUser?.auth_id)return;
-    dirty=true;
-    clearTimeout(window.__estateaiCloudTimer);
-    window.__estateaiCloudTimer=setTimeout(()=>window.cloudSaveState(currentUser.auth_id).catch(()=>{}),180);
-  };
-
-  // Safer login: network/Auth errors never leave the user on a broken blank screen.
-  window.login=async function(){
-    const input=document.getElementById('loginUser')?.value.trim()||'';
-    const password=document.getElementById('loginPass')?.value||'';
-    const errorEl=document.getElementById('loginError');
-    errorEl?.classList.add('hidden');
-    if(!input||!password){if(errorEl){errorEl.textContent='Enter your login details.';errorEl.classList.remove('hidden')}return;}
-    try{
-      const email=authEmailFromInput(input);
-      const r=await withRetry(async()=>{
-        const x=await estateaiSupabase.auth.signInWithPassword({email,password});
-        if(x.error)throw x.error; return x;
-      },'Login');
-      if(!r?.data?.user)throw new Error('Login failed');
-      await enterAuthenticatedApp(r.data.user);
-    }catch(e){
-      if(errorEl){errorEl.textContent=online?'Invalid ID/password or account not configured.':'No internet connection. Please reconnect and try again.';errorEl.classList.remove('hidden');}
-      setStatus('Login failed — '+(e?.message||'unknown error'),'bad');
-    }
-  };
-
-  // Do not allow realtime to overwrite unsaved local edits.
-  window.startEstateAIRealtime=function(){
-    if(!currentUser?.auth_id || estateaiRealtimeStartedFor===currentUser.auth_id)return;
-    stopEstateAIRealtime(); estateaiRealtimeStartedFor=currentUser.auth_id;
-    const ch=estateaiSupabase.channel('estateai-live-'+currentUser.auth_id+'-'+Date.now());
-    ch.on('postgres_changes',{event:'*',schema:'public',table:'estateai_state',filter:`user_id=eq.${currentUser.auth_id}`},async payload=>{
-      if(payload.new?.user_id!==currentUser.auth_id)return;
-      if(dirty||saving){return;}
-      try{await window.cloudLoadState(currentUser.auth_id);if(currentUser)showPage(currentPage);}catch(e){}
-    });
-    ch.on('postgres_changes',{event:'*',schema:'public',table:'user_profiles',filter:`id=eq.${currentUser.auth_id}`},async payload=>{
-      const p=payload.new||{};
-      if(p.active===false){safeToast('Your account was disabled by Admin');setTimeout(logout,900);return;}
-      if(p.name){currentUser.name=p.name;updateProfile();}
-      if(p.role){currentUser.role=p.role;buildNav();}
-    });
-    estateaiRealtimeChannel=ch;
-    ch.subscribe(st=>{if(st==='SUBSCRIBED')setStatus('Live cloud sync connected ✓','ok');});
-  };
-
-  // Same-browser tabs must not overwrite an unsaved state.
-  window.proSync=function(){
-    try{
-      if(proChannel)proChannel.close();
-      if('BroadcastChannel' in window){
-        proChannel=new BroadcastChannel('estateai-pro-live-v5');
-        proChannel.onmessage=()=>{if(currentUser&&!dirty&&!saving)window.cloudLoadState(currentUser.auth_id).then(()=>showPage(currentPage)).catch(()=>{});};
-      }
-    }catch(e){}
-  };
-
-  async function flush(){
-    if(currentUser?.auth_id&&dirty&&navigator.onLine){try{await window.cloudSaveState(currentUser.auth_id)}catch(e){}}
-  }
-  window.addEventListener('online',()=>{online=true;setStatus('Internet restored — syncing…','warn');if(currentUser?.auth_id)window.cloudSaveState(currentUser.auth_id).catch(()=>{});});
-  window.addEventListener('offline',()=>{online=false;setStatus('Offline — changes will sync when internet returns','warn');});
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush();});
-  window.addEventListener('pagehide',()=>{if(currentUser?.auth_id&&dirty&&navigator.onLine)window.cloudSaveState(currentUser.auth_id).catch(()=>{});});
-  window.addEventListener('error',e=>{console.error(e.error||e.message);});
-  window.addEventListener('unhandledrejection',e=>{console.error(e.reason);});
-
-  // Periodic durability check. It does not reset data.
-  setInterval(()=>{if(currentUser?.auth_id&&dirty&&!saving&&navigator.onLine)window.cloudSaveState(currentUser.auth_id).catch(()=>{});},4000);
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    ensureBanner();
-    setTimeout(()=>{if(currentUser)window.proSync();},600);
-  });
-})();
-</script>
-
+</div>
 </body>
 </html>
