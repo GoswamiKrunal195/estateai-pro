@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>EstateAI Rajkot CRM</title>
+<title>EstateAI Pro — India Real Estate CRM</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -324,7 +324,7 @@ body.ea-social .content:before{content:"◉";position:absolute;right:8%;top:7%;f
   <div class="login-box">
     <div class="login-logo">
       <h1>Estate<span>AI</span></h1>
-      <p>Rajkot Real Estate CRM</p>
+      <p>India Real Estate CRM</p>
     </div>
 
     <div id="loginError" class="login-error hidden"></div>
@@ -350,7 +350,7 @@ body.ea-social .content:before{content:"◉";position:absolute;right:8%;top:7%;f
 <aside class="sidebar">
   <div class="logo">
     <h1>Estate<span>AI</span></h1>
-    <p>Rajkot Real Estate CRM</p>
+    <p>India Real Estate CRM</p>
   </div>
 
   <nav class="nav" id="nav"></nav>
@@ -406,7 +406,7 @@ window.ESTATEAI_ADMIN_FUNCTION_URL=window.ESTATEAI_SUPABASE_URL+"/functions/v1/a
 /* =========================================================
    ESTATEAI CRM
    Browser-only version
-   Data persists through localStorage
+   Data persists permanently in Supabase Cloud
 ========================================================= */
 
 const STORAGE="estateai_rajkot_v3";
@@ -453,14 +453,14 @@ const defaultData={
   ],
   settings:{
    company:"EstateAI Realty",
-   city:"Rajkot",
+   city:"India",
    currency:"INR ₹",
    timezone:"Asia/Kolkata",
    theme:"light"
   }
 };
 
-// Cloud-first mode: demo records and browser persistence are disabled.
+// Cloud-first mode: Supabase Cloud is the source of truth; browser storage is not used for CRM persistence.
 const ESTATEAI_ADMIN_EMAIL="admin@estateai.local";
 const ESTATEAI_ADMIN_ID="1";
 const ESTATEAI_ADMIN_PASSWORD="Krunal@195";
@@ -477,24 +477,44 @@ function loadDB(){
   }catch(e){ return clone(defaultData); }
 }
 let cloudSaveTimer=null;
+let cloudSaveChain=Promise.resolve();
+let cloudLastSavedAt=0;
 async function cloudLoadState(userId){
   const {data,error}=await estateaiSupabase.from("estateai_state").select("state").eq("user_id",userId).maybeSingle();
   if(error) throw error;
-  if(data?.state){ db={...clone(defaultData),...data.state}; proEnsureArray(); }
-  else { db=clone(defaultData); proEnsureArray(); await cloudSaveState(userId); }
+  if(data?.state && typeof data.state === "object"){
+    db={...clone(defaultData),...data.state};
+    proEnsureArray();
+  } else {
+    db=clone(defaultData);
+    proEnsureArray();
+    await cloudSaveState(userId);
+  }
   return db;
 }
-async function cloudSaveState(userId){
-  if(!userId) return;
+function cloudSaveState(userId){
+  if(!userId)return Promise.resolve();
   const state=clone(db);
-  const {error}=await estateaiSupabase.from("estateai_state").upsert({user_id:userId,state,updated_at:new Date().toISOString()},{onConflict:"user_id"});
-  if(error){ console.error("Cloud save failed",error); toast("Cloud save failed: "+error.message); }
+  cloudSaveChain=cloudSaveChain.catch(()=>{}).then(async()=>{
+    const {error}=await estateaiSupabase.from("estateai_state").upsert(
+      {user_id:userId,state,updated_at:new Date().toISOString()},
+      {onConflict:"user_id"}
+    );
+    if(error){
+      console.error("Cloud save failed",error);
+      toast("Cloud save failed: "+error.message);
+      throw error;
+    }
+    cloudLastSavedAt=Date.now();
+  });
+  return cloudSaveChain;
 }
 function saveDB(){
-  if(currentUser?.auth_id){
-    clearTimeout(cloudSaveTimer);
-    cloudSaveTimer=setTimeout(()=>cloudSaveState(currentUser.auth_id),150);
-  }
+  if(!currentUser?.auth_id)return;
+  clearTimeout(cloudSaveTimer);
+  // Short debounce + serialized writes: every CRM change reaches Supabase without
+  // overlapping requests that could otherwise overwrite a newer state with an older one.
+  cloudSaveTimer=setTimeout(()=>{ cloudSaveState(currentUser.auth_id).catch(()=>{}); },150);
 }
 function uid(){
   return Date.now()+Math.floor(Math.random()*1000);
@@ -661,7 +681,7 @@ function dashboardPage(){
  return `
  <div class="page-head">
   <div>
-   <h2>Rajkot Dashboard</h2>
+   <h2>India Real Estate Dashboard</h2>
    <p>Welcome, ${esc(currentUser.name)}. Manage your real-estate business from one place.</p>
   </div>
   <button class="primary" onclick="openPropertyModal()">+ Add Property</button>
@@ -701,7 +721,7 @@ function dashboardPage(){
 
  <div class="card" style="margin-top:18px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
-   <h3>Rajkot Property Inventory</h3>
+   <h3>India Property Inventory</h3>
    <button class="secondary" onclick="showPage('properties')">View All</button>
   </div>
   <div class="table-wrap">
@@ -735,7 +755,7 @@ function kpi(icon,title,value,sub){
 function propertiesPage(){
  return `
  <div class="page-head">
-  <div><h2>Rajkot Properties</h2><p>Buy, sell and rent inventory.</p></div>
+  <div><h2>India Property Inventory</h2><p>Buy, sell and rent inventory.</p></div>
   <button class="primary" onclick="openPropertyModal()">+ Add Property</button>
  </div>
 
@@ -775,7 +795,7 @@ function propertyCards(list){
    <span class="badge ${p.purpose==="Sale"?"blue":"purple"}">${esc(p.purpose)}</span>
    ${p.verified?'<span class="badge green">✓ Verified</span>':'<span class="badge orange">Unverified</span>'}
    <h3>${esc(p.title)}</h3>
-   <p>📍 ${esc(p.locality)}, Rajkot</p>
+   <p>📍 ${esc(p.locality||"")}${p.city?`, ${esc(p.city)}`:""}${p.state?`, ${esc(p.state)}`:""}${p.pincode?` • ${esc(p.pincode)}`:""}</p>
    <p>📐 ${esc(p.area)} ${p.bhk?` · ${esc(p.bhk)} BHK`:""}</p>
    <p>👤 ${esc(p.owner||"Owner")}</p>
    <div class="property-footer">
@@ -809,7 +829,7 @@ function renderProperties(){
 }
 
 function openPropertyModal(property=null){
- document.getElementById("modalTitle").textContent=property?"Edit Property":"Add Rajkot Property";
+ document.getElementById("modalTitle").textContent=property?"Edit Property":"Add Property";
  document.getElementById("modalBody").innerHTML=`
  <form onsubmit="saveProperty(event,${property?property.id:"null"})">
   <div class="form-grid">
@@ -912,7 +932,7 @@ function viewProperty(id){
   <div class="grid2">
    <div class="stat-mini"><strong>Property</strong><p>${esc(p.title)}</p></div>
    <div class="stat-mini"><strong>Price</strong><p>${esc(p.price)}</p></div>
-   <div class="stat-mini"><strong>Location</strong><p>${esc(p.locality)}, Rajkot</p></div>
+   <div class="stat-mini"><strong>Location</strong><p>${esc(p.locality||"")}${p.city?`, ${esc(p.city)}`:""}${p.state?`, ${esc(p.state)}`:""}${p.pincode?` • ${esc(p.pincode)}`:""}</p></div>
    <div class="stat-mini"><strong>Type</strong><p>${esc(p.type)}</p></div>
    <div class="stat-mini"><strong>Purpose</strong><p>${esc(p.purpose)}</p></div>
    <div class="stat-mini"><strong>Area</strong><p>${esc(p.area)}</p></div>
@@ -1633,7 +1653,7 @@ function stopEstateAIRealtime(){
    - social/API connector readiness
    - AI assistant configuration hook
 ========================================================= */
-const ESTATEAI_PRO_VERSION="4.0.0";
+const ESTATEAI_PRO_VERSION="5.0.0";
 let proChannel=null;
 
 function proEnsureArray(){
@@ -1673,7 +1693,7 @@ function proWelcome(){
    <div class="pro-welcome-box">
     <div class="pro-welcome-icon">🏙️</div>
     <h1>Welcome, <span>${esc(name)}</span></h1>
-    <p>EstateAI Rajkot Pro is preparing your command center.</p>
+    <p>EstateAI Pro is preparing your India-wide real-estate command center.</p>
     <div class="pro-welcome-status">
       <span class="pro-pill">✓ Secure Session</span>
       <span class="pro-pill">⚡ Live Sync</span>
@@ -1695,7 +1715,7 @@ function proDashboardEnhance(){
   hero.innerHTML=`
    <div class="pro-hero-grid">
     <div><h2>EstateAI Pro Command Center</h2>
-    <p><span class="pro-live-dot"></span>Live CRM workspace • Rajkot • ${ESTATEAI_PRO_VERSION}</p>
+    <p><span class="pro-live-dot"></span>Live CRM workspace • India • ${ESTATEAI_PRO_VERSION}</p>
     <div class="pro-command">
       <button onclick="showPage('properties')">🏠 <b>Inventory</b><br><small>Manage properties</small></button>
       <button onclick="showPage('leads')">👥 <b>Lead Center</b><br><small>Buyers & sellers</small></button>
@@ -1750,7 +1770,7 @@ async function proReadPhotoFiles(){
 /* Replace property modal with a photo-enabled version. */
 const _openPropertyModal=window.openPropertyModal;
 window.openPropertyModal=async function(property=null){
- document.getElementById("modalTitle").textContent=property?"Edit Property":"Add Rajkot Property";
+ document.getElementById("modalTitle").textContent=property?"Edit Property":"Add Property";
  document.getElementById("modalBody").innerHTML=`
  <form onsubmit="proSaveProperty(event,${property?property.id:"null"})">
   <div class="form-grid">
@@ -1763,7 +1783,10 @@ window.openPropertyModal=async function(property=null){
    <div class="form-group"><label>Price</label><input id="pPrice" required value="${esc(property?.price||"")}" placeholder="₹85 L"></div>
    <div class="form-group"><label>Area</label><input id="pArea" value="${esc(property?.area||"")}" placeholder="1600 Sq Ft"></div>
    <div class="form-group"><label>BHK</label><select id="pBhk"><option value="">N/A</option>${["1","2","3","4","5+"].map(x=>`<option ${property?.bhk===x?"selected":""}>${x}</option>`).join("")}</select></div>
-   <div class="form-group"><label>Locality</label><select id="pLocality">${rajkotAreas().map(x=>`<option ${property?.locality===x?"selected":""}>${x}</option>`).join("")}</select></div>
+   <div class="form-group"><label>State</label><input id="pState" value="${esc(property?.state||"")}" placeholder="Gujarat"></div>
+   <div class="form-group"><label>City</label><input id="pCity" value="${esc(property?.city||"")}" placeholder="Rajkot / Ahmedabad / Mumbai"></div>
+   <div class="form-group"><label>Locality / Area</label><input id="pLocality" value="${esc(property?.locality||"")}" placeholder="Area / locality"></div>
+   <div class="form-group"><label>PIN Code</label><input id="pPincode" inputmode="numeric" maxlength="6" value="${esc(property?.pincode||"")}" placeholder="360001"></div>
    <div class="form-group"><label>Owner / Seller</label><input id="pOwner" value="${esc(property?.owner||"")}" placeholder="Seller name"></div>
    <div class="form-group"><label>Status</label><select id="pStatus"><option ${!property||property.status==="Active"?"selected":""}>Active</option><option ${property?.status==="Sold"?"selected":""}>Sold</option><option ${property?.status==="On Hold"?"selected":""}>On Hold</option></select></div>
    <div class="form-group"><label>Verification</label><select id="pVerified"><option value="yes" ${property?.verified?"selected":""}>Verified</option><option value="no" ${property&&!property.verified?"selected":""}>Unverified</option></select></div>
@@ -1782,8 +1805,9 @@ window.proSaveProperty=async function(e,id){
  const obj={
   id:id||uid(),title:document.getElementById("pTitle").value,type:document.getElementById("pType").value,
   purpose:document.getElementById("pPurpose").value,price:document.getElementById("pPrice").value,
-  area:document.getElementById("pArea").value,bhk:document.getElementById("pBhk").value,city:"Rajkot",
-  locality:document.getElementById("pLocality").value,owner:document.getElementById("pOwner").value,
+  area:document.getElementById("pArea").value,bhk:document.getElementById("pBhk").value,
+  state:document.getElementById("pState")?.value||"",city:document.getElementById("pCity")?.value||"",
+  locality:document.getElementById("pLocality")?.value||"",pincode:document.getElementById("pPincode")?.value||"",owner:document.getElementById("pOwner").value,
   status:document.getElementById("pStatus").value,verified:document.getElementById("pVerified").value==="yes",
   updated:"Just now",notes:document.getElementById("pNotes").value,
   photos:uploaded.length?uploaded:(old?.photos||[])
@@ -1803,7 +1827,7 @@ window.viewProperty=function(id){
   <div class="grid2">
    <div class="stat-mini"><strong>Property</strong><p>${esc(p.title)}</p></div>
    <div class="stat-mini"><strong>Price</strong><p>${esc(p.price)}</p></div>
-   <div class="stat-mini"><strong>Location</strong><p>${esc(p.locality)}, Rajkot</p></div>
+   <div class="stat-mini"><strong>Location</strong><p>${esc(p.locality||"")}${p.city?`, ${esc(p.city)}`:""}${p.state?`, ${esc(p.state)}`:""}${p.pincode?` • ${esc(p.pincode)}`:""}</p></div>
    <div class="stat-mini"><strong>Type</strong><p>${esc(p.type)}</p></div>
    <div class="stat-mini"><strong>Purpose</strong><p>${esc(p.purpose)}</p></div>
    <div class="stat-mini"><strong>Area</strong><p>${esc(p.area)}</p></div>
@@ -2106,5 +2130,170 @@ document.addEventListener("DOMContentLoaded",()=>{
   window.addEventListener('load',()=>setTimeout(()=>pageFx(window.currentPage||'dashboard'),100));
 })();
 </script>
+
+<script id="estateai-india-reliability-v5">
+(function(){
+  "use strict";
+  const V="5.0.0";
+  const RETRIES=6;
+  const BACKOFF=[500,1000,2000,4000,8000,15000];
+  let dirty=false, saving=false, saveQueued=false, lastCloudAt=0, lastError="";
+  let saveVersion=0, activeSaveVersion=0;
+  let online=navigator.onLine;
+  const originalToast=window.toast;
+  function safeToast(m){try{if(typeof originalToast==='function')originalToast(m)}catch(_){} }
+  function statusText(){return online?(dirty?"Saving to cloud…":"Cloud saved") : "Offline — waiting for internet";}
+  function ensureBanner(){
+    let b=document.getElementById('estateaiCloudStatus');
+    if(!b){
+      b=document.createElement('div'); b.id='estateaiCloudStatus';
+      b.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;padding:9px 14px;border-radius:999px;background:#101828;color:#fff;font:600 12px Arial;box-shadow:0 8px 28px #0003;display:none;pointer-events:none';
+      document.body.appendChild(b);
+    }
+    return b;
+  }
+  function setStatus(msg,kind){
+    const b=ensureBanner(); b.textContent=msg;
+    b.style.background=kind==='bad'?'#b42318':kind==='warn'?'#b54708':'#101828';
+    b.style.display='block';
+    clearTimeout(setStatus.t); if(kind==='ok')setStatus.t=setTimeout(()=>b.style.display='none',1800);
+  }
+  window.estateAICloudStatus=()=>({online,dirty,saving,lastCloudAt,lastError,version:V});
+
+  function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+  async function withRetry(fn,label){
+    let last;
+    for(let i=0;i<RETRIES;i++){
+      try{return await fn();}
+      catch(e){last=e; if(i===RETRIES-1)break; await sleep(BACKOFF[i]);}
+    }
+    throw last||new Error(label+' failed');
+  }
+
+  // Cloud is the source of truth. Local browser storage is not used as a CRM database.
+  window.cloudLoadState=async function(userId){
+    if(!userId)throw new Error('Missing authenticated user');
+    const run=()=>estateaiSupabase.from('estateai_state').select('state,updated_at').eq('user_id',userId).maybeSingle();
+    let result;
+    try{ result=await withRetry(async()=>{const r=await run();if(r.error)throw r.error;return r;},'Cloud load'); }
+    catch(e){lastError=e?.message||String(e);setStatus('Cloud load failed — retrying', 'bad');throw e;}
+    const data=result?.data;
+    if(data?.state && typeof data.state==='object'){
+      db={...clone(defaultData),...data.state};
+      proEnsureArray();
+    }else{
+      db=clone(defaultData);proEnsureArray();
+      await window.cloudSaveState(userId);
+    }
+    dirty=false; lastError=""; lastCloudAt=Date.now();
+    setStatus('Cloud data loaded ✓','ok');
+    return db;
+  };
+
+  window.cloudSaveState=async function(userId){
+    if(!userId)return;
+    const myVersion=++saveVersion;
+    // Always snapshot immediately so a later UI mutation cannot change this request's payload.
+    const state=clone(db);
+    state.__estateai={schema:5,app:V,savedAt:new Date().toISOString()};
+    if(!navigator.onLine){dirty=true;setStatus('Offline — cloud save queued','warn');return;}
+    if(myVersion<activeSaveVersion)return;
+    activeSaveVersion=myVersion;saving=true;dirty=true;setStatus('Saving to cloud…','warn');
+    try{
+      await withRetry(async()=>{
+        const r=await estateaiSupabase.from('estateai_state').upsert(
+          {user_id:userId,state,updated_at:new Date().toISOString()},
+          {onConflict:'user_id'}
+        );
+        if(r.error)throw r.error;
+        return r;
+      },'Cloud save');
+      if(myVersion===saveVersion){dirty=false;lastCloudAt=Date.now();lastError="";setStatus('Cloud saved ✓','ok');}
+    }catch(e){
+      lastError=e?.message||String(e); dirty=true;
+      setStatus('Cloud save failed — will retry','bad');
+      throw e;
+    }finally{saving=false;}
+  };
+
+  window.saveDB=function(){
+    if(!currentUser?.auth_id)return;
+    dirty=true;
+    clearTimeout(window.__estateaiCloudTimer);
+    window.__estateaiCloudTimer=setTimeout(()=>window.cloudSaveState(currentUser.auth_id).catch(()=>{}),180);
+  };
+
+  // Safer login: network/Auth errors never leave the user on a broken blank screen.
+  window.login=async function(){
+    const input=document.getElementById('loginUser')?.value.trim()||'';
+    const password=document.getElementById('loginPass')?.value||'';
+    const errorEl=document.getElementById('loginError');
+    errorEl?.classList.add('hidden');
+    if(!input||!password){if(errorEl){errorEl.textContent='Enter your login details.';errorEl.classList.remove('hidden')}return;}
+    try{
+      const email=authEmailFromInput(input);
+      const r=await withRetry(async()=>{
+        const x=await estateaiSupabase.auth.signInWithPassword({email,password});
+        if(x.error)throw x.error; return x;
+      },'Login');
+      if(!r?.data?.user)throw new Error('Login failed');
+      await enterAuthenticatedApp(r.data.user);
+    }catch(e){
+      if(errorEl){errorEl.textContent=online?'Invalid ID/password or account not configured.':'No internet connection. Please reconnect and try again.';errorEl.classList.remove('hidden');}
+      setStatus('Login failed — '+(e?.message||'unknown error'),'bad');
+    }
+  };
+
+  // Do not allow realtime to overwrite unsaved local edits.
+  window.startEstateAIRealtime=function(){
+    if(!currentUser?.auth_id || estateaiRealtimeStartedFor===currentUser.auth_id)return;
+    stopEstateAIRealtime(); estateaiRealtimeStartedFor=currentUser.auth_id;
+    const ch=estateaiSupabase.channel('estateai-live-'+currentUser.auth_id+'-'+Date.now());
+    ch.on('postgres_changes',{event:'*',schema:'public',table:'estateai_state',filter:`user_id=eq.${currentUser.auth_id}`},async payload=>{
+      if(payload.new?.user_id!==currentUser.auth_id)return;
+      if(dirty||saving){return;}
+      try{await window.cloudLoadState(currentUser.auth_id);if(currentUser)showPage(currentPage);}catch(e){}
+    });
+    ch.on('postgres_changes',{event:'*',schema:'public',table:'user_profiles',filter:`id=eq.${currentUser.auth_id}`},async payload=>{
+      const p=payload.new||{};
+      if(p.active===false){safeToast('Your account was disabled by Admin');setTimeout(logout,900);return;}
+      if(p.name){currentUser.name=p.name;updateProfile();}
+      if(p.role){currentUser.role=p.role;buildNav();}
+    });
+    estateaiRealtimeChannel=ch;
+    ch.subscribe(st=>{if(st==='SUBSCRIBED')setStatus('Live cloud sync connected ✓','ok');});
+  };
+
+  // Same-browser tabs must not overwrite an unsaved state.
+  window.proSync=function(){
+    try{
+      if(proChannel)proChannel.close();
+      if('BroadcastChannel' in window){
+        proChannel=new BroadcastChannel('estateai-pro-live-v5');
+        proChannel.onmessage=()=>{if(currentUser&&!dirty&&!saving)window.cloudLoadState(currentUser.auth_id).then(()=>showPage(currentPage)).catch(()=>{});};
+      }
+    }catch(e){}
+  };
+
+  async function flush(){
+    if(currentUser?.auth_id&&dirty&&navigator.onLine){try{await window.cloudSaveState(currentUser.auth_id)}catch(e){}}
+  }
+  window.addEventListener('online',()=>{online=true;setStatus('Internet restored — syncing…','warn');if(currentUser?.auth_id)window.cloudSaveState(currentUser.auth_id).catch(()=>{});});
+  window.addEventListener('offline',()=>{online=false;setStatus('Offline — changes will sync when internet returns','warn');});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush();});
+  window.addEventListener('pagehide',()=>{if(currentUser?.auth_id&&dirty&&navigator.onLine)window.cloudSaveState(currentUser.auth_id).catch(()=>{});});
+  window.addEventListener('error',e=>{console.error(e.error||e.message);});
+  window.addEventListener('unhandledrejection',e=>{console.error(e.reason);});
+
+  // Periodic durability check. It does not reset data.
+  setInterval(()=>{if(currentUser?.auth_id&&dirty&&!saving&&navigator.onLine)window.cloudSaveState(currentUser.auth_id).catch(()=>{});},4000);
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    ensureBanner();
+    setTimeout(()=>{if(currentUser)window.proSync();},600);
+  });
+})();
+</script>
+
 </body>
 </html>
