@@ -462,6 +462,7 @@ const defaultData={
 
 // Cloud-first mode: Supabase Cloud is the source of truth; browser storage is not used for CRM persistence.
 const ESTATEAI_ADMIN_EMAIL="admin@estateai.local";
+const ESTATEAI_ADMIN_EMAIL_ALT="admin@estateai.in";
 const ESTATEAI_ADMIN_ID="1";
 const ESTATEAI_ADMIN_PASSWORD="Krunal@195";
 // Never seed demo CRM records.
@@ -553,17 +554,40 @@ async function login(){
   const errorEl=document.getElementById("loginError");
   errorEl.classList.add("hidden");
   if(!input||!password){ errorEl.textContent="Enter your login details."; errorEl.classList.remove("hidden"); return; }
-  const email=authEmailFromInput(input);
-  const {data,error}=await estateaiSupabase.auth.signInWithPassword({email,password});
-  if(error||!data?.user){ errorEl.textContent="Invalid ID or password."; errorEl.classList.remove("hidden"); return; }
-  await enterAuthenticatedApp(data.user);
+
+  // Admin ID 1 accepts the current .local Auth account and the older .in account
+  // so an existing EstateAI setup does not get locked out after migration.
+  const emails = input==="1"
+    ? [ESTATEAI_ADMIN_EMAIL,ESTATEAI_ADMIN_EMAIL_ALT]
+    : [authEmailFromInput(input)];
+
+  let lastError=null;
+  for(const email of emails){
+    try{
+      const {data,error}=await estateaiSupabase.auth.signInWithPassword({email,password});
+      if(!error && data?.user){
+        await enterAuthenticatedApp(data.user);
+        return;
+      }
+      lastError=error;
+    }catch(e){ lastError=e; }
+  }
+
+  const msg=String(lastError?.message||"").toLowerCase();
+  if(msg.includes("email not confirmed"))
+    errorEl.textContent="Email confirm nahi hua. Supabase Authentication → Users me Admin user ko confirm karo.";
+  else if(msg.includes("invalid login credentials"))
+    errorEl.textContent="Admin ID/password match nahi hua. ID 1 aur password Krunal@195 use karo.";
+  else
+    errorEl.textContent=lastError?.message || "Login failed. Supabase Auth user check karo.";
+  errorEl.classList.remove("hidden");
 }
 async function enterAuthenticatedApp(authUser){
   await cloudLoadState(authUser.id);
   let profile=null;
   const q=await estateaiSupabase.from("user_profiles").select("id,name,email,role,active").eq("id",authUser.id).maybeSingle();
   if(q.error) console.warn(q.error); else profile=q.data;
-  const isAdminUser=authUser.email?.toLowerCase()===ESTATEAI_ADMIN_EMAIL;
+  const isAdminUser=[ESTATEAI_ADMIN_EMAIL,ESTATEAI_ADMIN_EMAIL_ALT].includes(String(authUser.email||"").toLowerCase());
   if(profile?.active===false){ await estateaiSupabase.auth.signOut(); throw new Error("Account disabled"); }
   currentUser={
     auth_id:authUser.id,id:authUser.id,name:profile?.name||authUser.user_metadata?.name||authUser.email.split("@")[0],
