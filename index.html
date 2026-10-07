@@ -29,48 +29,22 @@ tailwind.config={
 .shimmer{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 37%,#f1f5f9 63%);background-size:400% 100%;animation:shim 1.4s ease infinite}
 @keyframes shim{0%{background-position:100% 0}100%{background-position:-100% 0}}
 .reel-gradient{background:linear-gradient(to top,rgba(0,0,0,0.85) 15%, transparent 65%)}
+</style>
 
-/* EstateAI Pro Secure Auth */
-#estateAuth{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 15% 20%,rgba(0,209,160,.16),transparent 35%),radial-gradient(circle at 85% 10%,rgba(255,184,0,.16),transparent 35%),linear-gradient(135deg,#071426,#0A1931 55%,#112555);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
-#estateAuth.auth-hidden{display:none}
-.auth-card{width:min(460px,100%);background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.4);border-radius:28px;box-shadow:0 30px 100px rgba(0,0,0,.35);padding:30px;animation:authIn .6s ease both}
-@keyframes authIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
-.auth-logo{width:52px;height:52px;border-radius:16px;background:#0A1931;color:#FFB800;display:grid;place-items:center;font:900 24px 'Plus Jakarta Sans';box-shadow:0 10px 30px rgba(10,25,49,.25)}
-.auth-title{font:800 25px 'Plus Jakarta Sans';color:#0A1931;margin-top:18px}
-.auth-sub{font-size:13px;color:#64748b;margin-top:5px}
-.auth-label{display:block;font-size:12px;font-weight:800;color:#334155;margin:18px 0 7px}
-.auth-input{width:100%;border:1px solid #dbe3ee;border-radius:14px;padding:13px 14px;font-size:14px;outline:none;transition:.2s;background:#fff}
-.auth-input:focus{border-color:#0A1931;box-shadow:0 0 0 4px rgba(10,25,49,.08);transform:translateY(-1px)}
-.auth-login{width:100%;margin-top:20px;border:0;border-radius:14px;padding:14px;background:#0A1931;color:#fff;font-weight:800;cursor:pointer;transition:.2s}
-.auth-login:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(10,25,49,.25)}
-.auth-login:disabled{opacity:.65;cursor:wait}
-.auth-error{display:none;margin-top:12px;padding:11px 12px;border-radius:12px;background:#fff1f2;border:1px solid #fecdd3;color:#be123c;font-size:12px;font-weight:700}
-.auth-security{margin-top:18px;padding:11px 12px;border-radius:12px;background:#f8fafc;color:#64748b;font-size:11px;line-height:1.5}
-.auth-status{margin-top:10px;text-align:center;font-size:11px;color:#64748b}
+<style id="estateai-cloud-css">
+#estateLogin{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 20%,rgba(0,209,160,.18),transparent 32%),radial-gradient(circle at 80% 80%,rgba(255,184,0,.16),transparent 30%),#071426;}
+#estateLogin .box{width:min(440px,100%);background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.4);border-radius:28px;padding:30px;box-shadow:0 30px 100px rgba(0,0,0,.35)}
+#estateLogin input{width:100%;border:1px solid #dbe3ee;border-radius:14px;padding:13px 14px;margin-top:7px;outline:none}
+#estateLogin input:focus{border-color:#00a98f;box-shadow:0 0 0 4px rgba(0,209,160,.1)}
+#estateLogin button{width:100%;border:0;border-radius:14px;padding:14px;margin-top:16px;background:#0A1931;color:#fff;font-weight:800;cursor:pointer}
+#estateLogin button:disabled{opacity:.6;cursor:wait}
+#estateLogin .err{min-height:20px;margin-top:10px;color:#dc2626;font-size:13px;font-weight:700}
+#estateCloudBadge{position:fixed;right:14px;bottom:14px;z-index:9998;background:#0A1931;color:#fff;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:800;box-shadow:0 8px 30px rgba(0,0,0,.15)}
 </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased">
-
-<!-- Secure Login -->
-<div id="estateAuth">
-  <div class="auth-card">
-    <div class="auth-logo">E</div>
-    <div class="auth-title">EstateAI Pro</div>
-    <div class="auth-sub">Secure India Real Estate CRM</div>
-    <form id="estateLoginForm" autocomplete="on">
-      <label class="auth-label" for="estateLoginId">Admin ID / Email</label>
-      <input id="estateLoginId" class="auth-input" autocomplete="username" placeholder="Enter Admin ID or email" required>
-      <label class="auth-label" for="estateLoginPassword">Password</label>
-      <input id="estateLoginPassword" type="password" class="auth-input" autocomplete="current-password" placeholder="Enter password" required>
-      <button id="estateLoginBtn" class="auth-login" type="submit">🔐 Secure Login</button>
-      <div id="estateLoginError" class="auth-error"></div>
-      <div class="auth-security"><i class="fa-solid fa-shield-halved"></i> Login is verified by Supabase Auth. Passwords are not stored in this HTML. Session tokens are handled by Supabase.</div>
-      <div id="estateAuthStatus" class="auth-status">Checking secure connection…</div>
-    </form>
-  </div>
-</div>
+<div id="estateLogin"><div class="box"><div style="font-size:13px;font-weight:900;letter-spacing:.12em;color:#64748b">ESTATEAI PRO</div><div style="font-size:30px;font-weight:900;color:#0A1931;margin-top:5px">Secure Cloud CRM</div><div style="font-size:13px;color:#64748b;margin:7px 0 22px">Your complete website data is stored in Supabase Cloud.</div><label style="font-size:12px;font-weight:800">Admin ID / Email</label><input id="estateLoginId" value="1" autocomplete="username"><label style="display:block;font-size:12px;font-weight:800;margin-top:14px">Password</label><input id="estateLoginPass" type="password" autocomplete="current-password"><button id="estateLoginBtn" onclick="estateaiLogin()">🔐 Secure Login</button><div id="estateLoginErr" class="err"></div><div style="font-size:11px;color:#64748b;margin-top:12px;line-height:1.5">🔒 Password is verified by Supabase Auth. It is never stored in your CRM database.</div></div></div>
 <div id="estateApp" style="display:none">
-
 <!-- Top Bar -->
 <div class="bg-brand-900 text-white text-xs py-2 px-4 hidden md:flex justify-between items-center">
   <div class="flex items-center gap-6 mx-auto max-w-[1280px] w-full justify-between">
@@ -608,86 +582,71 @@ tailwind.config={
 <!-- Toast -->
 <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-full text-sm font-600 shadow-xl hidden items-center gap-2 z-50"><i class="fa-solid fa-check bg-teal w-6 h-6 rounded-full flex items-center justify-center text-xs"></i><span id="toastMsg">Synced successfully</span></div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-(function(){
-  "use strict";
-  const SUPABASE_URL="https://butmgtzgxllieevzgsqo.supabase.co";
-  const SUPABASE_KEY="sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
-  const ADMIN_EMAIL="admin@estateai.local";
-  const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-  window.estateaiSupabase=sb;
-  const $=id=>document.getElementById(id);
-  const status=$("estateAuthStatus"), error=$("estateLoginError"), btn=$("estateLoginBtn");
-
-  function showError(msg){ error.textContent=msg; error.style.display="block"; }
-  function clearError(){ error.textContent=""; error.style.display="none"; }
-
-  async function enter(user){
-    if(!user) throw new Error("No authenticated user returned.");
-    // Admin is determined server-side by the configured Auth identity.
-    const isAdmin=(user.email||"").toLowerCase()===ADMIN_EMAIL;
-    if(!isAdmin){
-      // Allow future authenticated agents, but do not grant Admin from client input.
-      status.textContent="Authenticated user session detected.";
-    } else status.textContent="Admin identity verified.";
-    $("estateAuth").classList.add("auth-hidden");
-    $("estateApp").style.display="";
-    document.body.dataset.authenticated="true";
-    window.estateaiCurrentUser={id:user.id,email:user.email,role:isAdmin?"Admin":"Agent"};
-    window.dispatchEvent(new CustomEvent("estateai:authenticated",{detail:window.estateaiCurrentUser}));
+const ESTATEAI_SUPABASE_URL='https://butmgtzgxllieevzgsqo.supabase.co';
+const ESTATEAI_SUPABASE_KEY='sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig';
+const ESTATEAI_ADMIN_EMAIL='admin@estateai.local';
+const estateaiSupabase=window.supabase.createClient(ESTATEAI_SUPABASE_URL,ESTATEAI_SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+window.estateaiSupabase=estateaiSupabase;
+window.estateaiCloud={user:null,saving:false,pending:false};
+function estateaiEmail(v){const x=String(v||'').trim();return x==='1'?ESTATEAI_ADMIN_EMAIL:x;}
+function estateaiSetStatus(t){const b=document.getElementById('estateCloudBadge');if(b)b.textContent=t;}
+function estateaiShowError(t){const e=document.getElementById('estateLoginErr');if(e)e.textContent=t||'';}
+async function estateaiSaveCloud(){
+  if(!window.estateaiCloud.user)return;
+  window.estateaiCloud.pending=true;
+  if(window.estateaiCloud.saving)return;
+  window.estateaiCloud.saving=true;
+  while(window.estateaiCloud.pending){
+    window.estateaiCloud.pending=false;
+    const state={version:1,fbEnabled,igEnabled,activeTab,listings,leads,stages,stageColors,savedAt:new Date().toISOString()};
+    const {error}=await estateaiSupabase.from('estateai_state').upsert({user_id:window.estateaiCloud.user.id,state,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    if(error){console.error(error);estateaiSetStatus('☁ Cloud: save retry');setTimeout(()=>{window.estateaiCloud.pending=true;estateaiSaveCloud()},2500);break;}
+    estateaiSetStatus('☁ Cloud: saved');
   }
-
-  async function restore(){
-    try{
-      const r=await sb.auth.getSession();
-      if(r.error) throw r.error;
-      if(r.data.session?.user) await enter(r.data.session.user);
-      else status.textContent="Secure connection ready. Please sign in.";
-    }catch(e){
-      status.textContent="Secure connection unavailable.";
-      console.warn("Auth restore:",e);
-    }
+  window.estateaiCloud.saving=false;
+}
+let estateaiSaveTimer;
+function estateaiScheduleSave(){clearTimeout(estateaiSaveTimer);estateaiSaveTimer=setTimeout(estateaiSaveCloud,350);}
+async function estateaiLoadCloud(){
+  const {data,error}=await estateaiSupabase.from('estateai_state').select('state').eq('user_id',window.estateaiCloud.user.id).maybeSingle();
+  if(error){estateaiSetStatus('☁ Cloud: read error');console.error(error);return;}
+  if(data?.state){
+    const s=data.state;
+    if(Array.isArray(s.listings))listings=s.listings;
+    if(Array.isArray(s.leads))leads=s.leads;
+    if(typeof s.fbEnabled==='boolean')fbEnabled=s.fbEnabled;
+    if(typeof s.igEnabled==='boolean')igEnabled=s.igEnabled;
+    if(typeof s.activeTab==='string')activeTab=s.activeTab;
+  }else{
+    await estateaiSaveCloud();
   }
-
-  $("estateLoginForm").addEventListener("submit",async function(ev){
-    ev.preventDefault(); clearError();
-    const id=$("estateLoginId").value.trim(), pw=$("estateLoginPassword").value;
-    if(!id||!pw){showError("Admin ID/email and password are required.");return;}
-    const email=id==="1"?ADMIN_EMAIL:id;
-    btn.disabled=true; btn.textContent="⏳ Verifying securely…"; status.textContent="Authenticating with Supabase…";
-    try{
-      const r=await sb.auth.signInWithPassword({email,password:pw});
-      if(r.error) throw r.error;
-      await enter(r.data.user);
-      btn.textContent="✓ Login successful";
-    }catch(e){
-      const msg=String(e?.message||"Login failed");
-      let friendly=msg;
-      if(/invalid login credentials/i.test(msg)) friendly="Invalid Admin ID/email or password.";
-      else if(/email not confirmed/i.test(msg)) friendly="Email is not confirmed. In Supabase Auth, confirm this admin account or enable auto-confirm.";
-      else if(/fetch|network|failed to fetch/i.test(msg)) friendly="Internet/Supabase connection problem. Check your internet and try again.";
-      showError(friendly);
-      status.textContent="Login failed — please check your details.";
-      btn.disabled=false; btn.textContent="🔐 Secure Login";
-    }
-  });
-
-  sb.auth.onAuthStateChange((event,session)=>{
-    if(session?.user && event==="SIGNED_IN"){
-      enter(session.user).catch(console.error);
-    }
-  });
-
-  window.estateaiSecureLogout=async function(){
-    await sb.auth.signOut();
-    location.reload();
-  };
-  restore();
-})();
+}
+async function estateaiEnter(user){
+  window.estateaiCloud.user=user;
+  document.getElementById('estateLogin').style.display='none';
+  document.getElementById('estateApp').style.display='block';
+  estateaiSetStatus('☁ Cloud: loading...');
+  await estateaiLoadCloud();
+  document.getElementById('estateCloudBadge').textContent='☁ Cloud: saved';
+  if(typeof renderFeed==='function')renderFeed();
+  if(typeof renderKanban==='function')renderKanban();
+  if(typeof renderProperties==='function')renderProperties();
+}
+async function estateaiLogin(){
+  const btn=document.getElementById('estateLoginBtn');const id=document.getElementById('estateLoginId').value;const pw=document.getElementById('estateLoginPass').value;
+  estateaiShowError(''); if(!pw){estateaiShowError('Password enter karo.');return;}
+  btn.disabled=true;btn.textContent='Signing in...';
+  const {data,error}=await estateaiSupabase.auth.signInWithPassword({email:estateaiEmail(id),password:pw});
+  if(error){estateaiShowError(error.message.includes('Invalid login')?'Invalid ID or password.':error.message);btn.disabled=false;btn.textContent='🔐 Secure Login';return;}
+  await estateaiEnter(data.user);
+}
+async function estateaiLogout(){await estateaiSupabase.auth.signOut();location.reload();}
+window.estateaiLogout=estateaiLogout;
+(async()=>{const {data}=await estateaiSupabase.auth.getSession();if(data.session?.user)await estateaiEnter(data.session.user);})();
+estateaiSupabase.auth.onAuthStateChange(async(event,session)=>{if(event==='SIGNED_OUT')location.reload();});
 </script>
-
 <script>
 // Data
 let fbEnabled = true;
@@ -781,7 +740,7 @@ function toggleSync(platform, el){
   if(platform==='fb') fbEnabled=el.checked;
   if(platform==='ig') igEnabled=el.checked;
   showToast(`${platform==='fb'?'Facebook':'Instagram'} auto-sync ${el.checked?'enabled':'paused'}`);
-  renderFeed();
+  renderFeed(); estateaiScheduleSave();
 }
 
 function renderProperties(){
@@ -834,7 +793,7 @@ function moveLead(name){
   const lead=leads.find(l=>l.name===name);
   if(lead && lead.stage<4){
     lead.stage+=1;
-    renderKanban();
+    renderKanban(); estateaiScheduleSave();
     showToast(`${lead.name} moved to ${stages[lead.stage]}`);
   }
 }
@@ -848,7 +807,7 @@ function addRandomListing(){
   const s=samples[Math.floor(Math.random()*samples.length)];
   const requireApproval=document.getElementById('requireApproval')?.checked;
   listings.unshift({id:Date.now(), source:s.source, title:s.title, price:s.price, loc:s.loc, city:s.city, bhk:s.bhk, area:s.area, img:s.img, views:(Math.floor(Math.random()*30)+5)+'K', likes:Math.floor(Math.random()*2000)+200, time:'just now', status: requireApproval?'draft':'live', tag:s.tag});
-  renderFeed(); renderProperties();
+  renderFeed(); renderProperties(); estateaiScheduleSave();
   showToast(`New ${s.source==='instagram'?'Reel':'Facebook post'} detected → listing ${requireApproval?'drafted':'published'}!`);
   if(!requireApproval) {
     // flash preview
@@ -861,7 +820,7 @@ function addRandomLead(){
   const props=['Bandra 3BHK','Powai 2BHK','Whitefield Villa','Dwarka 1BHK'];
   const n=names[Math.floor(Math.random()*names.length)];
   leads.unshift({name:n, phone:'+91 98*** '+Math.floor(1000+Math.random()*8999), src: Math.random()>0.5?'IG Reel':'Facebook', prop: props[Math.floor(Math.random()*props.length)], city:'Mumbai', stage:0, time:'now', budget:'1-3 Cr'});
-  renderKanban();
+  renderKanban(); estateaiScheduleSave();
   showToast(`New lead ${n} auto-captured from ${Math.random()>0.5?'Instagram DM':'Facebook comment'}`);
 }
 
@@ -888,7 +847,7 @@ function simulateConnect(which){
     if(which==='facebook') fbEnabled=true; else igEnabled=true;
     setTimeout(()=>{ addRandomListing(); },1200);
   }
-  renderFeed();
+  renderFeed(); estateaiScheduleSave();
 }
 
 // Mobile menu
@@ -905,6 +864,6 @@ renderFeed();
 renderKanban();
 renderProperties();
 </script>
-</div>
+</div><div id="estateCloudBadge">☁ Cloud: connecting...</div>
 </body>
 </html>
