@@ -400,6 +400,7 @@ body.ea-social .content:before{content:"◉";position:absolute;right:8%;top:7%;f
 window.ESTATEAI_SUPABASE_URL="https://butmgtzgxllieevzgsqo.supabase.co";
 window.ESTATEAI_SUPABASE_KEY="sb_publishable_lnKzv7qUPKa8HY7wHi-b5A_9X-ucMig";
 window.estateaiSupabase=window.supabase.createClient(window.ESTATEAI_SUPABASE_URL,window.ESTATEAI_SUPABASE_KEY);
+window.ESTATEAI_ADMIN_FUNCTION_URL=window.ESTATEAI_SUPABASE_URL+"/functions/v1/admin-users";
 </script>
 <script>
 /* =========================================================
@@ -553,6 +554,7 @@ async function enterAuthenticatedApp(authUser){
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
   buildNav(); updateProfile(); showPage("dashboard"); setTimeout(proWelcome,120);
+  startEstateAIRealtime();
 }
 async function restoreSession(){
   try{
@@ -561,6 +563,7 @@ async function restoreSession(){
   }catch(e){ console.warn("Session restore failed",e); }
 }
 async function logout(){
+  stopEstateAIRealtime();
   await estateaiSupabase.auth.signOut(); currentUser=null; location.reload();
 }
 
@@ -1584,6 +1587,44 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 /* =========================================================
+   SUPABASE REALTIME CLOUD SYNC
+========================================================= */
+let estateaiRealtimeChannel=null;
+let estateaiRealtimeStartedFor="";
+async function startEstateAIRealtime(){
+  if(!currentUser?.auth_id || estateaiRealtimeStartedFor===currentUser.auth_id)return;
+  stopEstateAIRealtime();
+  estateaiRealtimeStartedFor=currentUser.auth_id;
+  const channelName="estateai-live-"+currentUser.auth_id+"-"+Date.now();
+  const ch=estateaiSupabase.channel(channelName);
+  ch.on("postgres_changes",{event:"*",schema:"public",table:"estateai_state",filter:isAdmin()?undefined:`user_id=eq.${currentUser.auth_id}`},async payload=>{
+    const changedId=payload.new?.user_id||payload.old?.user_id;
+    if(!changedId)return;
+    if(changedId===currentUser.auth_id){
+      try{await cloudLoadState(currentUser.auth_id); if(currentUser)showPage(currentPage); }catch(e){console.warn("Realtime state refresh failed",e);}
+    }
+    if(isAdmin() && currentPage==="masteradmin") renderAdminUsers();
+  });
+  ch.on("postgres_changes",{event:"*",schema:"public",table:"user_profiles",filter:isAdmin()?undefined:`id=eq.${currentUser.auth_id}`},async payload=>{
+    const id=payload.new?.id||payload.old?.id;
+    if(id===currentUser.auth_id){
+      const p=payload.new||{};
+      if(p.active===false){toast("Your account was disabled by Admin");setTimeout(logout,900);return;}
+      currentUser.name=p.name||currentUser.name; currentUser.role=p.role||currentUser.role; updateProfile(); buildNav();
+    }
+    if(isAdmin() && currentPage==="masteradmin") renderAdminUsers();
+  });
+  estateaiRealtimeChannel=ch;
+  ch.subscribe(status=>{
+    if(status==="SUBSCRIBED")console.log("EstateAI Supabase Realtime connected");
+  });
+}
+function stopEstateAIRealtime(){
+  if(estateaiRealtimeChannel){try{estateaiSupabase.removeChannel(estateaiRealtimeChannel);}catch(e){}}
+  estateaiRealtimeChannel=null;estateaiRealtimeStartedFor="";
+}
+
+/* =========================================================
    ESTATEAI PRO EXTENSION
    - authentic welcome animation
    - photo uploads use cloud storage when configured
@@ -1616,7 +1657,7 @@ function proSync(){
   try{
     if("BroadcastChannel" in window){
       proChannel=new BroadcastChannel("estateai-pro-live");
-      proChannel.onmessage=()=>{ db=loadDB(); if(currentUser) showPage(currentPage); };
+      proChannel.onmessage=()=>{ if(currentUser) cloudLoadState(currentUser.auth_id).then(()=>showPage(currentPage)).catch(()=>{}); };
     }
   }catch(e){}
 }
@@ -1888,47 +1929,103 @@ function askAI(){
 
 async function adminCloudUsers(){
   if(!isAdmin()) return [];
-  const {data,error}=await estateaiSupabase.from("user_profiles").select("id,name,email,role,active,updated_at").order("updated_at",{ascending:false});
-  if(error){toast(error.message);return [];} return data||[];
+  const r=await adminCall("list",{});
+  return r?.users||[];
 }
 async function viewUserCloudData(userId){
   if(!isAdmin()) return;
-  const {data,error}=await estateaiSupabase.from("estateai_state").select("state,updated_at").eq("user_id",userId).maybeSingle();
-  if(error){toast(error.message);return;}
-  const st=data?.state||{};
+  const r=await adminCall("view_state",{userId});
+  if(!r?.ok)return;
+  const st=r.state||{};
   document.getElementById("modalTitle").textContent="User Cloud Data";
-  document.getElementById("modalBody").innerHTML=`<div class="kpis">${kpi("🏠","Properties",(st.properties||[]).length,"Cloud")}${kpi("👥","Leads",(st.leads||[]).length,"Cloud")}${kpi("📅","Follow-ups",(st.followups||[]).length,"Cloud")}${kpi("🤝","Deals",(st.deals||[]).length,"Cloud")}</div><div class="card"><pre style="white-space:pre-wrap;max-height:450px;overflow:auto">${esc(JSON.stringify(st,null,2))}</pre></div>`; openModal();
+  document.getElementById("modalBody").innerHTML=`<div class="kpis">${kpi("🏠","Properties",(st.properties||[]).length,"Cloud")}${kpi("👥","Leads",(st.leads||[]).length,"Cloud")}${kpi("📅","Follow-ups",(st.followups||[]).length,"Cloud")}${kpi("🤝","Deals",(st.deals||[]).length,"Cloud")}</div><div class="card"><p style="color:#667085">Last cloud update: ${esc(r.updated_at||"—")}</p><pre style="white-space:pre-wrap;max-height:450px;overflow:auto;margin-top:12px">${esc(JSON.stringify(st,null,2))}</pre></div>`;
+  openModal();
 }
 async function renderAdminUsers(){
-  const users=await adminCloudUsers();
   const box=document.getElementById("adminCloudUsers"); if(!box)return;
-  box.innerHTML=users.map(u=>`<div class="card" style="margin-top:10px;display:flex;justify-content:space-between;gap:10px;align-items:center"><div><strong>${esc(u.name||"User")}</strong><div style="color:#667085;font-size:13px">${esc(u.email)} · ${esc(u.role||"Agent")} · ${u.active===false?"Disabled":"Active"}</div></div><button class="secondary" onclick="viewUserCloudData('${u.id}')">View Cloud Data</button></div>`).join("")||"<div class='card'>No registered users yet.</div>";
+  box.innerHTML='<div class="card">⏳ Loading live cloud users...</div>';
+  const users=await adminCloudUsers();
+  if(!users.length){box.innerHTML='<div class="card">No registered users yet.</div>';return;}
+  box.innerHTML=users.map(u=>`
+   <div class="admin-user-row card" style="margin-top:10px;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap">
+    <div style="min-width:240px;flex:1"><strong>${esc(u.name||"User")}</strong><div style="color:#667085;font-size:13px;margin-top:4px">${esc(u.email||"")} · ${esc(u.role||"Agent")} · ${u.active===false?"Disabled":"Active"}</div><div style="color:#98a2b3;font-size:12px;margin-top:3px">Cloud: ${esc(u.cloud_updated_at||"No CRM data yet")}</div></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="secondary" onclick="viewUserCloudData('${u.id}')">View Data</button>
+      <button class="secondary" onclick="adminEditUser('${u.id}')">Edit</button>
+      <button class="secondary" onclick="adminResetPassword('${u.id}')">Reset Password</button>
+      <button class="secondary" onclick="adminClearUserData('${u.id}')">Clear CRM</button>
+      ${u.role!=="Admin"?`<button class="danger" onclick="adminDeleteUser('${u.id}')">Delete User</button>`:""}
+    </div>
+   </div>`).join("");
+}
+async function adminCall(action,payload={}){
+  if(!isAdmin()){toast("Admin access required");return null;}
+  const {data}=await estateaiSupabase.auth.getSession();
+  const token=data?.session?.access_token;
+  if(!token){toast("Admin session expired");return null;}
+  try{
+    const r=await fetch(window.ESTATEAI_ADMIN_FUNCTION_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({action,...payload})});
+    const out=await r.json().catch(()=>({ok:false,error:"Invalid server response"}));
+    if(!r.ok||out.ok===false){toast(out.error||"Admin action failed");return null;}
+    return out;
+  }catch(e){toast("Admin server unavailable");console.error(e);return null;}
+}
+function openAdminCreateUser(){
+ document.getElementById("modalTitle").textContent="Create Cloud User";
+ document.getElementById("modalBody").innerHTML=`<form onsubmit="return adminCreateUser(event)"><div class="form-grid"><div class="form-group"><label>Full Name</label><input id="auName" required></div><div class="form-group"><label>Email</label><input id="auEmail" type="email" required></div><div class="form-group"><label>Password</label><input id="auPass" type="password" minlength="8" required></div><div class="form-group"><label>Role</label><select id="auRole"><option>Agent</option><option>Admin</option></select></div></div><div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Create Cloud User</button></div></form>`;
+ openModal();
+}
+async function adminCreateUser(e){
+ e.preventDefault();
+ const r=await adminCall("create",{name:document.getElementById("auName").value,email:document.getElementById("auEmail").value,password:document.getElementById("auPass").value,role:document.getElementById("auRole").value});
+ if(r){closeModal();toast("Cloud user created");renderAdminUsers();}
+ return false;
+}
+async function adminEditUser(id){
+ const users=await adminCloudUsers(); const u=users.find(x=>x.id===id); if(!u)return;
+ document.getElementById("modalTitle").textContent="Edit Cloud User";
+ document.getElementById("modalBody").innerHTML=`<form onsubmit="return adminSaveUser(event,'${id}')"><div class="form-grid"><div class="form-group"><label>Name</label><input id="euName" value="${esc(u.name||"")}" required></div><div class="form-group"><label>Email</label><input value="${esc(u.email||"")}" disabled></div><div class="form-group"><label>Role</label><select id="euRole"><option ${u.role==="Agent"?"selected":""}>Agent</option><option ${u.role==="Admin"?"selected":""}>Admin</option></select></div><div class="form-group"><label>Status</label><select id="euActive"><option value="yes" ${u.active!==false?"selected":""}>Active</option><option value="no" ${u.active===false?"selected":""}>Disabled</option></select></div></div><div class="form-actions"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button class="primary">Save Cloud User</button></div></form>`;
+ openModal();
+}
+async function adminSaveUser(e,id){
+ e.preventDefault();
+ const r=await adminCall("update_profile",{userId:id,name:document.getElementById("euName").value,role:document.getElementById("euRole").value,active:document.getElementById("euActive").value==="yes"});
+ if(r){closeModal();toast("Cloud user updated");renderAdminUsers(); if(id===currentUser?.auth_id){await enterAuthenticatedApp((await estateaiSupabase.auth.getUser()).data.user);}}
+ return false;
+}
+async function adminResetPassword(id){
+ const p=prompt("New password (minimum 8 characters):"); if(!p)return;
+ const r=await adminCall("reset_password",{userId:id,password:p}); if(r)toast("Password reset successfully");
+}
+async function adminClearUserData(id){
+ if(!confirm("Clear this user's complete CRM cloud data? This cannot be undone."))return;
+ const r=await adminCall("clear_data",{userId:id}); if(r){toast("User CRM data cleared");renderAdminUsers();}
+}
+async function adminDeleteUser(id){
+ if(!confirm("Delete this user and their cloud data permanently?"))return;
+ const r=await adminCall("delete_user",{userId:id}); if(r){toast("User deleted");renderAdminUsers();}
 }
 
 /* Admin gets the complete operational surface. */
 function proAdminPage(){
  if(!isAdmin())return `<div class="card"><h2>Access denied</h2></div>`;
  return `
- <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>Full control over inventory, leads, users, integrations and data.</p></div>
- <button class="primary" onclick="backupData()">⬇ Backup Everything</button></div>
+ <div class="page-head"><div><h2>🛡️ Master Admin Command Center</h2><p>Full cloud control. Changes sync through Supabase and appear live on connected browsers.</p></div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" onclick="openAdminCreateUser()">＋ Create User</button><button class="primary" onclick="backupData()">⬇ Backup Everything</button></div></div>
  <div class="kpis">
-  ${kpi("🏠","Properties",db.properties.length,"Full control")}
-  ${kpi("👥","Leads",db.leads.length,"Full control")}
-  ${kpi("🌐","Social Inbox",db.socialInbox.length,"Incoming")}
-  ${kpi("👤","Users",db.users.length,"Access control")}
+  ${kpi("🏠","My Properties",db.properties.length,"Cloud")}${kpi("👥","My Leads",db.leads.length,"Cloud")}${kpi("🌐","Social Inbox",db.socialInbox.length,"Live")}${kpi("🛡️","Admin","FULL","Control")}
  </div>
  <div class="grid3">
-  <div class="card"><h3>👥 Users & Roles</h3><p style="color:#667085;margin-top:6px">Create, disable and change roles.</p><button class="secondary" style="margin-top:12px" onclick="openUserModal()">Manage Users</button></div>
-  <div class="card"><h3>🌐 Integrations</h3><p style="color:#667085;margin-top:6px">Social/API/AI connection flags.</p><button class="secondary" style="margin-top:12px" onclick="openConnectorModal()">Configure</button></div>
-  <div class="card"><h3>💾 Data Control</h3><p style="color:#667085;margin-top:6px">Export/import/reset local database.</p><button class="secondary" style="margin-top:12px" onclick="backupData()">Backup</button></div>
+  <div class="card"><h3>👥 User Control</h3><p style="color:#667085;margin-top:6px">Create, disable, role-change, password reset and delete non-Admin users.</p><button class="secondary" style="margin-top:12px" onclick="renderAdminUsers()">Refresh Users</button></div>
+  <div class="card"><h3>☁️ Cloud Control</h3><p style="color:#667085;margin-top:6px">View every user's CRM state stored in Supabase.</p><span class="badge green" style="margin-top:12px">LIVE SYNC</span></div>
+  <div class="card"><h3>⚡ Realtime</h3><p style="color:#667085;margin-top:6px">Cloud changes automatically refresh connected web sessions.</p><span class="badge green" style="margin-top:12px">ACTIVE</span></div>
  </div>
- <div class="card" style="margin-top:18px"><h3>👥 Registered Users & Cloud Data</h3><div id="adminCloudUsers"><div class="card">Loading users...</div></div></div><div class="card" style="margin-top:18px"><h3>Live System Status</h3>
-  <div class="pro-source"><span>Realtime browser sync</span><span class="badge green">ACTIVE</span></div>
-  <div class="pro-source"><span>Photo storage</span><span class="badge green">ACTIVE</span></div>
+ <div class="card" style="margin-top:18px"><h3>👥 All Registered Users</h3><p style="color:#667085;margin-top:5px">Admin-only cloud directory. Passwords are never shown or stored here.</p><div id="adminCloudUsers"><div class="card">Loading live cloud users...</div></div></div>
+ <div class="card" style="margin-top:18px"><h3>🔄 Live System Status</h3>
+  <div class="pro-source"><span>Supabase Cloud State</span><span class="badge green">CONNECTED</span></div>
+  <div class="pro-source"><span>Supabase Realtime</span><span class="badge green">LIVE</span></div>
   <div class="pro-source"><span>Social official API</span><span class="badge ${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"green":"orange"}">${db.settings.integrations.facebook||db.settings.integrations.instagram||db.settings.integrations.google?"CONFIGURED":"REQUIRES API"}</span></div>
-  <div class="pro-source"><span>Secure AI backend</span><span class="badge ${db.settings.integrations.ai?"green":"orange"}">${db.settings.integrations.ai?"CONFIGURED":"REQUIRES BACKEND"}</span></div>
- </div>
- `;
+ </div>`;
 }
 
 /* Add the new pages to the router and nav while preserving all existing pages. */
